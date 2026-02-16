@@ -1,0 +1,656 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, Helvetica, sans-serif;
+  font-style: normal;
+  font-size: 16px;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-style: normal !important;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Launch App button - Golden Casino style */
+.synthwave-laser-button {
+  position: relative;
+  padding: 18px 50px;
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-style: normal;
+  color: #fff8e7;
+  background: linear-gradient(
+    180deg,
+    #8b5a2b 0%,
+    #cd853f 15%,
+    #daa520 30%,
+    #ffd700 50%,
+    #daa520 70%,
+    #cd853f 85%,
+    #8b5a2b 100%
+  );
+  border: 3px solid;
+  border-image: linear-gradient(
+    180deg,
+    #ffd700,
+    #b8860b,
+    #8b6914,
+    #b8860b,
+    #ffd700
+  ) 1;
+  cursor: pointer;
+  letter-spacing: 3px;
+  text-shadow:
+    0 1px 0 #8b4513,
+    0 2px 4px rgba(0, 0, 0, 0.5),
+    0 0 10px rgba(255, 215, 0, 0.5);
+  box-shadow:
+    0 0 15px rgba(255, 215, 0, 0.6),
+    0 0 30px rgba(255, 165, 0, 0.4),
+    0 5px 15px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  border-radius: 8px;
+  z-index: 1;
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.3s ease,
+    filter 0.3s ease;
+}
+
+/* Smaller variant for compact buttons */
+.synthwave-laser-button.synthwave-laser-button--small {
+  padding: 12px 28px;
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+
+/* Golden shimmer animation */
+.synthwave-laser-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    rgba(255, 215, 0, 0.3),
+    transparent
+  );
+  z-index: 2;
+  transform: skewX(-25deg);
+  animation: golden-shimmer 3s infinite;
+}
+
+/* Sparkle overlay */
+.synthwave-laser-button::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.3) 0%, transparent 8%),
+    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.25) 0%, transparent 6%),
+    radial-gradient(circle at 50% 20%, rgba(255, 215, 0, 0.3) 0%, transparent 10%),
+    radial-gradient(circle at 70% 50%, rgba(255, 255, 255, 0.2) 0%, transparent 5%);
+  z-index: 1;
+  pointer-events: none;
+  animation: sparkle-pulse 2s ease-in-out infinite;
+}
+
+@keyframes golden-shimmer {
+  0% {
+    left: -100%;
+  }
+  50%, 100% {
+    left: 150%;
+  }
+}
+
+@keyframes sparkle-pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Golden glow pulse animation for the button */
+@keyframes golden-glow-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 15px rgba(255, 215, 0, 0.6),
+      0 0 30px rgba(255, 165, 0, 0.4),
+      0 5px 15px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 25px rgba(255, 215, 0, 0.8),
+      0 0 50px rgba(255, 165, 0, 0.6),
+      0 0 70px rgba(255, 140, 0, 0.3),
+      0 5px 20px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  }
+}
+
+.synthwave-laser-button {
+  animation: golden-glow-pulse 2.5s ease-in-out infinite;
+}
+
+.synthwave-laser-button:hover {
+  transform: translateY(-3px) scale(1.02);
+  filter: brightness(1.1);
+  box-shadow:
+    0 0 30px rgba(255, 215, 0, 0.9),
+    0 0 60px rgba(255, 165, 0, 0.7),
+    0 0 90px rgba(255, 140, 0, 0.4),
+    0 8px 25px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.synthwave-laser-button:active {
+  transform: scale(0.98);
+  filter: brightness(0.95);
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.7),
+    0 0 40px rgba(255, 165, 0, 0.5),
+    0 3px 10px rgba(0, 0, 0, 0.6),
+    inset 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.synthwave-laser-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  filter: grayscale(30%);
+  animation: none;
+  box-shadow:
+    0 0 10px rgba(255, 215, 0, 0.3),
+    0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+.synthwave-laser-button:disabled::before,
+.synthwave-laser-button:disabled::after {
+  animation: none;
+  opacity: 0.3;
+}
+
+/* Button text wrapper */
+.synthwave-laser-button .button-text {
+  position: relative;
+  z-index: 3;
+  display: block;
+}
+
+/* Checking state - keep button active looking */
+.synthwave-laser-button.is-checking {
+  cursor: wait;
+  opacity: 1;
+  filter: none;
+  animation: golden-glow-pulse 1.5s ease-in-out infinite, checking-pulse 0.8s ease-in-out infinite;
+}
+
+.synthwave-laser-button.is-checking::before {
+  animation: golden-shimmer 1.5s infinite;
+}
+
+@keyframes checking-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* Progress bar container */
+.progress-bar-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 0 0 5px 5px;
+  overflow: hidden;
+  z-index: 10;
+}
+
+/* Progress bar fill with flowing animation */
+.progress-bar-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    #ffd700 20%,
+    #fff8dc 40%,
+    #ffd700 60%,
+    #ffaa00 80%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: progress-flow 1.2s linear infinite;
+  box-shadow: 
+    0 0 10px rgba(255, 215, 0, 0.8),
+    0 0 20px rgba(255, 165, 0, 0.5);
+}
+
+@keyframes progress-flow {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* Alternative: Indeterminate progress bar style */
+.progress-bar-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.6),
+    transparent
+  );
+  animation: progress-shine 1s ease-in-out infinite;
+}
+
+@keyframes progress-shine {
+  0% {
+    left: -50%;
+  }
+  100% {
+    left: 150%;
+  }
+}
+
+/* Checking text animation */
+.synthwave-laser-button.is-checking .button-text {
+  animation: text-pulse 1s ease-in-out infinite;
+}
+
+@keyframes text-pulse {
+  0%, 100% {
+    opacity: 1;
+    text-shadow:
+      0 1px 0 #8b4513,
+      0 2px 4px rgba(0, 0, 0, 0.5),
+      0 0 10px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    opacity: 0.8;
+    text-shadow:
+      0 1px 0 #8b4513,
+      0 2px 4px rgba(0, 0, 0, 0.5),
+      0 0 20px rgba(255, 215, 0, 0.8),
+      0 0 30px rgba(255, 165, 0, 0.5);
+  }
+}
+
+/* Golden Wallet Connect Button */
+.golden-wallet-button {
+  position: relative;
+  min-width: 55px;
+  height: 55px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    180deg,
+    #8b5a2b 0%,
+    #cd853f 15%,
+    #daa520 30%,
+    #ffd700 50%,
+    #daa520 70%,
+    #cd853f 85%,
+    #8b5a2b 100%
+  );
+  border: 3px solid #ffd700;
+  border-radius: 12px;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow:
+    0 0 15px rgba(255, 215, 0, 0.6),
+    0 0 30px rgba(255, 165, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.3s ease,
+    filter 0.3s ease;
+  animation: golden-glow-pulse 2.5s ease-in-out infinite;
+}
+
+.golden-wallet-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    rgba(255, 215, 0, 0.3),
+    transparent
+  );
+  z-index: 2;
+  transform: skewX(-25deg);
+  animation: golden-shimmer 3s infinite;
+}
+
+.golden-wallet-button:hover {
+  transform: translateY(-2px) scale(1.05);
+  filter: brightness(1.1);
+  box-shadow:
+    0 0 25px rgba(255, 215, 0, 0.9),
+    0 0 50px rgba(255, 165, 0, 0.7),
+    0 6px 20px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.golden-wallet-button:active {
+  transform: scale(0.95);
+  filter: brightness(0.95);
+}
+
+/* Connected wallet icon */
+.wallet-connected-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    #ffd700 0%,
+    #ffb700 45%,
+    #d19000 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 0 10px rgba(255, 215, 0, 0.6),
+    0 0 20px rgba(255, 165, 0, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  animation: connected-pulse 2s ease-in-out infinite;
+}
+
+.wallet-connected-icon span {
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes connected-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 10px rgba(255, 215, 0, 0.6),
+      0 0 20px rgba(255, 165, 0, 0.4),
+      inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 15px rgba(255, 215, 0, 0.85),
+      0 0 30px rgba(255, 165, 0, 0.6),
+      0 0 40px rgba(255, 140, 0, 0.35),
+      inset 0 1px 2px rgba(255, 255, 255, 0.4);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+/* Gem animation - blinking and glowing effect */
+@keyframes gemBlink {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 5px rgba(0, 231, 1, 0.8)) drop-shadow(0 0 10px rgba(0, 231, 1, 0.6)) drop-shadow(0 0 20px rgba(0, 231, 1, 0.4));
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    filter: drop-shadow(0 0 10px rgba(0, 231, 1, 1)) drop-shadow(0 0 20px rgba(0, 231, 1, 0.8)) drop-shadow(0 0 30px rgba(0, 231, 1, 0.6));
+    transform: scale(1.05);
+  }
+}
+
+@keyframes gemGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(0, 231, 1, 0.5), 0 0 10px rgba(0, 231, 1, 0.3), inset 0 0 10px rgba(0, 231, 1, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(0, 231, 1, 0.8), 0 0 25px rgba(0, 231, 1, 0.6), inset 0 0 15px rgba(0, 231, 1, 0.4);
+  }
+}
+
+.gem-animation {
+  animation: gemBlink 1.5s ease-in-out infinite;
+}
+
+.gem-glow {
+  animation: gemGlow 2s ease-in-out infinite;
+}
+
+/* Mine animation - pulsing/glowing effect */
+@keyframes minePulse {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.8)) drop-shadow(0 0 10px rgba(255, 0, 0, 0.6));
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    filter: drop-shadow(0 0 10px rgba(255, 0, 0, 1)) drop-shadow(0 0 20px rgba(255, 0, 0, 0.8));
+    transform: scale(1.02);
+  }
+}
+
+@keyframes mineGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5), 0 0 10px rgba(255, 0, 0, 0.3), inset 0 0 10px rgba(255, 0, 0, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.8), 0 0 25px rgba(255, 0, 0, 0.6), inset 0 0 15px rgba(255, 0, 0, 0.4);
+  }
+}
+
+.mine-animation {
+  animation: minePulse 1s ease-in-out infinite;
+}
+
+.mine-glow {
+  animation: mineGlow 1.5s ease-in-out infinite;
+}
+
+/* Probability multiplier explosion animation */
+@keyframes probabilityExplosion {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+    filter: blur(10px);
+  }
+  30% {
+    transform: scale(2) rotate(-90deg);
+    opacity: 0.8;
+    filter: blur(5px);
+  }
+  50% {
+    transform: scale(1.2) rotate(0deg);
+    opacity: 1;
+    filter: blur(2px);
+  }
+  70% {
+    transform: scale(1.1) rotate(10deg);
+    opacity: 1;
+    filter: blur(0px);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+@keyframes fireExplosion {
+  0%, 100% {
+    box-shadow: 
+      0 0 10px rgba(255, 100, 0, 0.8),
+      0 0 20px rgba(255, 150, 0, 0.6),
+      0 0 30px rgba(255, 200, 0, 0.4),
+      0 0 40px rgba(255, 100, 0, 0.3),
+      inset 0 0 20px rgba(255, 100, 0, 0.5);
+  }
+  25% {
+    box-shadow: 
+      0 0 20px rgba(255, 50, 0, 1),
+      0 0 40px rgba(255, 100, 0, 0.8),
+      0 0 60px rgba(255, 150, 0, 0.6),
+      0 0 80px rgba(255, 200, 0, 0.4),
+      inset 0 0 30px rgba(255, 50, 0, 0.7);
+  }
+  50% {
+    box-shadow: 
+      0 0 15px rgba(255, 150, 0, 0.9),
+      0 0 30px rgba(255, 200, 0, 0.7),
+      0 0 45px rgba(255, 250, 0, 0.5),
+      0 0 60px rgba(255, 150, 0, 0.3),
+      inset 0 0 25px rgba(255, 150, 0, 0.6);
+  }
+  75% {
+    box-shadow: 
+      0 0 25px rgba(255, 80, 0, 1),
+      0 0 50px rgba(255, 120, 0, 0.8),
+      0 0 75px rgba(255, 180, 0, 0.6),
+      0 0 100px rgba(255, 220, 0, 0.4),
+      inset 0 0 35px rgba(255, 80, 0, 0.8);
+  }
+}
+
+@keyframes firePulse {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+.probability-slide-in {
+  animation: probabilityExplosion 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  display: inline-block;
+  text-shadow: 
+    0 0 10px rgba(255, 100, 0, 0.8),
+    0 0 20px rgba(255, 150, 0, 0.6),
+    0 0 30px rgba(255, 200, 0, 0.4),
+    0 0 40px rgba(255, 100, 0, 0.3);
+  color: #ffaa00;
+  font-weight: 900;
+  z-index: 2;
+}
+
+.probability-explosion-container {
+  position: relative;
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(255, 100, 0, 0.4) 0%, rgba(255, 200, 0, 0.3) 50%, rgba(255, 100, 0, 0.4) 100%);
+  border: 2px solid rgba(255, 150, 0, 0.8);
+  animation: fireExplosion 0.8s ease-out;
+  box-shadow: 
+    0 0 10px rgba(255, 100, 0, 0.6),
+    0 0 20px rgba(255, 150, 0, 0.4),
+    inset 0 0 15px rgba(255, 200, 0, 0.3);
+}
+
+.probability-explosion-container::before {
+  content: '💥';
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  font-size: 1.5em;
+  animation: firePulse 0.2s ease-in-out infinite;
+  z-index: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 0 5px rgba(255, 100, 0, 0.8));
+}
+
+.probability-explosion-container::after {
+  content: '🔥';
+  position: absolute;
+  bottom: -20px;
+  left: -20px;
+  font-size: 1.3em;
+  animation: firePulse 0.25s ease-in-out infinite 0.1s;
+  z-index: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 0 5px rgba(255, 150, 0, 0.8));
+}

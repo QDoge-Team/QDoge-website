@@ -5,6 +5,8 @@
 /.pnp
 .pnp.*
 .yarn/*
+SECURITY_AUDIT.md
+SETUP_SUMMARY.md
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
