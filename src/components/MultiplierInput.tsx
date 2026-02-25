@@ -5,10 +5,10 @@ type props = { onChange: Function, disabled?: boolean, value: number };
 
 const MultiPlierInput: React.FC<props> = ({ onChange, disabled, value }) => {
     return <div className="mt-2 flex flex-col">
-        <p className={`text-sm ${disabled ? "text-text_1" : "text-[#bdbcbc]"}  font-bold`}>
+        <p className={`text-xs font-mono tracking-wide ${disabled ? "text-gray-600" : "text-gray-400"}`}>
             Target Multiplier
         </p>
-        <div className="flex bg-input_bg rounded overflow-hidden shadow-input">
+        <div className="flex bg-black/60 rounded-lg overflow-hidden border border-cyan-400/15 hover:border-cyan-400/30 transition-colors">
             <Input onChange={onChange} value={value} disabled={disabled} />
             <div className="relative flex">
                 <button
@@ -16,17 +16,17 @@ const MultiPlierInput: React.FC<props> = ({ onChange, disabled, value }) => {
                     onClick={() =>
                         onChange((value / 2).toFixed(2) || "0")
                     }
-                    className={`px-2 text-text_1 w-8 focus:outline-none ${disabled ? "cursor-not-allowed" : "hover:bg-input_hover active:scale-90 transform"}`}
+                    className={`px-2 text-cyan-400/50 w-8 font-mono text-sm focus:outline-none ${disabled ? "cursor-not-allowed" : "hover:bg-cyan-400/10 hover:text-cyan-400 active:scale-90 transform"} transition-colors`}
                 >
                     <DownSvg />
                 </button>
-                <div className="absolute w-[2px] bg-panel left-[50%] top-[20%] bottom-[25%]  transform -translate-x-1/2" />
+                <div className="absolute w-[1px] bg-cyan-400/15 left-[50%] top-[20%] bottom-[25%] transform -translate-x-1/2" />
                 <button
                     onClick={() =>
                         onChange((value * 2).toFixed(2) || "0")
                     }
                     disabled={disabled}
-                    className={`px-2 text-text_1 w-8 focus:outline-none ${disabled ? "cursor-not-allowed" : "hover:bg-input_hover  active:scale-90 transform"}`}
+                    className={`px-2 text-cyan-400/50 w-8 font-mono text-sm focus:outline-none ${disabled ? "cursor-not-allowed" : "hover:bg-cyan-400/10 hover:text-cyan-400 active:scale-90 transform"} transition-colors`}
                 >
                     <UpSvg />
                 </button>

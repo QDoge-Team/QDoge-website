@@ -7,6 +7,7 @@ export interface TokenPrice {
 
 let cachedPrice: TokenPrice | null = null;
 let cacheExpiry = 0;
+let priceFetchFailCount = 0;
 const CACHE_DURATION = 30000; // 30 seconds cache
 
 export const fetchQDogePrice = async (): Promise<TokenPrice> => {
@@ -27,10 +28,18 @@ export const fetchQDogePrice = async (): Promise<TokenPrice> => {
     // Cache the result
     cachedPrice = priceData;
     cacheExpiry = now + CACHE_DURATION;
+    priceFetchFailCount = 0;
     
     return priceData;
-  } catch (error) {
-    console.error("Failed to fetch QDoge price:", error);
+  } catch (error: any) {
+    priceFetchFailCount++;
+    // Only log first failure and every 10th to avoid console spam
+    if (priceFetchFailCount === 1) {
+      const msg = error?.response?.data?.message || error?.message || "Unknown error";
+      console.warn("QDoge price fetch failed (will retry silently):", msg);
+    } else if (priceFetchFailCount % 10 === 0) {
+      console.warn(`QDoge price fetch still failing after ${priceFetchFailCount} attempts`);
+    }
     
     // Return cached price if available, otherwise default to 1
     if (cachedPrice) {

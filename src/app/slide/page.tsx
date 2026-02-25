@@ -10,10 +10,9 @@ import CelebrationAnimations from "@/components/Mine/CelebrationAnimations";
 import useIsMobile from "@/hooks/useIsMobile";
 import SwitchTab from "@/components/SwitchTab";
 import AmountInput from "@/components/AmountInput";
-import { Button } from "@heroui/react";
 import MultiPlierInput from "@/components/MultiplierInput";
 import CurrentBets from "@/components/CurrentBets";
-import Slider, { findTile } from "@/components/Slider";
+import Slider from "@/components/Slider";
 import Layout from "@/layout/layout";
 import GameGuide from "@/components/GameGuide";
 
@@ -724,9 +723,16 @@ const SlideGame = () => {
 
         socketRef.current = s;
 
+        let socketErrorCount = 0;
+
         const handleConnect = () => {
             if (isUnmountingRef.current) return;
-            console.log("[SLIDE] Server connected");
+            if (socketErrorCount > 0) {
+                console.log(`[SLIDE] Server connected after ${socketErrorCount} failed attempt(s)`);
+            } else {
+                console.log("[SLIDE] Server connected");
+            }
+            socketErrorCount = 0;
             if (wallet?.publicKey) {
                 s.emit("auth", { publicId: wallet.publicKey });
             }
@@ -737,6 +743,16 @@ const SlideGame = () => {
         const handleDisconnect = () => {
             if (isUnmountingRef.current) return;
             console.log("[SLIDE] Server disconnected");
+        };
+
+        const handleConnectError = (error: any) => {
+            if (isUnmountingRef.current) return;
+            socketErrorCount++;
+            if (socketErrorCount === 1) {
+                console.warn("[SLIDE] Connection error (will retry silently):", error?.message);
+            } else if (socketErrorCount % 10 === 0) {
+                console.warn(`[SLIDE] Still unable to connect after ${socketErrorCount} attempts`);
+            }
         };
 
         const handleHistory = (data: any) => {
@@ -750,6 +766,7 @@ const SlideGame = () => {
         };
 
         s.on("connect", handleConnect);
+        s.on("connect_error", handleConnectError);
         s.on("disconnect", handleDisconnect);
         s.on("game-join-error", joinFailed);
         s.on("game-join-sucess", joinSuccess);
@@ -831,131 +848,145 @@ const SlideGame = () => {
         statusRef.current = status;
     }, [status]);
 
+    // Helper: get tier class for history pill
+    const getTierClass = (point: number) => {
+        if (point >= 1000) return 'tier-diamond';
+        if (point >= 100) return 'tier-cyan';
+        if (point >= 10) return 'tier-orange';
+        if (point >= 5) return 'tier-blue';
+        if (point >= 2) return 'tier-white';
+        return 'tier-dark';
+    };
+
+    // Helper: is cancel action
+    const isCancel = planedbet && (status === STATUS.PLAYING || status === STATUS.BETTING);
+
     return (
         <Layout>
-            <div className={`h-full ${isMobile ? "w-full p-1" : ""} `}>
-                <div className="grid grid-cols-1 sm:grid-cols-4 rounded-md overflow-hidden  bg-panel border-[1px] border-[#020202bb]  shadow-md h-full">
-                    <div className="col-span-3 flex items-center justify-center">
-                        <div className={`  gap-2 ${isMobile ? "min-h-[350px] " : "min-h-[300px] "
-                            }   relative h-full overflow-hidden flex items-center justify-center`}>
-                            <div className="flex absolute right-1/2 translate-x-1/2 top-5 z-20 w-[300px] space-x-1 items-center">
-                                {history.slice(history.length - 10, history.length).map((h: any, index) => {
-                                    return <Button onClick={() => { }}
-                                        className="p-[3px] w-10  text-sm font-medium text-white"
-                                        key={index}
-                                        style={{
-                                            background: findTile(h.resultpoint).color,
-                                            color: findTile(h.resultpoint).text
-                                        }}>
-                                        {h.resultpoint}x
-                                    </Button>
-                                })}
-                                <Button onClick={() => { }} className="p-[3px] w-10 text-sm font-medium text-white" style={{ background: "#50e3c2" }}>Fairness</Button>
-                            </div>
-                            <div className="w-full h-full flex items-center" >
+            <div className={`h-full ${isMobile ? "w-full p-2" : "p-2 sm:p-4"}`}>
+                <div className="flex flex-col sm:flex-row gap-3 h-full max-w-[1200px] mx-auto">
+
+                    {/* ═══ GAME DISPLAY ═══ */}
+                    <div className="flex-1 game-display flex flex-col">
+                        {/* History row */}
+                        {/* Top bar: JACKPOT title + Join Pot */}
+                        <div className="slide-top-bar">
+                            <div className="slide-jackpot-title">JACKPOT</div>
+                            <button className="join-pot-button" onClick={() => { /* placeholder for join pot action */ }}>
+                                Join Pot
+                            </button>
+                        </div>
+
+                        <div className="slide-history-row m-3 mb-0 flex-wrap">
+                            {history.slice(-8).map((h: any, i: number) => (
+                                <span key={i} className={`slide-history-pill ${getTierClass(h.resultpoint)}`}>
+                                    {h.resultpoint}x
+                                </span>
+                            ))}
+                            <div className="flex-1" />
+                            <button className="slide-fairness-btn" onClick={() => setShowHelp(true)}>
+                                ⚖ Fair
+                            </button>
+                        </div>
+
+                        {/* Slider area */}
+                        <div className={`relative flex-1 flex items-center justify-center ${isMobile ? "min-h-[280px]" : "min-h-[300px]"} overflow-hidden`}>
+                            <div className="w-full h-full flex items-center">
                                 {(() => {
                                     const userHasBet = !!selfPlayerId.current || !!currentPlayerBet || !!savedBet.current || betting || planedbet;
                                     return (
-                                        <Slider 
-                                            multiplier={userHasBet ? result.multiplier : 1} 
-                                            elapsedTime={elapsedTime} 
-                                            numbers={userHasBet ? result.numbers : []} 
+                                        <Slider
+                                            multiplier={userHasBet ? result.multiplier : 1}
+                                            elapsedTime={elapsedTime}
+                                            numbers={userHasBet ? result.numbers : []}
                                         />
                                     );
                                 })()}
                             </div>
-                            <div className="absolute bottom-10 left-5 z-20">
-                                <div className="flex space-x-1 w-20 items-center">
-                                    <div className="w-3 h-3 rounded-full bg-bet_button"></div>
-                                    <div className="text-white text-sm">Bets: {bets.length}</div>
-                                </div>
+                        </div>
+
+                        {/* Bottom bar: bets count + payouts info + round */}
+                        <div className="flex items-center gap-3 px-3 pb-1">
+                            <div className="slide-bets-badge">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-60">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="9" cy="7" r="4"/>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                </svg>
+                                <span>{bets.length} Players</span>
                             </div>
-                            <div className="w-full absolute bottom-0 z-20">
-                                <StatusBar status={status} />
+                            <div className="slide-bets-badge">
+                                <span className="bet-dot" />
+                                <span>Payouts are settled in QU</span>
                             </div>
-                            <div className="absolute z-10 top-0 left-0 w-full h-full" style={{ background: "linear-gradient(90deg,#071824,transparent,#071824)" }} />
+                            <div className="flex-1" />
+                            <div className="slide-bets-badge">
+                                <span className="opacity-60">#</span>
+                                <span>Round: {history.length}</span>
+                            </div>
+                        </div>
+                        <StatusBar status={status} />
+                    </div>
+
+                    {/* ═══ BET PANEL ═══ */}
+                    <div className={`game-panel ${isMobile ? 'w-full' : 'min-w-[280px] xl:min-w-[300px]'} flex flex-col`}>
+                        <div className="game-panel-header">
+                            <div className="flex items-center gap-1.5">
+                                <span className="terminal-dot" style={{background:'#ff5f57'}} />
+                                <span className="terminal-dot" style={{background:'#febc2e'}} />
+                                <span className="terminal-dot" style={{background:'#28c840'}} />
+                            </div>
+                            <span className="flex-1 text-center text-[10px] font-mono text-cyan-400/50 tracking-[3px] uppercase">
+                                🎰 slide
+                            </span>
+                            <button
+                                onClick={() => setShowHelp(true)}
+                                className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-cyan-400/60 border border-cyan-400/15 hover:border-cyan-400/30 hover:text-cyan-400 transition-all"
+                                title="Game Help"
+                            >?</button>
+                        </div>
+
+                        <div className="game-panel-body flex flex-col gap-3 flex-1">
+                            <SwitchTab onChange={setActiveTab} active={activeTab} disabled={disable} />
+                            <AmountInput onChange={setBetAmount} value={betAmount} disabled={disable} />
+                            <MultiPlierInput onChange={setTarget} value={target} disabled={disable} />
+
+                            <button
+                                className={`slide-bet-button ${isCancel ? 'cancel' : ''} ${betting ? 'waiting' : ''}`}
+                                disabled={disable && !isCancel}
+                                onClick={() => {
+                                    if (betting || inputDisable.current) return;
+                                    if (status === STATUS.PLAYING) {
+                                        if (planedbet) {
+                                            savedBet.current = undefined;
+                                            setPlanedBet(false);
+                                        } else {
+                                            createbet();
+                                        }
+                                    } else if (status === STATUS.BETTING) {
+                                        if (planedbet) {
+                                            savedBet.current = undefined;
+                                            setPlanedBet(false);
+                                        } else {
+                                            createbet();
+                                        }
+                                    }
+                                }}
+                            >
+                                {getButtonContent()}
+                            </button>
+
+                            <CurrentBets bets={bets.map((b) => {
+                                if (status === STATUS.PLAYING) {
+                                    return { ...b, isWinner: false };
+                                } else {
+                                    return { ...b, isWinner: result.multiplier > b.target };
+                                }
+                            })} />
                         </div>
                     </div>
-                    {isMobile &&
-                        <div className="col-span-1 p-2 min-h-[560px] bg-sider_panel shadow-[0px_0px_15px_rgba(0,0,0,0.25)] flex flex-col justify-between">
-                            <div className="flex items-center justify-between mb-2">
-                                <h3 className="text-white font-bold">SLIDE</h3>
-                                <Button 
-                                    onClick={() => setShowHelp(true)} 
-                                    className="w-[36px] h-[36px] min-w-[36px] p-0 text-base font-bold text-white bg-[#00e701] hover:bg-[#00d600] rounded-full flex items-center justify-center"
-                                    title="Game Help"
-                                >
-                                    ?
-                                </Button>
-                            </div>
-                            <Button disabled={disable} onClick={() => {
-                                if (betting || inputDisable.current)
-                                    return;
-                                if (status === STATUS.PLAYING) {
-                                    if (planedbet) {
-                                        savedBet.current = undefined;
-                                        setPlanedBet(false);
-                                    } else {
-                                        createbet();
-                                    }
-                                } else if (status === STATUS.BETTING) {
-                                    createbet();
-                                }
-                            }}>{getButtonContent()}
-                            </Button>
-                            <AmountInput onChange={setBetAmount} value={betAmount} disabled={disable} />
-                            <MultiPlierInput onChange={setTarget} value={target} disabled={disable} />
-                            <SwitchTab onChange={setActiveTab} active={activeTab} disabled={disable} />
-                            <CurrentBets bets={bets.map((b) => {
-                                if (status === STATUS.PLAYING) {
-                                    return { ...b, isWinner: false }
-                                } else {
-                                    return { ...b, isWinner: result.multiplier > b.target }
-                                }
-                            })} />
-                        </div>
-                    }
-                    {!isMobile &&
-                        <div className="col-span-1 p-2 min-h-[560px] bg-sider_panel shadow-[0px_0px_15px_rgba(0,0,0,0.25)] flex flex-col gap-4">
-                            <div className="flex items-center gap-4 mb-2 mt-3">
-                                <div className="flex-1 [&>div]:mt-0">
-                                    <SwitchTab onChange={setActiveTab} active={activeTab} disabled={disable} />
-                                </div>
-                                <Button 
-                                    onClick={() => setShowHelp(true)} 
-                                    className="w-[36px] h-[36px] min-w-[36px] p-0 text-base font-bold text-white bg-[#00e701] hover:bg-[#00d600] rounded-full flex-shrink-0 flex items-center justify-center"
-                                    title="Game Help"
-                                >
-                                    ?
-                                </Button>
-                            </div>
-                            <AmountInput onChange={setBetAmount} value={betAmount} disabled={disable} />
-                            <MultiPlierInput onChange={setTarget} value={target} disabled={disable} />
-                            <Button className="bg-[#00e701] hover:bg-[#00d600] rounded-full uppercase font-bold" disabled={disable} onPress={() => {
-                                if (betting || inputDisable.current)
-                                    return;
-                                if (status === STATUS.PLAYING) {
-                                    if (planedbet) {
-                                        savedBet.current = undefined;
-                                        setPlanedBet(false);
-                                    } else {
-                                        createbet();
-                                    }
-                                } else if (status === STATUS.BETTING) {
-                                    createbet();
-                                }
-                            }}>{
-                                    getButtonContent()
-                                }</Button>
-                            <CurrentBets bets={bets.map((b) => {
-                                if (status === STATUS.PLAYING) {
-                                    return { ...b, isWinner: false }
-                                } else {
-                                    return { ...b, isWinner: result.multiplier > b.target }
-                                }
-                            })} />
-                        </div>
-                    }
+
                 </div>
             </div>
             <GameGuide isOpen={showHelp} onClose={() => setShowHelp(false)} gameName="slide" />
@@ -973,8 +1004,9 @@ export default SlideGame;
 const StatusBar = ({ status }: { status: STATUS }) => {
     const time = useRef<number>(-1);
     const [statustime, setstatustime] = useState(0);
+
     useEffect(() => {
-        let interval: any;
+        let interval: ReturnType<typeof setInterval> | undefined;
         switch (status) {
             case STATUS.BETTING:
                 time.current = 2000;
@@ -984,31 +1016,38 @@ const StatusBar = ({ status }: { status: STATUS }) => {
                         time.current--;
                         setstatustime(time.current);
                     }
-                }, 10)
+                }, 10);
                 break;
             case STATUS.PLAYING:
                 time.current = -1;
                 setstatustime(-1);
                 break;
             case STATUS.STARTING:
-                break;
             case STATUS.WAITTING:
                 break;
         }
-        return () => {
-            if (interval) {
-                clearInterval(interval)
-            }
-        }
-    }, [status])
+        return () => { if (interval) clearInterval(interval); };
+    }, [status]);
 
-
-    return <div className="w-full h-2 flex-col justify-between">
-        {statustime === -1 && <></>}
-        {statustime === 0 && <div className="text-white">Starting...</div>}
-        {statustime > 0 && <div className="h-2 bg-cyan-600" style={{
-            width: (100 / 2000) * statustime + "%"
-        }} ></div>}
-    </div >
-
+    return (
+        <div className="slide-status-bar">
+            {statustime === -1 && status === STATUS.WAITTING && (
+                <span className="status-text connecting">Connecting…</span>
+            )}
+            {statustime === -1 && status !== STATUS.WAITTING && (
+                <span className="status-text" style={{ color: 'rgba(0,243,255,0.3)' }}>●●●</span>
+            )}
+            {statustime === 0 && (
+                <span className="status-text">Starting…</span>
+            )}
+            {statustime > 0 && (
+                <>
+                    <div className="progress-fill" style={{ width: `${(statustime / 2000) * 100}%` }} />
+                    <span className="status-text">
+                        Betting {(statustime / 100).toFixed(1)}s
+                    </span>
+                </>
+            )}
+        </div>
+    );
 }

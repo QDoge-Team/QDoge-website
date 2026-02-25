@@ -17,12 +17,12 @@ const StopProfitInput: React.FC<StopProfitInputProps> = ({ value, onChange, disa
 
     return (
         <div className="mt-2">
-            <p className={`text-sm ${disabled ? "text-[#879097]" : "text-white"}`}>
+            <p className={`text-sm font-mono ${disabled ? "text-gray-500" : "text-gray-200"}`}>
                 {label}
             </p>
             <div
-                className={`flex w-full items-center  border-[2px] border-[#2f4553] hover:border-[#557086] ${disabled ? "bg-[#172c38]" : "bg-[#0f212e]"
-                    } rounded-full p-1.5`}
+                className={`flex w-full items-center border border-cyan-400/15 hover:border-cyan-400/30 ${disabled ? "bg-black/40" : "bg-black/60"
+                    } rounded-full p-1.5 transition-colors`}
             >
                 <input
                     disabled={disabled}
@@ -54,8 +54,8 @@ const StopProfitInput: React.FC<StopProfitInputProps> = ({ value, onChange, disa
                             }
                         }
                     }}
-                    className={`${disabled ? "bg-[#172c38]" : "bg-[#0f212e]"
-                        } text-white  w-[90%] flex-1 text-sm focus:outline-none`}
+                    className={`${disabled ? "bg-black/40" : "bg-black/60"
+                        } text-white w-[90%] flex-1 text-sm focus:outline-none font-mono`}
                 />
                 <div className="w-5">
                     <QubSvg />

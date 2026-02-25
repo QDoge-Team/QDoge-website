@@ -193,17 +193,17 @@ const ConnectModal = ({ open, onClose, darkMode }: { open: boolean; onClose: () 
                   >
                     {connected && wallet ? (
                       <div className="space-y-3">
-                        <div className="rounded-lg bg-green-900/30 p-4 border border-green-500/50">
-                          <p className="text-sm text-gray-300 mb-2 font-semibold">✓ Wallet Connected</p>
-                          <p className="text-green-400 font-mono text-xs break-all bg-black/30 p-2 rounded mt-2">
+                        <div className="rounded-lg bg-cyan-400/5 p-4 border border-cyan-400/20">
+                          <p className="text-sm text-gray-300 mb-2 font-semibold font-mono">✓ Wallet Connected</p>
+                          <p className="text-cyan-400 font-mono text-xs break-all bg-black/30 p-2 rounded mt-2">
                             {wallet.publicKey}
                           </p>
                           <p className="text-xs text-gray-400 mt-3">
-                            Connection Type: <span className="text-green-400 uppercase">{wallet.connectType}</span>
+                            Connection Type: <span className="text-cyan-400 uppercase">{wallet.connectType}</span>
                           </p>
                           {wallet.alias ? (
                             <p className="text-xs text-gray-400 mt-1">
-                              Alias: <span className="text-green-400">{wallet.alias}</span>
+                              Alias: <span className="text-cyan-400">{wallet.alias}</span>
                             </p>
                           ) : null}
                         </div>
@@ -259,7 +259,7 @@ const ConnectModal = ({ open, onClose, darkMode }: { open: boolean; onClose: () 
                   >
                     {connected ? (
                       <div className="space-y-3">
-                        <p className="text-green-400">✓ Wallet is already connected!</p>
+                        <p className="text-cyan-400 font-mono">✓ Wallet is already connected!</p>
                         <Button variant="bordered" className="text-white w-full" onPress={() => setSelectedMode("none")}>
                           Back
                         </Button>
@@ -384,16 +384,16 @@ const ConnectModal = ({ open, onClose, darkMode }: { open: boolean; onClose: () 
         isOpen={isDisconnectConfirmOpen} 
         onClose={() => setIsDisconnectConfirmOpen(false)}
       >
-        <div className="p-6 text-white bg-[#1a1a1a] rounded-lg border border-gray-700">
-          <h3 className="text-xl font-bold mb-4">Disconnect Wallet</h3>
-          <p className="text-gray-300 mb-6">
+        <div className="p-6 text-white bg-transparent rounded-xl border border-cyan-400/20">
+          <h3 className="text-xl font-bold font-mono text-cyan-400 mb-4 tracking-wide">Disconnect Wallet</h3>
+          <p className="text-gray-400 text-sm font-mono mb-6 leading-relaxed">
             Disconnect wallet from this application? You can reconnect anytime by clicking 'Connect Wallet'.
           </p>
           <div className="flex gap-3 justify-end">
             <Button 
               variant="bordered" 
               onPress={() => setIsDisconnectConfirmOpen(false)}
-              className="text-white border-gray-600"
+              className="text-white border-cyan-400/30"
             >
               Cancel
             </Button>
