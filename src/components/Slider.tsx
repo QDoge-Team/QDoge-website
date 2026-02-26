@@ -273,18 +273,11 @@ const Slider: React.FC<SliderProps> = ({ multiplier, elapsedTime, numbers = [] }
                                 <div className={`slide-card-icon ${isWinner ? 'winner' : ''}`}>
                                     <div className="relative flex justify-center items-center w-full h-full">
                                         {(isWinner) && <Effect color={tile} />}
-                                        <img src="/assets/image/qdoge-logo-small.png" alt="" className="small-logo" draggable={false} />
-                                        {isIdle ? (
-                                            <span className="slide-card-question">?</span>
-                                        ) : (
-                                            <span className="slide-card-multiplier">
-                                                {Number(number || 1).toFixed(1)}x
-                                            </span>
-                                        )}
+                                        <img src="/assets/image/qdoge_light.png" alt="" className="small-logo" draggable={false} />
                                     </div>
                                 </div>
                                 <span className="slide-card-label">
-                                    {isIdle ? 'Waiting' : `${Number(number || 1).toFixed(2)}x`}
+                                    {`${Number(number || 1).toFixed(2)}x`}
                                 </span>
                                 <span className="slide-card-amount">
                                     <QubicIcon /> 0

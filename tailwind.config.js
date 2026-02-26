@@ -12,10 +12,11 @@ module.exports = {
       },
       backgroundImage: {
         'casino': "url('/assets/image/hero-background.webp')",
-        'mine': "url('/assets/image/mines.png')",
-        'jackport': "url('/assets/image/Jackport.png')",
-        'crash': "url('/assets/image/crashgame.png')",
-        'poker': "url('/assets/image/poker.png')",
+        // simplified game thumbnails without mascot
+        'mine': "url('/assets/image/mine_simple.png')",
+        'jackport': "url('/assets/image/jackpot_simple.png')",
+        'crash': "url('/assets/image/crash_simple.png')",
+        'poker': "url('/assets/image/poker_simple.png')",
       },
       colors: {
         dark: {

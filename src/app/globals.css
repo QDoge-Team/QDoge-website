@@ -1202,8 +1202,8 @@ input[type="number"] {
 }
 
 .slide-card-icon .small-logo {
-  width: 28px;
-  height: 28px;
+  width: 50px;
+  height: 50px;
   object-fit: contain;
   position: absolute;
   z-index: 2;

@@ -136,11 +136,6 @@ export default function Page() {
                                 className="animate-fade-in-up relative" 
                                 style={{ animationDelay: `${idx * 0.1}s` }}
                             >
-                                {room.badge && (
-                                    <span className={`game-card-badge ${room.badge}`}>
-                                        {room.badge}
-                                    </span>
-                                )}
                                 <Card {...room} onClick={handleRoomClick} />
                             </div>
                         ))}
