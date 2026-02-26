@@ -280,7 +280,7 @@ const Slider: React.FC<SliderProps> = ({ multiplier, elapsedTime, numbers = [] }
                                     {`${Number(number || 1).toFixed(2)}x`}
                                 </span>
                                 <span className="slide-card-amount">
-                                    <QubicIcon /> 0
+                                    <QubicIcon />
                                 </span>
                             </div>
                         </div>
