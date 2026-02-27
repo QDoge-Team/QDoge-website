@@ -1606,6 +1606,22 @@ input[type="number"] {
   }
 }
 
+/* ────────── Override react-hot-toast colors ────────── */
+.react-hot-toast {
+  background: #0a0a0a !important;
+  color: #00f3ff !important;
+  border: 1px solid rgba(0,243,255,0.2) !important;
+}
+.react-hot-toast.success,
+.react-hot-toast.error,
+.react-hot-toast.loading {
+  background: #0a0a0a !important;
+  color: #00f3ff !important;
+}
+.react-hot-toast .rt-icon {
+  color: #00f3ff !important;
+}
+
 /* ═══════════════ Responsive ═══════════════ */
 
 @media (prefers-color-scheme: dark) {

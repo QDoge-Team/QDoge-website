@@ -347,15 +347,15 @@ const MineGame: React.FC = () => {
                 duration: 4000,
                 style: {
                     background: '#1a1a1a',
-                    color: '#ffa500',
-                    border: '2px solid #ffa500',
+                    color: '#00f3ff',
+                    border: '2px solid #00f3ff',
                     padding: '16px',
                     fontSize: '16px',
                     fontWeight: 'bold',
                     borderRadius: '8px',
                 },
                 iconTheme: {
-                    primary: '#ffa500',
+                    primary: '#00f3ff',
                     secondary: '#fff',
                 },
             });

@@ -23,9 +23,21 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const toastOptions = useMemo(() => ({
     duration: 4000,
     style: {
-      background: '#1a1a1a',
-      color: '#fff',
+      background: '#0a0a0a',
+      color: '#00f3ff',
     },
+    iconTheme: {
+      primary: '#00f3ff',
+      secondary: '#000000',
+    },
+    success: {
+      style: { background: '#0a0a0a', color: '#00f3ff' },
+      iconTheme: { primary: '#00f3ff', secondary: '#000000' }
+    },
+    error: {
+      style: { background: '#0a0a0a', color: '#00f3ff' },
+      iconTheme: { primary: '#00f3ff', secondary: '#000000' }
+    }
   }), []);
 
   // Pages that actually need the crash socket

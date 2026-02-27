@@ -938,7 +938,7 @@ const CrashGame = () => {
                                     />
 
                                     {isAuto ? (
-                                        <Button className="bg-cyan-400 hover:bg-cyan-300 font-bold uppercase rounded-full"
+                                        <Button className="bg-cyan-400 hover:bg-cyan-300 font-bold uppercase rounded-full px-8 py-4 text-black"
                                             disabled={
                                                 (betting &&
                                                 gameState !== GAME_STATES.InProgress &&
@@ -976,7 +976,7 @@ const CrashGame = () => {
                                         </Button>
                                     ) : (
                                         <Button
-                                            className="bg-cyan-400 hover:bg-cyan-300 font-bold uppercase rounded-full"
+                                            className="bg-cyan-400 hover:bg-cyan-300 font-bold uppercase rounded-full px-8 py-4 text-black"
                                             disabled={joining || !currency?._id}
                                             onClick={() => {
                                                 if (!betting) {
@@ -1030,6 +1030,7 @@ const CrashGame = () => {
                                 </div>
                                 {isAuto ? (
                                     <Button
+                                        className="bg-cyan-400 hover:bg-cyan-300 font-bold uppercase rounded-full px-8 py-4 text-black"
                                         disabled={
                                             (betting &&
                                             gameState !== GAME_STATES.InProgress &&
@@ -1067,6 +1068,7 @@ const CrashGame = () => {
                                     </Button>
                                 ) : (
                                     <Button
+                                        className="bg-cyan-400 hover:bg-cyan-300 font-bold uppercase rounded-full px-8 py-4 text-black"
                                         disabled={joining || !currency?._id}
                                         onClick={() => {
                                             if (!betting) {

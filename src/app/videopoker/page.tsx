@@ -433,7 +433,7 @@ const VideoPoker = () => {
                                     onPress={handleDeal}
                                     disabled={loading}
                                     color="default"
-                                    className="synthwave-laser-button synthwave-laser-button--small mt-5"
+                                    className="synthwave-laser-button synthwave-laser-button--small mt-5 px-8 py-4 text-black"
                                 >
                                     {dealing ? "Deal" : "Bet Again"}
                                 </Button>
@@ -473,7 +473,7 @@ const VideoPoker = () => {
                                         ?
                                     </Button>
                                 </div>
-                                <Button disabled={disabled} onPress={handleDeal} color="success" className="bg-cyan-400 hover:bg-cyan-300 rounded-full uppercase font-bold">
+                                <Button disabled={disabled} onPress={handleDeal} color="success" className="bg-cyan-400 hover:bg-cyan-300 rounded-full uppercase font-bold text-black">
                                     Bet
                                 </Button>
                             </div>
@@ -501,7 +501,7 @@ const VideoPoker = () => {
                                         ?
                                     </Button>
                                 </div>
-                                <Button disabled={disabled} onPress={handleDeal} color="success" className="bg-cyan-400 hover:bg-cyan-300 rounded-full uppercase font-bold">
+                                <Button disabled={disabled} onPress={handleDeal} color="success" className="bg-cyan-400 hover:bg-cyan-300 rounded-full uppercase font-bold px-8 py-4 text-black">
                                     Bet
                                 </Button>
                             </div>
