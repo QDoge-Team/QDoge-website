@@ -79,6 +79,7 @@ export function WalletConnectProvider({ children }: WalletConnectProviderProps) 
       return { uri: uri || "", approve };
     } catch (error) {
       console.error("Failed to connect:", error);
+      toast.error("WalletConnect connection failed. Check console for details.");
       return { uri: "", approve: async () => {} };
     } finally {
       setIsConnecting(false);
@@ -226,6 +227,12 @@ export function WalletConnectProvider({ children }: WalletConnectProviderProps) 
         setSessionTopic("");
         setIsConnected(false);
         localStorage.removeItem("sessionTopic");
+      });
+
+      // watch for transport errors (unauthorized origin etc.)
+      client.on("transport_error", (err: any) => {
+        console.error("WalletConnect transport error:", err);
+        toast.error(`WalletConnect transport error: ${err?.message || err}`);
       });
     }).catch((error) => {
       console.error("WalletConnect init failed:", error);

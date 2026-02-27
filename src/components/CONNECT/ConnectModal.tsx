@@ -240,8 +240,15 @@ const ConnectModal = ({ open, onClose, darkMode }: { open: boolean; onClose: () 
                           <Button
                             color="primary"
                             className="flex items-center justify-center gap-3 w-full"
-                            isDisabled={!walletConnectReady || !!walletConnectError}
                             onPress={async () => {
+                              if (!walletConnectReady) {
+                                toast.error("WalletConnect is initializing. Please wait a moment.");
+                                return;
+                              }
+                              if (walletConnectError) {
+                                toast.error(walletConnectError);
+                                return;
+                              }
                               const ok = await generateURI();
                               if (ok) {
                                 setSelectedMode("walletconnect");
