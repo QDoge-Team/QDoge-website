@@ -1039,7 +1039,7 @@ const MineGame: React.FC = () => {
                         }
                     }}
                     className={`${disabledbtn ? "bg-cyan-400/50" : "bg-cyan-400 hover:bg-cyan-300"
-                        } text-black font-bold py-2 px-4 rounded-full w-full flex  justify-center text-center`}
+                        } slide-bet-button`}
                 >
                     <div className="flex text-nowrap">
                         {status === GAME_STATUS.LIVE

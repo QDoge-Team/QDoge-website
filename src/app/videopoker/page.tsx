@@ -473,7 +473,7 @@ const VideoPoker = () => {
                                         ?
                                     </Button>
                                 </div>
-                                <Button disabled={disabled} onPress={handleDeal} color="success" className="bg-cyan-400 hover:bg-cyan-300 rounded-full uppercase font-bold text-black">
+                                <Button disabled={disabled} onPress={handleDeal} color="success" className="slide-bet-button">
                                     Bet
                                 </Button>
                             </div>

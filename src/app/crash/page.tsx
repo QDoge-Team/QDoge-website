@@ -976,7 +976,7 @@ const CrashGame = () => {
                                         </Button>
                                     ) : (
                                         <Button
-                                            className="bg-cyan-400 hover:bg-cyan-300 font-bold uppercase rounded-full px-8 py-4 text-black"
+                                            className="slide-bet-button"
                                             disabled={joining || !currency?._id}
                                             onClick={() => {
                                                 if (!betting) {

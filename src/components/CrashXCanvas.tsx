@@ -317,15 +317,15 @@ class CrashGameEngine {
 
                 // Draw scale-bar loader animation instead of "waiting..." text
                 if (DISPLAY_PAYOUT === "__LOADING__") {
-                    const panelWidth = 60; // match ruler panel width
-                    const contentWidth = width - panelWidth;
+                    // mimic main PageLoader: wider bars, centered on full canvas
                     const barCount = 5;
-                    const barWidth = Math.max(width * 0.012, 4);
-                    const barMaxH = height * 0.1;
-                    const gap = barWidth * 1.2;
+                    // medium bars for connecting loader
+                    const barWidth = 6; // px
+                    const barMaxH = 16; // px height
+                    const gap = 8; // px gap
                     const totalW = barCount * barWidth + (barCount - 1) * gap;
-                    const startX = (contentWidth - totalW) / 2;
-                    const baseY = height / 2;
+                    const startX = (width - totalW) / 2;  // center across full width
+                    const baseY = height / 2; // vertical centre
                     const now = Date.now();
 
                     for (let i = 0; i < barCount; i++) {
@@ -349,9 +349,9 @@ class CrashGameEngine {
 
                     // "CONNECTING" text below bars
                     ctx.fillStyle = "#00f3ff";
-                    ctx.font = `${Math.max(height * 0.03, 10)}px monospace`;
+                    ctx.font = `${Math.max(height * 0.02, 8)}px monospace`;
                     ctx.letterSpacing = "3px";
-                    ctx.fillText("CONNECTING", contentWidth / 2, baseY + height * 0.02);
+                    ctx.fillText("CONNECTING", width / 2, baseY + height * 0.02);
                     ctx.letterSpacing = "0px";
                 } else {
                     ctx.font = `${height * 0.16}px Unlock`;
