@@ -183,6 +183,30 @@ export function QubicConnectProvider({ children }: QubicConnectProviderProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run once on mount - dispatch is stable from MetaMaskProvider
 
+  // if there was an existing WalletConnect session (signClient) which is connected but our
+  // context hasn't yet marked the wallet as connected, automatically fetch an account
+  // and call our connect() helper so downstream consumers see a valid wallet object.
+  useEffect(() => {
+    if (!connected && walletConnectHook.isConnected) {
+      (async () => {
+        try {
+          const accs = await walletConnectHook.requestAccounts();
+          if (accs && accs.length > 0) {
+            const first = accs[0];
+            connect({
+              connectType: "walletconnect",
+              publicKey: first.address,
+              alias: first.name,
+            });
+            toast.success(`Wallet reconnected: ${first.address.slice(0,8)}...${first.address.slice(-8)}`);
+          }
+        } catch (err) {
+          console.error("Auto-connect from WalletConnect session failed:", err);
+        }
+      })();
+    }
+  }, [connected, walletConnectHook.isConnected, walletConnectHook]);
+
   // Track consecutive balance-fetch failures to throttle logging
   const balanceFetchFailCountRef = useRef(0);
 

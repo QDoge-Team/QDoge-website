@@ -59,15 +59,15 @@ const ConnectModal = ({ open, onClose, darkMode }: { open: boolean; onClose: () 
     exit: { opacity: 0, y: -20 },
   };
 
-  const generateURI = async () => {
-    if (typeof window === 'undefined') return;
+  const generateURI = async (): Promise<boolean> => {
+    if (typeof window === 'undefined') return false;
     if (walletConnectError) {
       toast.error(walletConnectError);
-      return;
+      return false;
     }
     if (!walletConnectReady) {
       toast.error("WalletConnect is still initializing. Please try again in a moment.");
-      return;
+      return false;
     }
     setQrCode("");
     setConnectionURI("");
@@ -83,25 +83,27 @@ const ConnectModal = ({ open, onClose, darkMode }: { open: boolean; onClose: () 
       } catch (error: any) {
         console.error("WalletConnect connect failed:", error);
         toast.error(error?.message || "WalletConnect connect failed");
-        return;
+        return false;
       }
       if (uri) {
         setConnectionURI(uri);
         try {
           const result = await generateQRCode(uri);
           setQrCode(result);
+          // fire approval but don't block the UI, errors will be logged
           approve().catch((error) => {
             console.error("WalletConnect approval failed:", error);
           });
         } catch (error) {
           console.error('Failed to generate QR code:', error);
         }
-        return;
+        return true;
       }
       await new Promise((resolve) => setTimeout(resolve, 500));
     }
 
     toast.error("WalletConnect is not ready yet. Please try again.");
+    return false;
   };
 
   useEffect(() => {
@@ -234,16 +236,26 @@ const ConnectModal = ({ open, onClose, darkMode }: { open: boolean; onClose: () 
                         >
                           <span className="w-32">MetaMask</span>
                         </Button>
-                        <Button
-                          color="primary"
-                          className="flex items-center justify-center gap-3"
-                          onPress={() => {
-                            generateURI();
-                            setSelectedMode("walletconnect");
-                          }}
-                        >
-                          <span className="w-32">Wallet Connect</span>
-                        </Button>
+                        <div className="flex flex-col items-center w-full">
+                          <Button
+                            color="primary"
+                            className="flex items-center justify-center gap-3 w-full"
+                            isDisabled={!walletConnectReady || !!walletConnectError}
+                            onPress={async () => {
+                              const ok = await generateURI();
+                              if (ok) {
+                                setSelectedMode("walletconnect");
+                              }
+                            }}
+                          >
+                            <span className="w-32">Wallet Connect</span>
+                          </Button>
+                          {walletConnectError && (
+                            <p className="text-red-500 text-xs mt-1">
+                              WalletConnect error: {walletConnectError}
+                            </p>
+                          )}
+                        </div>
                       </>
                     )}
                   </motion.div>
@@ -302,7 +314,12 @@ const ConnectModal = ({ open, onClose, darkMode }: { open: boolean; onClose: () 
                     animate="visible"
                     exit="exit"
                   >
-                    Connect your Qubic Wallet. You need to have Qubic Wallet installed and unlocked.
+                    <p className="mb-2">
+                      Connect your Qubic Wallet via WalletConnect. Please ensure the mobile app is installed
+                      and unlocked. The deep link button only works on devices where the <code>qubic-wallet://</code>
+                      protocol is registered (typically mobile). On desktop you can either scan the QR code or
+                      copy the URI below and open it on your phone.
+                    </p>
                     <div className="mt-5 flex flex-col gap-2">
                       <div className="flex min-h-[216px] min-w-[216px] flex-col items-center justify-center">
                         {qrCode ? (
@@ -314,14 +331,46 @@ const ConnectModal = ({ open, onClose, darkMode }: { open: boolean; onClose: () 
                       <Button
                         color="primary"
                         className="flex items-center justify-center gap-3"
-                        onPress={() => window.open(`qubic-wallet://pairwc/${connectionURI}`, "_blank")}
+                        onPress={() => window.open(`qubic-wallet://pairwc/${encodeURIComponent(connectionURI)}`, "_blank")}
                         isDisabled={!connectionURI}
                       >
                         Open in Qubic Wallet
                       </Button>
-                      <Button variant="bordered" className="text-white" onPress={() => setSelectedMode("none")}>
-                        Cancel
-                      </Button>
+                      {connectionURI && (
+                        <>
+                          <p className="text-xs text-gray-500 break-words mt-1">
+                            URI: {connectionURI}
+                          </p>
+                          <Button
+                            variant="bordered"
+                            className="text-white text-xs py-1 px-2 mt-1"
+                            onPress={() => {
+                              navigator.clipboard.writeText(connectionURI).then(() => {
+                                toast.success("Connection URI copied to clipboard");
+                              });
+                            }}
+                          >
+                            Copy URI
+                          </Button>
+                        </>
+                      )}
+                      <div className="flex gap-2 justify-center">
+                        <Button variant="bordered" className="text-white" onPress={() => setSelectedMode("none") }>
+                          Back
+                        </Button>
+                        <Button
+                          variant="bordered"
+                          className="text-white"
+                          onPress={async () => {
+                            const ok = await generateURI();
+                            if (!ok) {
+                              setSelectedMode("none");
+                            }
+                          }}
+                        >
+                          Retry
+                        </Button>
+                      </div>
                     </div>
                   </motion.div>
                 )}
