@@ -15,7 +15,7 @@ const GameBoard = () => {
         if (isChecking) return;
 
         if (!connected || !wallet?.publicKey) {
-            router.push("/landing");
+            router.push("/mine");
             return;
         }
 
@@ -33,7 +33,7 @@ const GameBoard = () => {
             }
 
             if (data.exists) {
-                router.push("/landing");
+                router.push("/mine");
             } else {
                 router.push(`/register?walletId=${walletId}`);
             }
@@ -45,7 +45,7 @@ const GameBoard = () => {
 
             if (isNetworkError) {
                 console.warn("Backend unreachable, proceeding to landing page");
-                router.push("/landing");
+                router.push("/mine");
             } else {
                 toast.error(e?.message || "Server error. Please try again.", { id: "launch-error" });
             }

@@ -49,7 +49,7 @@ function RegisterPageContent() {
       }
 
       toast.success("Registered successfully!", { id: "register-success" });
-      router.push("/landing");
+      router.push("/mine");
     } catch (e: any) {
       toast.error(e?.message || "Registration failed", { id: "register-error" });
     } finally {
