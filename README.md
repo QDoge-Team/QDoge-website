@@ -2,8 +2,6 @@
 
 A Next.js-based Web3 casino gaming platform with **QUBIC token** wallet integration, featuring multiple casino games including Crash, Mines, Slots, and more.
 
-## Features
-
 - 🎰 Multiple casino games (Crash, Slide, Mines, Video Poker, etc.)
 - 🔗 **QUBIC Wallet Integration** (MetaMask Snap, WalletConnect)
 - 🔌 Real-time game updates via Socket.io
@@ -48,7 +46,7 @@ npm --version
    
    Create a `.env.local` file in the root directory:
    ```env
-   NEXT_PUBLIC_API_URL=https://casino.qdogeonqubic.com
+   NEXT_PUBLIC_API_URL=https://casino.truebliss.dev
    ```
    
    **Note:** If you're running a local backend, update the URL:

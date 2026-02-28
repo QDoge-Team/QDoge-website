@@ -80,7 +80,7 @@ export default function Modal({ isOpen, children, onClose, className }: ModalPro
         >
             <div
                 ref={contentRef}
-                className={`relative z-[2147483647] bg-black/95 backdrop-blur-xl border border-cyan-400/20 w-[400px] max-w-[90vw] rounded-xl shadow-2xl shadow-cyan-400/5 ${className || ''}`}
+                className={`relative z-[2147483647] bg-white w-[400px] max-w-[90vw] rounded-lg shadow-2xl ${className || ''}`}
                 onClick={(e) => e.stopPropagation()}
                 onMouseDown={(e) => e.stopPropagation()}
                 onPointerDown={(e) => e.stopPropagation()}

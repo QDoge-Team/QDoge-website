@@ -16,11 +16,11 @@ export const DefaultAvatar = () => {
 const CurrentBets = ({ bets }: { bets: any[] }) => {
     return (
         <div className="mt-5">
-            <div className="h-[250px] overflow-y-auto bg-black/60 backdrop-blur-sm border border-cyan-400/10 rounded-lg">
+            <div className="h-[250px] overflow-y-auto bg-panel  rounded-sm ">
                 {bets.map((row, index) => (
                     <div
                         key={index}
-                        className={`flex px-3 py-1.5 items-center hover:bg-cyan-400/5 justify-between transition-colors ${index % 2 === 0 ? "bg-black/20" : ""}`}
+                        className={`flex px-3 py-1.5 items-center hover:bg-[#29374793] justify-between ${index % 2 === 0 ? "bg-opacity-10" : ""}`}
                     >
                         <div className="flex items-center w-3/5">
                             {!row?.avatar ? (
@@ -34,11 +34,11 @@ const CurrentBets = ({ bets }: { bets: any[] }) => {
                                     className="w-8 h-8 rounded-full"
                                 />
                             )}
-                            <div className="text-xs px-1 font-[14px] text-gray-300 max-w-sm overflow-hidden text-ellipsis whitespace-nowrap font-mono">
+                            <div className="text-xs px-1 font-[14px] text-white max-w-sm overflow-hidden text-ellipsis whitespace-nowrap ">
                                 {row.name || row.playerID}
                             </div>
                         </div>
-                        <div className="text-xs text-center text-cyan-400/80 font-bold font-mono">
+                        <div className="text-xs text-center text-stone-200 font-bold">
                             {row?.stoppedAt
                                 ? `${row?.stoppedAt?.toFixed(2)}x`
                                 : `${row.target}x`}
@@ -48,7 +48,7 @@ const CurrentBets = ({ bets }: { bets: any[] }) => {
                                 <CurrencyIcon />
                             </div>
                             <span
-                                className={`text-xs px-1 font-mono ${row.stoppedAt ? "text-cyan-400" : "text-gray-400"
+                                className={`text-xs px-1 ${row.stoppedAt ? "text-green-600" : "text-stone-100"
                                     } font-bold`}
                             >{`${row.stoppedAt
                                 ? Math.floor((row.stoppedAt / 100) * row.betAmount)

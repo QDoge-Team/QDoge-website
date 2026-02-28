@@ -25,7 +25,7 @@ if %errorlevel% neq 0 (
 echo.
 echo Creating .env.local file...
 if not exist .env.local (
-    echo NEXT_PUBLIC_API_URL=https://casino.qdogeonqubic.com > .env.local
+    echo NEXT_PUBLIC_API_URL=https://casino.truebliss.dev > .env.local
     echo .env.local file created!
 ) else (
     echo .env.local already exists, skipping...

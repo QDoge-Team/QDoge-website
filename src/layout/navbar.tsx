@@ -12,7 +12,6 @@ import {
     Link,
     Button,
 } from "@heroui/react";
-import { usePathname } from "next/navigation";
 import { MenuList } from "@/components/Sidebar/menulist";
 import { useQubicConnect } from "@/components/CONNECT/QubicConnectContext";
 import ConnectModal from "@/components/CONNECT/ConnectModal";
@@ -24,7 +23,6 @@ const CustomNavbar = () => {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const [isDisconnectModalOpen, setIsDisconnectModalOpen] = React.useState(false);
     const [isWithdrawModalOpen, setIsWithdrawModalOpen] = React.useState(false);
-    const pathname = usePathname();
 
     const { connected, wallet, disconnect, showConnectModal, toggleConnectModal, walletBalances } = useQubicConnect();
 
@@ -32,11 +30,6 @@ const CustomNavbar = () => {
         if (str.length <= 8) return str;
         return `${str.slice(0, 4)}...${str.slice(-4)}`;
     }
-
-    // Get current page name for breadcrumb
-    const currentPage = pathname.split("/").pop() || "home";
-    const pageTitle = MenuList.find(m => m.path === currentPage)?.title || 
-                      (currentPage === "landing" ? "Lobby" : currentPage.charAt(0).toUpperCase() + currentPage.slice(1));
 
     const handleDisconnect = async () => {
         await disconnect();
@@ -46,158 +39,113 @@ const CustomNavbar = () => {
     return (
         <Navbar isBordered isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen} classNames={
             {
-                base: "sm:backdrop-blur-xl h-[64px] bg-black/80 backdrop-blur-xl text-white border-b border-cyan-400/10 shadow-[0_1px_30px_rgba(0,0,0,0.5)]",
+                base: "sm:backdrop-blur-none h-[74px] bg-black text-white shadow-md",
             }
         }>
             <NavbarContent className="sm:hidden" justify="start">
-                <NavbarMenuToggle aria-label={isMenuOpen ? "Close menu" : "Open menu"} className="text-cyan-400" />
+                <NavbarMenuToggle aria-label={isMenuOpen ? "Close menu" : "Open menu"} />
             </NavbarContent>
 
             <NavbarContent className="sm:hidden pr-3" justify="center">
                 <NavbarBrand>
                     <img
-                        src="/assets/image/qdoge-logo-small.png"
+                        src="/assets/image/logo.png"
                         alt="QDoge Casino"
-                        className="h-8 w-auto border border-cyan-400/30 rounded-full shadow-[0_0_12px_rgba(0,243,255,0.15)]"
+                        className="h-8 w-auto"
                     />
-                    <span className="ml-2 text-cyan-400 font-mono text-xs tracking-[0.15em]">QDOGE</span>
                 </NavbarBrand>
             </NavbarContent>
 
-            <NavbarContent className="hidden sm:flex gap-6" justify="center">
-                <NavbarBrand className="gap-3">
+            <NavbarContent className="hidden sm:flex gap-4" justify="center">
+                <NavbarBrand>
                     <img
-                        src="/assets/image/qdoge-logo-small.png"
+                        src="/assets/image/logo.png"
                         alt="QDoge Casino"
-                        className="h-8 w-auto border border-cyan-400/25 rounded-full shadow-[0_0_15px_rgba(0,243,255,0.1)] transition-shadow hover:shadow-[0_0_20px_rgba(0,243,255,0.25)]"
+                        className="h-8 w-auto"
                     />
-                    <div className="flex flex-col">
-                        <span className="text-cyan-400 font-mono text-xs tracking-[0.2em] leading-none">QDOGE<span className="text-gray-600">::</span><span className="text-gray-500">CASINO</span></span>
-                        {/* Breadcrumb */}
-                        <div className="nav-breadcrumb mt-0.5">
-                            <span>home</span>
-                            <span className="separator">/</span>
-                            <span className="current">{pageTitle.toLowerCase()}</span>
-                        </div>
-                    </div>
                 </NavbarBrand>
+                {/* <NavbarItem>
+                    <Link color="foreground" href="#">
+                        Features
+                    </Link>
+                </NavbarItem>
+                <NavbarItem isActive>
+                    <Link aria-current="page" href="#">
+                        Customers
+                    </Link>
+                </NavbarItem>
+                <NavbarItem>
+                    <Link color="foreground" href="#">
+                        Integrations
+                    </Link>
+                </NavbarItem> */}
             </NavbarContent>
 
             <NavbarContent justify="end">
                 <NavbarItem>
                     {connected && wallet ? (
                         <div className="flex items-center gap-2">
-                            {/* Balance display */}
-                            <div className="hidden sm:flex items-center gap-3 mr-1 px-4 py-2 rounded-xl bg-black/60 border border-cyan-400/10">
-                                <div className="flex flex-col items-end">
-                                    <p className="text-[9px] text-gray-500 font-mono tracking-[0.2em] leading-none">BALANCE</p>
-                                    <p className="text-sm font-bold text-white font-mono mt-0.5">
-                                        {walletBalances.qubic.toLocaleString()} <span className="text-cyan-400/40 text-[10px]">QUBIC</span>
-                                    </p>
-                                </div>
-                                <div className="w-[1px] h-6 bg-cyan-400/10" />
-                                <div className="flex flex-col items-end">
-                                    <p className="text-[9px] text-gray-500 font-mono tracking-[0.2em] leading-none">QDOGE</p>
-                                    <p className="text-sm font-bold text-white font-mono mt-0.5">
-                                        {walletBalances.qdoge.toLocaleString()} <span className="text-purple-400/40 text-[10px]">QDG</span>
-                                    </p>
-                                </div>
+                            <div className="flex flex-col items-end mr-2">
+                                <p className="text-xs text-gray-400">Balance</p>
+                                <p className="text-sm font-bold text-white">
+                                    {walletBalances.qubic.toLocaleString()} QUBIC
+                                </p>
                             </div>
-                            {/* Wallet address */}
-                            <button 
-                                className="cyber-button !py-1.5 !px-3 !text-[10px] !tracking-wider !rounded-lg"
-                                onClick={() => toggleConnectModal()}
+                            <Button 
+                                color="success" 
+                                variant="flat" 
+                                className="border border-success-500 text-white hover:bg-success-500/20" 
+                                onPress={() => toggleConnectModal()}
                             >
-                                <span className="font-mono">{truncateMiddle(wallet.publicKey)}</span>
-                            </button>
-                            {/* Withdraw */}
-                            <button 
-                                className="cyber-button cyber-button--secondary !py-1.5 !px-3 !text-[10px] !rounded-lg hidden sm:inline-flex !tracking-wider"
-                                onClick={() => setIsWithdrawModalOpen(true)}
+                                {truncateMiddle(wallet.publicKey)}
+                            </Button>
+                            <Button 
+                                color="primary" 
+                                variant="flat" 
+                                size="sm"
+                                className="border border-primary-500 text-white hover:bg-primary-500/20 font-semibold" 
+                                onPress={() => setIsWithdrawModalOpen(true)}
                             >
-                                WITHDRAW
-                            </button>
-                            {/* Disconnect */}
-                            <button 
-                                className="hidden sm:inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 hover:border-red-500/30 transition-all text-xs"
-                                onClick={() => setIsDisconnectModalOpen(true)}
+                                Withdraw
+                            </Button>
+                            <Button 
+                                color="danger" 
+                                variant="flat" 
+                                size="sm"
+                                className="border border-red-500 text-white hover:bg-red-500/20 font-semibold" 
+                                onPress={() => setIsDisconnectModalOpen(true)}
                             >
-                                ✕
-                            </button>
+                                Disconnect
+                            </Button>
                         </div>
                     ) : (
-                        <button 
-                            className="cyber-button !text-xs !tracking-[0.15em] !rounded-lg"
-                            onClick={() => toggleConnectModal()}
+                        <Button 
+                            color="primary" 
+                            variant="flat" 
+                            className="border border-primary-500 text-white hover:bg-primary-500 font-semibold" 
+                            onPress={() => toggleConnectModal()}
                         >
-                            <span className="mr-1.5 text-sm">⟁</span> CONNECT
-                        </button>
+                            Connect Wallet
+                        </Button>
                     )}
                 </NavbarItem>
             </NavbarContent>
 
-            <NavbarMenu className="bg-black/95 backdrop-blur-xl px-6 pt-8 flex flex-col items-center justify-start gap-2 border-t border-cyan-400/10">
-                {/* Mobile balance */}
-                {connected && wallet && (
-                    <div className="w-full max-w-sm mb-4 p-4 rounded-xl bg-black/60 border border-cyan-400/10">
-                        <div className="flex items-center justify-between mb-3">
-                            <p className="text-[9px] text-gray-500 font-mono tracking-[0.2em]">WALLET BALANCE</p>
-                            <div className="network-status">
-                                <span className="dot" />
-                                <span>LIVE</span>
-                            </div>
-                        </div>
-                        <div className="flex gap-4">
-                            <div>
-                                <p className="text-lg font-bold text-white font-mono">{walletBalances.qubic.toLocaleString()}</p>
-                                <p className="text-[9px] text-cyan-400/50 font-mono tracking-widest">QUBIC</p>
-                            </div>
-                            <div className="w-[1px] bg-cyan-400/10" />
-                            <div>
-                                <p className="text-lg font-bold text-white font-mono">{walletBalances.qdoge.toLocaleString()}</p>
-                                <p className="text-[9px] text-purple-400/50 font-mono tracking-widest">QDOGE</p>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Game menu cards */}
-                <div className="w-full max-w-sm space-y-1">
-                    {MenuList.map((item, index) => (
-                        <NavbarMenuItem key={`${item.path}-${index}`}>
-                            <Link
-                                className={`sidebar-menu-item w-full ${pathname.endsWith(item.path) ? "active" : ""}`}
-                                href={item.path}
-                                size="lg"
-                                onPress={() => setIsMenuOpen(false)}
-                            >
-                                <span className="menu-icon">{item.icon}</span>
-                                <span className="menu-text">
-                                    <span className="menu-title">{item.title}</span>
-                                    <span className="menu-desc">{item.desc}</span>
-                                </span>
-                            </Link>
-                        </NavbarMenuItem>
-                    ))}
-                </div>
-
-                {/* Mobile actions */}
-                {connected && wallet && (
-                    <div className="flex gap-2 mt-4 w-full max-w-sm">
-                        <button 
-                            className="cyber-button cyber-button--secondary flex-1 !text-[10px] !tracking-wider"
-                            onClick={() => { setIsWithdrawModalOpen(true); setIsMenuOpen(false); }}
+            <NavbarMenu className="bg-dark-900/20 px-12 flex flex-col items-center justify-center gap-4">
+                {MenuList.map((item, index) => (
+                    <NavbarMenuItem key={`${item}-${index}`} className="w-1/2 bg-dark-500 py-2 px-4 rounded-lg">
+                        <Link
+                            className="text-white w-full hover:text-success-500"
+                            color={
+                                "foreground"
+                            }
+                            href={item.path}
+                            size="lg"
                         >
-                            WITHDRAW
-                        </button>
-                        <button 
-                            className="cyber-button cyber-button--danger flex-1 !text-[10px] !tracking-wider"
-                            onClick={() => { setIsDisconnectModalOpen(true); setIsMenuOpen(false); }}
-                        >
-                            DISCONNECT
-                        </button>
-                    </div>
-                )}
+                            {item.title}
+                        </Link>
+                    </NavbarMenuItem>
+                ))}
             </NavbarMenu>
             <ConnectModal open={showConnectModal} onClose={() => toggleConnectModal(false)} />
             <WithdrawModal open={isWithdrawModalOpen} onClose={() => setIsWithdrawModalOpen(false)} />
@@ -207,40 +155,29 @@ const CustomNavbar = () => {
                 isOpen={isDisconnectModalOpen} 
                 onClose={() => setIsDisconnectModalOpen(false)}
             >
-                <div className="game-panel w-full max-w-md">
-                    <div className="game-panel-header">
-                        <div className="dots">
-                            <span className="dot dot-r" />
-                            <span className="dot dot-y" />
-                            <span className="dot dot-g" />
-                        </div>
-                        <span className="panel-title">Disconnect</span>
-                    </div>
-                    <div className="game-panel-body">
-                        <div className="flex items-center gap-3 mb-4">
-                            <span className="text-red-400 text-xl">⚠</span>
-                            <h3 className="text-base font-mono text-white tracking-wide">Disconnect Wallet</h3>
-                        </div>
-                        <p className="text-gray-500 text-xs font-mono mb-6 leading-relaxed">
-                            Are you sure you want to disconnect your wallet? You can reconnect at any time.
-                        </p>
-                        <div className="flex gap-3 justify-end">
-                            <button 
-                                className="cyber-button cyber-button--secondary !text-xs !py-2 !px-5"
-                                onClick={() => setIsDisconnectModalOpen(false)}
-                            >
-                                Cancel
-                            </button>
-                            <button 
-                                className="cyber-button cyber-button--danger !text-xs !py-2 !px-5"
-                                onClick={async () => {
-                                    await disconnect();
-                                    setIsDisconnectModalOpen(false);
-                                }}
-                            >
-                                Disconnect
-                            </button>
-                        </div>
+                <div className="p-6 text-white bg-[#1a1a1a] rounded-lg border border-gray-700 w-full max-w-md">
+                    <h3 className="text-xl font-bold mb-4">Disconnect Wallet</h3>
+                    <p className="text-gray-300 mb-6">
+                        Are you sure you want to disconnect your wallet? You can reconnect anytime by clicking 'Connect Wallet'.
+                    </p>
+                    <div className="flex gap-3 justify-end">
+                        <Button 
+                            variant="bordered" 
+                            onPress={() => setIsDisconnectModalOpen(false)}
+                            className="text-white border-gray-600"
+                        >
+                            Cancel
+                        </Button>
+                        <Button 
+                            color="danger" 
+                            onPress={async () => {
+                                await disconnect();
+                                setIsDisconnectModalOpen(false);
+                            }}
+                            className="text-white"
+                        >
+                            Disconnect
+                        </Button>
                     </div>
                 </div>
             </Modal>

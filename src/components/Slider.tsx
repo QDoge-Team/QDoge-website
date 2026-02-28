@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useRef, useState } from "react";
 import useIsMobile from "../hooks/useIsMobile"
+import { Image as HImage } from "@heroui/react";
 
 const AUDIO_ENABLED = false;
 
@@ -20,17 +21,25 @@ const Effect: React.FC<any> = ({ color }) => {
         if (!AUDIO_ENABLED) return;
         if (color && color.audio && !audioPlayedRef.current) {
             const audio = color.audio;
+            // Reset audio to beginning if it was already played
             if (audio.currentTime > 0) {
                 audio.currentTime = 0;
             }
+            
+            // Play audio muted initially
             audio.muted = true;
             audio.play().then(() => {
+                // Unmute after a small delay
                 setTimeout(() => {
                     audio.muted = false;
                 }, 1000);
                 audioPlayedRef.current = true;
-            }).catch(() => {});
+            }).catch(() => {
+                // Silently handle autoplay errors - this is expected behavior
+                // Don't log to avoid console spam
+            });
         }
+        
         return () => {
             audioPlayedRef.current = false;
         };
@@ -91,202 +100,115 @@ const Effect: React.FC<any> = ({ color }) => {
     return <div className="absolute w-full h-full left-0 top-0 z-20" ref={canvasRef} />;
 };
 
-/* ─── Currency icon (Qubic logo inline) ─── */
-const QubicIcon = () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="inline-block">
-        <rect x="2" y="2" width="20" height="20" rx="4" fill="#00f3ff" fillOpacity="0.15" stroke="#00f3ff" strokeWidth="1.5" strokeOpacity="0.5" />
-        <text x="12" y="17" textAnchor="middle" fill="#00f3ff" fontSize="13" fontWeight="bold" fontFamily="monospace">≡</text>
-    </svg>
-);
-
 const Slider: React.FC<SliderProps> = ({ multiplier, elapsedTime, numbers = [] }) => {
+    const sliderRef = useRef<HTMLDivElement | null>(null);
     const [displayNumbers, setDisplayNumbers] = useState<number[]>([]);
     const isMobile = useIsMobile();
-    const isIdle = !numbers.length || !multiplier;
 
-    const [animationEnded, setAnimationEnded] = useState<boolean>(false);
-
-    // radius for 3D placement
-    const radius = 300;
-
-    // Generate idle placeholder cards when no game data is available
-    useEffect(() => {
-        if (!numbers.length || !multiplier) {
-            const placeholders = Array.from({ length: 30 }, () => {
-                const vals = [1.0, 1.2, 1.5, 2.0, 3.0, 5.0, 8.0, 10.0, 15.0, 20.0];
-                return vals[Math.floor(Math.random() * vals.length)];
-            });
-            setDisplayNumbers(placeholders);
-            setAnimationEnded(false);
-            return;
-        }
-    }, [numbers.length, multiplier]);
+    const [animationEnded, setAnimationEnded] = useState<boolean>(false); // New state to track animation end
 
     useEffect(() => {
+        // Check if numbers is an array  
         if (!numbers.length || !multiplier) {
             return;
         }
-        const fixedIndex = 70;
-        let updatedNumbers = [...numbers];
+        // Insert the multiplier into the numbers array at a fixed position
+        const fixedIndex = 70; // Fixed index where the multiplier will be inserted
+        let updatedNumbers = [...numbers]; // Create a copy to avoid mutating the original array
 
         if (!updatedNumbers.includes(multiplier)) {
             if (fixedIndex < updatedNumbers.length) {
                 updatedNumbers.splice(fixedIndex, 0, multiplier);
             } else {
-                updatedNumbers.push(multiplier);
+                updatedNumbers.push(multiplier); // Append if index is out of bounds
             }
         }
         setDisplayNumbers(updatedNumbers);
         setAnimationEnded(false);
     }, [multiplier, numbers]);
 
-    // animate arrival of winner card (no rotation required)
-    const animationRef = useRef<number | null>(null);
+
     useEffect(() => {
-        if (!isIdle) {
-            const targetIndex = displayNumbers.indexOf(multiplier);
-            if (targetIndex !== -1) {
-                const duration = elapsedTime * 1000;
-                const startTime = performance.now();
-                const animate = (t: number) => {
-                    const progress = Math.min((t - startTime) / duration, 1);
-                    if (progress < 1) {
-                        animationRef.current = requestAnimationFrame(animate);
-                    } else {
-                        setAnimationEnded(true);
-                    }
-                };
-                animationRef.current = requestAnimationFrame(animate);
-                return () => {
-                    if (animationRef.current !== null) {
-                        cancelAnimationFrame(animationRef.current);
-                    }
-                };
-            }
-        }
-    }, [isIdle, displayNumbers, multiplier, elapsedTime]);
+        // Find the index of the multiplier
+        const targetCardIndex = displayNumbers.indexOf(multiplier);
 
-    // compute layout positions and scales for cards
-    const cardWidth = 130;
-    const gap = 16; // desired gap between card edges
-    const scaleStep = 0.13;
-    const minScale = 0.5;
-    const count = displayNumbers.length;
-    const positions: number[] = new Array(count).fill(0);
-    const scales: number[] = new Array(count).fill(1);
-    const centerIndex = Math.floor(count / 2);
+        if (sliderRef.current && targetCardIndex !== -1 && displayNumbers.length > 0) {
 
-    // center card stays at 0
-    if (count > 0) {
-        positions[centerIndex] = 0;
-        scales[centerIndex] = 1;
-    }
-    // compute right side
-    let currentX = 0;
-    for (let i = centerIndex + 1; i < count; i++) {
-        const prevIdx = i - 1;
-        const prevScale = Math.max(minScale, 1 - Math.abs(prevIdx - centerIndex) * scaleStep);
-        const curScale = Math.max(minScale, 1 - Math.abs(i - centerIndex) * scaleStep);
-        const prevWidth = cardWidth * prevScale;
-        const curWidth = cardWidth * curScale;
-        currentX += prevWidth / 2 + curWidth / 2 + gap;
-        positions[i] = currentX;
-        scales[i] = curScale;
-    }
-    // compute left side
-    currentX = 0;
-    for (let i = centerIndex - 1; i >= 0; i--) {
-        const prevIdx = i + 1;
-        const prevScale = Math.max(minScale, 1 - Math.abs(prevIdx - centerIndex) * scaleStep);
-        const curScale = Math.max(minScale, 1 - Math.abs(i - centerIndex) * scaleStep);
-        const prevWidth = cardWidth * prevScale;
-        const curWidth = cardWidth * curScale;
-        currentX -= prevWidth / 2 + curWidth / 2 + gap;
-        positions[i] = currentX;
-        scales[i] = curScale;
-    }
-    // recenter whole strip using the physical edges of the first/last card
-    if (count > 1) {
-        const leftEdge = positions[0] - (cardWidth * scales[0]) / 2;
-        const rightEdge = positions[count - 1] + (cardWidth * scales[count - 1]) / 2;
-        const shift = (leftEdge + rightEdge) / 2;
-        for (let i = 0; i < count; i++) {
-            positions[i] -= shift;
-        }
-        // make sure the center card is exactly at x=0 after shifting
-        const centerOffset = positions[centerIndex];
-        for (let i = 0; i < count; i++) {
-            positions[i] -= centerOffset;
-        }
-    }
+            const slider = sliderRef.current;
+            slider.style.transition = ``;
+            slider.style.transform = `translateX(0px)`;
 
+            const cards = slider.children;
+
+            if (cards.length === 0) return;
+
+            // Calculate card dimensions
+            const cardWidth = (cards[0] as HTMLElement).offsetWidth;
+            const containWidth = slider.offsetWidth;
+            const cardMarginRight = parseFloat(getComputedStyle(cards[0] as HTMLElement).marginRight);
+
+            // Calculate the position to stop at
+            const cardOffset = Math.random() * cardWidth; // Random offset within card width
+            const targetPosition = -(
+                targetCardIndex * (cardWidth + cardMarginRight) - containWidth / 2 + cardOffset
+            );
+
+            // Apply transform for the sliding animation
+            slider.style.transition = `transform ${elapsedTime * 1000}ms cubic-bezier(0.24, 0.78, 0.15, 1)`;
+            slider.style.transform = `translateX(${targetPosition}px)`;
+
+            // Add event listener for animation end
+            const handleTransitionEnd = () => {
+                setAnimationEnded(true);
+            };
+            slider.addEventListener('transitionend', handleTransitionEnd);
+
+            // Cleanup function to remove the event listener
+            return () => {
+                slider.removeEventListener('transitionend', handleTransitionEnd);
+            };
+        }
+
+    }, [displayNumbers, multiplier, elapsedTime]);
     return (
-        <div className="slide-strip-wrapper">
-            {/* Edge fade overlays */}
-            <div className="slide-edge-fade left" />
-            <div className="slide-edge-fade right" />
-
-            {/* Gold diamond indicator at top center */}
-            <div className="slide-gold-indicator">
-                <img src="/assets/image/jewellery.png" alt="" className="slide-gold-diamond" draggable={false} />
-            </div>
-
-            {/* Card arc container */}
-            <div
-                className="slide-card-strip"
-                style={{
-                    willChange: 'transform',
-                    transform: `translate(-50%, -50%)`
-                }}
-            >
+        <div className="relative overflow-hidden w-full h-full">
+            <div ref={sliderRef} className="flex transition-transform duration-0 items-center h-full">
                 {displayNumbers.map((number, index) => {
-                        const tile = findTile(number);
-                        const isWinner = animationEnded && number === multiplier;
-
-                        const centerIndex = Math.floor(displayNumbers.length / 2);
-                        // derived values from precomputed arrays
-                        const x = positions[index] ?? 0;
-                        const scale = scales[index] ?? 1;
-                        // keep all cards aligned on same Y axis
-                        const y = 0;
-                        // tilt away from center: right cards tilt right, left cards tilt left
-                        // tilt away from center, capped at 8 degrees
-                        const rawTilt = x * 0.05;
-                        const tilt = Math.sign(rawTilt) * Math.min(Math.abs(rawTilt), 8); // degrees
-                        const transformStyle = `translateX(${x}px) translateY(${y}px) scale(${scale}) rotateY(${tilt}deg)`;
-                        const zIndex = Math.floor(1000 - Math.abs(index - centerIndex));
-
-                        return (
+                    let tile = findTile(number);
+                    let isCrashedpoint = number === multiplier;
+                    return (
                         <div
                             key={index}
-                            className={`slide-card ${isWinner ? 'active' : ''}`}
-                            style={{
-                                ['--tier-color' as any]: tile?.color,
-                                transform: transformStyle,
-                                zIndex,
-                                opacity: 0.7 + 0.3 * scale,
-                            } as React.CSSProperties}
-                        >
-                            <div className="slide-card-bg" />
-                            <div className="slide-card-edge-glow" />
-                            <div className="slide-card-content">
-                                <div className={`slide-card-icon ${isWinner ? 'winner' : ''}`}>
-                                    <div className="relative flex justify-center items-center w-full h-full">
-                                        {(isWinner) && <Effect color={tile} />}
-                                        <img src="/assets/image/qdoge_light.png" alt="" className="small-logo" draggable={false} />
+                            className={`${isMobile ? "min-w-[80px] h-40" : "min-w-[100px] h-44"} rounded-md  mr-2 flex-col overflow-clip`}>
+                            <div
+                                className={`border-[3px] border-b-0 text-xl h-[85%] p-1 flex justify-center bg-[#213743]`}
+                                style={{
+                                    borderColor: animationEnded && isCrashedpoint ? tile?.color : '#213743'
+                                }}
+                            >
+                                <div className="relative flex justify-center items-center p-3 z-0">
+                                    <HImage
+                                        src="/assets/image/card.png"
+                                        alt="card"
+                                        className="w-full h-full object-contain"
+                                    />
+                                    {(animationEnded && isCrashedpoint) && <Effect color={tile} />}
+                                    <div
+                                        className="z-10 absolute top-1/2 left-1/2 text-[1rem] text-white transform -translate-x-1/2 -translate-y-1/2"
+                                    >
+                                        {Number(number || 1).toFixed(2)}x
                                     </div>
                                 </div>
-                                <span className="slide-card-label">
-                                    {`${Number(number || 1).toFixed(2)}x`}
-                                </span>
-                                <span className="slide-card-amount">
-                                    <QubicIcon />
-                                </span>
                             </div>
+                            <div className={`flex h-[15%]`}
+                                style={{ backgroundColor: tile?.color }} // Apply dynamic background color
+                            />
                         </div>
-                    );
+                    )
                 })}
             </div>
+            <div className="absolute left-1/2 bottom-20 rounded-full h-1/3 border-l-2 border-white transform -translate-x-1/2 pointer-events-none"></div>
+            <div className="w-3 h-3 rounded-full bg-white absolute left-1/2 bottom-20 -translate-x-1/2" />
         </div>
     );
 };
@@ -385,7 +307,7 @@ const TILES = [
         h: 4
     },
     {
-        color: "#00f3ff",
+        color: "#00e701",
         text: "white",
         point: 100,
         hexKey: "hex-green",

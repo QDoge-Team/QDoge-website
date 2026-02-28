@@ -49,13 +49,13 @@ const MineCustomInput = ({
   return (
     <div className="mt-2 flex flex-col">
       {label && (
-        <p className={`text-sm font-mono ${disabled ? "text-gray-500" : "text-gray-200"}`}>
+        <p className={`text-sm ${disabled ? "text-[#879097]" : "text-white"}`}>
           {label}
         </p>
       )}
-      <div className="flex bg-black/60 border border-cyan-400/15 overflow-hidden p-[1px] rounded-full">
+      <div className="flex bg-[#2f4553] overflow-hidden p-[1px] rounded-full">
         <button
-          className={`px-2 text-gray-500 rounded-l-full focus:outline-none rounded-md text-[.75rem] font-mono hover:bg-cyan-400/15 ${visible == false && "bg-cyan-400/10 text-cyan-400"
+          className={`px-2 text-[#879097] rounded-l-full focus:outline-none rounded-md text-[.75rem] hover:bg-[#557086] ${visible == false && "bg-[#0f212e]"
             }`}
           onClick={() => !disabled && setVisible(false)}
         >
@@ -63,14 +63,14 @@ const MineCustomInput = ({
         </button>
         <button
           onClick={() => !disabled && setVisible(true)}
-          className={`px-2 text-gray-500 focus:outline-none rounded-md text-[.75rem] text-nowrap font-mono hover:bg-cyan-400/15 ${visible && "bg-cyan-400/10 text-cyan-400"
+          className={`px-2 text-[#879097] focus:outline-none  rounded-md text-[.75rem] text-nowrap hover:bg-[#557086] ${visible && "bg-[#0f212e]"
             }`}
         >
           Increase By:
         </button>
         <div
-          className={`flex ${!visible || disabled ? "bg-black/40" : "bg-black/60"
-            } rounded-r-full border-cyan-400/15 hover:border-cyan-400/30 w-full transition-colors`}
+          className={`flex ${!visible || disabled ? "bg-[#172c38]" : "bg-[#0f212e]"
+            }  rounded-r-full border-[#2f4553] hover:border-[#557086] w-full`}
         >
           <input
             type="number"
@@ -104,7 +104,7 @@ const MineCustomInput = ({
                 }
               }
             }}
-            className=" px-3 py-1 text-white bg-transparent w-[80%] focus:outline-none font-mono"
+            className=" px-3 py-1 text-white bg-[#0f212e00] w-[80%] focus:outline-none"
           />
           <div className="flex items-center justify-center pl-2 pr-1.5 w-[35px] ">
             <PercentSvg />

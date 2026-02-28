@@ -10,8 +10,8 @@ const Input: React.FC<props> = ({ icon, type, onChange, value, disabled, classNa
         setDisplayValue(String(value || ''));
     }, [value]);
 
-    return <div className={`flex ${disabled ? "bg-black/40" : "bg-black/60"
-        } rounded-lg outline-none border border-cyan-400/15 hover:border-cyan-400/30 transition-colors w-full ${className || ""}`}>
+    return <div className={`flex ${disabled ? "bg-[#2b2f3a]" : "bg-[#1f2937]"
+        } rounded-full outline-none border border-white/10 hover:border-[#4b5563] w-full ${className || ""}`}>
         <input
             disabled={disabled}
             type={type || "number"} 
@@ -27,7 +27,7 @@ const Input: React.FC<props> = ({ icon, type, onChange, value, disabled, classNa
             value={displayValue}
             min={0} 
             step={1} 
-            className="outline-none h-full w-full p-[7px] px-2 focus:outline-none bg-transparent text-white font-mono text-sm" />
+            className="outline-none h-full w-full p-[7px] px-2 focus:outline-none bg-transparent text-white" />
         {icon &&
             <div className="flex items-center justify-center p-1 w-[30px] ">
                 {icon}

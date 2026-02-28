@@ -760,16 +760,16 @@ const CrashGame = () => {
                     Loading...
                 </div>
             ) : (
-            <div className="flex w-full justify-center h-full p-2 sm:p-4">
-                <div className="w-full h-full flex justify-center max-w-[1400px]">
+            <div className="flex w-full justify-center h-full">
+                <div className="w-full bg-[#10100f] h-full flex justify-center ">
                     <div
-                        className={` ${isMobile ? "flex flex-col items-center gap-4" : "flex gap-4"
-                            } w-full`}
+                        className={` ${isMobile ? "flex flex-col  items-center" : "flex"
+                            } w-full rounded-md overflow-hidden`}
                     >
                         <div
-                            className={`game-display w-full gap-2 ${isMobile ? "p-1 w-full" : "p-0"
+                            className={`w-full gap-2 ${isMobile ? "p-1 w-full" : "p-0"
                                 } px-4 sm:px-0 ${isMobile ? "h-[300px] " : "min-h-[300px] "
-                                } relative h-full overflow-hidden`}
+                                }   relative h-full overflow-hidden`}
                         >
                             <div className="absolute top-4 z-10 left-5 max-w-[70%]">
                                 <div className="flex space-x-1 items-center">
@@ -851,17 +851,9 @@ const CrashGame = () => {
                             />
                         </div>
                         {!isMobile && (
-                            <div className="game-panel min-w-[300px] xl:min-w-[320px] min-h-[560px] flex flex-col justify-between">
-                                <div className="game-panel-header">
-                                    <div className="flex items-center gap-1.5">
-                                        <span className="terminal-dot" style={{background:'#ff5f57'}}></span>
-                                        <span className="terminal-dot" style={{background:'#febc2e'}}></span>
-                                        <span className="terminal-dot" style={{background:'#28c840'}}></span>
-                                    </div>
-                                    <span className="text-xs font-mono text-cyan-400/80 tracking-wider">📈 CRASH</span>
-                                </div>
-                                <div className="game-panel-body gap-2 flex flex-col">
-                                    <div className="flex items-center gap-4 mb-2 mt-1">
+                            <div className="col-span-1 p-1 min-h-[560px] bg-sider_panel shadow-[0px_0px_15px_rgba(0,0,0,0.25)] flex flex-col justify-between">
+                                <div className="gap-2 p-1 py-4 flex flex-col">
+                                    <div className="flex items-center gap-4 mb-2 mt-3">
                                         <div className="flex-1 [&>div]:mt-0">
                                     <SwitchTab
                                         onChange={(e) => setActiveTab(e)}
@@ -871,7 +863,7 @@ const CrashGame = () => {
                                         </div>
                                         <Button 
                                             onClick={() => setShowHelp(true)} 
-                                            className="w-[36px] h-[36px] min-w-[36px] p-0 text-base font-bold text-white bg-cyan-400 hover:bg-cyan-300 rounded-full flex-shrink-0 flex items-center justify-center"
+                                            className="w-[36px] h-[36px] min-w-[36px] p-0 text-base font-bold text-white bg-[#00e701] hover:bg-[#00d600] rounded-full flex-shrink-0 flex items-center justify-center"
                                             title="Game Help"
                                         >
                                             ?
@@ -938,7 +930,7 @@ const CrashGame = () => {
                                     />
 
                                     {isAuto ? (
-                                        <Button className="bg-cyan-400 hover:bg-cyan-300 font-bold uppercase rounded-full px-8 py-4 text-black"
+                                        <Button className="bg-[#00e701] hover:bg-[#00d600] font-bold uppercase rounded-full"
                                             disabled={
                                                 (betting &&
                                                 gameState !== GAME_STATES.InProgress &&
@@ -976,7 +968,7 @@ const CrashGame = () => {
                                         </Button>
                                     ) : (
                                         <Button
-                                            className="slide-bet-button"
+                                            className="bg-[#00e701] hover:bg-[#00d600] font-bold uppercase rounded-full"
                                             disabled={joining || !currency?._id}
                                             onClick={() => {
                                                 if (!betting) {
@@ -1008,21 +1000,12 @@ const CrashGame = () => {
                             </div>
                         )}
                         {isMobile && (
-                            <div className="game-panel w-full flex flex-col justify-between">
-                                <div className="game-panel-header">
-                                    <div className="flex items-center gap-1.5">
-                                        <span className="terminal-dot" style={{background:'#ff5f57'}}></span>
-                                        <span className="terminal-dot" style={{background:'#febc2e'}}></span>
-                                        <span className="terminal-dot" style={{background:'#28c840'}}></span>
-                                    </div>
-                                    <span className="text-xs font-mono text-cyan-400/80 tracking-wider">📈 CRASH</span>
-                                </div>
-                                <div className="game-panel-body">
+                            <div className="col-span-1 p-2 bg-sider_panel shadow-[0px_0px_15px_rgba(0,0,0,0.25)] flex flex-col justify-between">
                                 <div className="flex items-center justify-between mb-2">
                                     <h3 className="text-white font-bold">CRASH</h3>
                                     <Button 
                                         onClick={() => setShowHelp(true)} 
-                                        className="w-[36px] h-[36px] min-w-[36px] p-0 text-base font-bold text-white bg-cyan-400 hover:bg-cyan-300 rounded-full flex items-center justify-center"
+                                        className="w-[36px] h-[36px] min-w-[36px] p-0 text-base font-bold text-white bg-[#00e701] hover:bg-[#00d600] rounded-full flex items-center justify-center"
                                         title="Game Help"
                                     >
                                         ?
@@ -1030,7 +1013,6 @@ const CrashGame = () => {
                                 </div>
                                 {isAuto ? (
                                     <Button
-                                        className="bg-cyan-400 hover:bg-cyan-300 font-bold uppercase rounded-full px-8 py-4 text-black"
                                         disabled={
                                             (betting &&
                                             gameState !== GAME_STATES.InProgress &&
@@ -1068,7 +1050,6 @@ const CrashGame = () => {
                                     </Button>
                                 ) : (
                                     <Button
-                                        className="bg-cyan-400 hover:bg-cyan-300 font-bold uppercase rounded-full px-8 py-4 text-black"
                                         disabled={joining || !currency?._id}
                                         onClick={() => {
                                             if (!betting) {
@@ -1155,7 +1136,6 @@ const CrashGame = () => {
                                     disabled={disabled}
                                     active={activeTab}
                                 />
-                                </div>
                             </div>
                         )}
                     </div>
@@ -1193,7 +1173,7 @@ const NetStatus = ({ payout }: { payout: number }) => {
 
     return (
         <div
-            className={`w-[10px] h-[10px] rounded-full  bg-cyan-400 ${netStatus ? " animate-zoom " : ""
+            className={`w-[10px] h-[10px] rounded-full  bg-[#24db5b] ${netStatus ? " animate-zoom " : ""
                 }`}
         />
     );

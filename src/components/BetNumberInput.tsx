@@ -20,13 +20,13 @@ const BetNumberInput: React.FC<props> = ({ disabled, value, onChange, Icon }) =>
     return (
         <div className="mt-2">
             <div className="d-flex justify-between">
-                <p className={`text-sm ${disabled ? "text-gray-500" : "text-gray-300"} font-bold font-mono`}>
+                <p className={`text-sm ${disabled ? "text-[#879097]" : "text-[#d1d1d1]"} font-bold`}>
                     Number of Bets
                 </p>
             </div>
             <div
-                className={`flex w-full rounded-full items-center border border-cyan-400/15 hover:border-cyan-400/30 ${disabled ? "bg-black/40" : "bg-black/60"
-                    } rounded p-1.5 transition-colors`}
+                className={`flex w-full rounded-full items-center  border-[2px] border-[#2f4553] hover:border-[#557086]  ${disabled ? "bg-[#172c38]" : "bg-[#0f212e]"
+                    } rounded p-1.5`}
             >
                 <input
                     disabled={disabled}
@@ -58,8 +58,8 @@ const BetNumberInput: React.FC<props> = ({ disabled, value, onChange, Icon }) =>
                             }
                         }
                     }}
-                    className={`${disabled ? "bg-black/40" : "bg-black/60"
-                        } text-white w-[90%] flex-1 text-sm focus:outline-none font-mono`}
+                    className={`${disabled ? "bg-[#172c38]" : "bg-[#0f212e]"
+                        } text-white  w-[90%] flex-1 text-sm focus:outline-none`}
                 />
                 {value === 0 && (
                     <div className="w-5">

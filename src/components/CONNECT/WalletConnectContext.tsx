@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useCallback, useState } from "react";
 import SignClient from "@walletconnect/sign-client";
 import { WalletConnectAccount } from "./types/account";
-import toast from "react-hot-toast";
 
 interface WalletConnectContextType {
   signClient: SignClient | null;
@@ -80,7 +79,6 @@ export function WalletConnectProvider({ children }: WalletConnectProviderProps) 
       return { uri: uri || "", approve };
     } catch (error) {
       console.error("Failed to connect:", error);
-      toast.error("WalletConnect connection failed. Check console for details.");
       return { uri: "", approve: async () => {} };
     } finally {
       setIsConnecting(false);
@@ -228,14 +226,6 @@ export function WalletConnectProvider({ children }: WalletConnectProviderProps) 
         setSessionTopic("");
         setIsConnected(false);
         localStorage.removeItem("sessionTopic");
-      });
-
-      // watch for transport errors (unauthorized origin etc.)
-      // @ts-ignore: SignClient types don't include this event, but it is emitted by
-      // older versions and useful for debugging origin/authorization issues.
-      (client as any).on("transport_error", (err: any) => {
-        console.error("WalletConnect transport error:", err);
-        toast.error(`WalletConnect transport error: ${err?.message || err}`);
       });
     }).catch((error) => {
       console.error("WalletConnect init failed:", error);

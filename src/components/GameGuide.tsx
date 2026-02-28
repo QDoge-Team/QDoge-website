@@ -156,8 +156,8 @@ const GameGuide: React.FC<GameGuideProps> = ({ isOpen, onClose, gameName }) => {
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
-            <div className="bg-black/95 backdrop-blur-xl text-white rounded-xl max-h-[90vh] overflow-y-auto border border-cyan-400/20">
-                <div className="sticky top-0 bg-black/95 backdrop-blur-xl border-b border-cyan-400/15 p-4 flex items-center justify-between">
+            <div className="bg-[#1a1a1a] text-white rounded-lg max-h-[90vh] overflow-y-auto">
+                <div className="sticky top-0 bg-[#1a1a1a] border-b border-gray-700 p-4 flex items-center justify-between">
                     <h2 className="text-2xl font-bold">{guide.title}</h2>
                     <Button
                         isIconOnly
@@ -171,8 +171,8 @@ const GameGuide: React.FC<GameGuideProps> = ({ isOpen, onClose, gameName }) => {
                 <div className="p-6 space-y-6">
                     {guide.steps.map((step, index) => (
                         <div key={index} className="space-y-2">
-                            <h3 className="text-lg font-semibold text-cyan-400 flex items-center font-mono">
-                                <span className="w-8 h-8 rounded-full bg-cyan-400 text-black font-bold flex items-center justify-center mr-3 text-sm font-mono">
+                            <h3 className="text-lg font-semibold text-[#00e701] flex items-center">
+                                <span className="w-8 h-8 rounded-full bg-[#00e701] text-black font-bold flex items-center justify-center mr-3 text-sm">
                                     {index + 1}
                                 </span>
                                 {step.title}
@@ -183,10 +183,10 @@ const GameGuide: React.FC<GameGuideProps> = ({ isOpen, onClose, gameName }) => {
                         </div>
                     ))}
                 </div>
-                <div className="sticky bottom-0 bg-black/95 backdrop-blur-xl border-t border-cyan-400/15 p-4 flex justify-end">
+                <div className="sticky bottom-0 bg-[#1a1a1a] border-t border-gray-700 p-4 flex justify-end">
                     <Button
                         onClick={onClose}
-                        className="bg-cyan-400 hover:bg-cyan-300 text-black font-bold font-mono"
+                        className="bg-[#00e701] hover:bg-[#00d600] text-black font-bold"
                     >
                         Got it!
                     </Button>

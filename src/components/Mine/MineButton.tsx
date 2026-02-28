@@ -54,7 +54,7 @@ const MineButton = ({ point, mine, isAuto, onClick }: MineButtonProps) => {
   const getButtonClassName = () => {
     const baseClass = "p-2 w-full h-full rounded-lg aspect-square";
     // Transparent thin blocks
-    const autoClass = isAuto ? "bg-purple-500/30 border border-purple-500/50" : "bg-white/10 border border-cyan-400/20 hover:bg-cyan-400/5";
+    const autoClass = isAuto ? "bg-[#9000ff]/30 border border-[#9000ff]/50" : "bg-white/10 border border-white/20 hover:bg-white/15";
     
     if (mine?.mined) {
       // Revealed tile

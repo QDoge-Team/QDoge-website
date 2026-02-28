@@ -183,33 +183,6 @@ export function QubicConnectProvider({ children }: QubicConnectProviderProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run once on mount - dispatch is stable from MetaMaskProvider
 
-  // if there was an existing WalletConnect session (signClient) which is connected but our
-  // context hasn't yet marked the wallet as connected, automatically fetch an account
-  // and call our connect() helper so downstream consumers see a valid wallet object.
-  useEffect(() => {
-    if (!connected && walletConnectHook.isConnected) {
-      (async () => {
-        try {
-          const accs = await walletConnectHook.requestAccounts();
-          if (accs && accs.length > 0) {
-            const first = accs[0];
-            connect({
-              connectType: "walletconnect",
-              publicKey: first.address,
-              alias: first.name,
-            });
-            toast.success(`Wallet reconnected: ${first.address.slice(0,8)}...${first.address.slice(-8)}`);
-          }
-        } catch (err) {
-          console.error("Auto-connect from WalletConnect session failed:", err);
-        }
-      })();
-    }
-  }, [connected, walletConnectHook.isConnected, walletConnectHook]);
-
-  // Track consecutive balance-fetch failures to throttle logging
-  const balanceFetchFailCountRef = useRef(0);
-
   // Fetch wallet balance directly from wallet connection (not from backend)
   const fetchBalance = useCallback(async (): Promise<void> => {
     if (!wallet?.publicKey) {
@@ -221,6 +194,8 @@ export function QubicConnectProvider({ children }: QubicConnectProviderProps) {
     }
 
     try {
+      console.log(`Fetching balance for wallet: ${wallet.publicKey}`);
+      
       // Always use backend API for balance fetching (most reliable)
       const response = await axiosServices.get(`/wallet/balance/${wallet.publicKey}`);
       
@@ -228,32 +203,22 @@ export function QubicConnectProvider({ children }: QubicConnectProviderProps) {
         const qubicBalance = Math.floor(response.data.qubic || 0);
         const qdogeBalance = Math.floor(response.data.qdoge || 0);
         
-        // Only log on recovery or first success
-        if (balanceFetchFailCountRef.current > 0) {
-          console.log(`Balance fetch recovered after ${balanceFetchFailCountRef.current} failure(s): QU=${qubicBalance}, QDoge=${qdogeBalance}`);
-        }
-        balanceFetchFailCountRef.current = 0;
+        console.log(`Balance fetched successfully: QU=${qubicBalance}, QDoge=${qdogeBalance}`);
         
         setWalletBalances({
           qubic: qubicBalance,
           qdoge: qdogeBalance,
         });
       } else {
-        console.warn("Empty or invalid response from balance API");
+        console.warn("Empty or invalid response from balance API:", response);
         setWalletBalances({ qubic: 0, qdoge: 0 });
       }
     } catch (error: any) {
-      balanceFetchFailCountRef.current++;
-      const failCount = balanceFetchFailCountRef.current;
-      
-      // Only log the first failure and then every 10th to avoid console spam
-      if (failCount === 1) {
-        const errorMessage = error?.response?.data?.error || error?.response?.data?.message || error?.message || "Unknown error";
-        console.warn("Balance fetch failed (will retry silently):", errorMessage);
-      } else if (failCount % 10 === 0) {
-        console.warn(`Balance fetch still failing after ${failCount} attempts`);
-      }
+      console.error("Failed to fetch balance:", error);
+      const errorMessage = error?.response?.data?.error || error?.response?.data?.message || error?.message || "Unknown error";
+      console.error("Error details:", errorMessage);
       // Keep previous balances on error instead of resetting to 0
+      // setWalletBalances({ qubic: 0, qdoge: 0 });
     }
   }, [wallet?.publicKey, setWalletBalances]);
 
