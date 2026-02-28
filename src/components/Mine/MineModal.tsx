@@ -5,13 +5,13 @@ const MineModal = ({ visible, data }: MineModalPropsType) => {
   if (!visible) return <></>;
   return (
     <div className="absolute left-1/2 top-1/2 opacity-90 z-10">
-      <div className="w-36 h-28 absolute left-[-4.5rem] top-[-3rem] pb-3 rounded-md bg-[#1a2c38] text-sm shadow-md border-4 border-[#00e701] text-center animate-zoomIn">
+      <div className="w-36 h-28 absolute left-[-4.5rem] top-[-3rem] pb-3 rounded-md bg-black/90 backdrop-blur-sm text-sm shadow-neon border-2 border-cyan-400 text-center animate-zoomIn">
         <div className="flex flex-col items-center p-4">
-          <div className="text-[#00e701] font-bold text-4xl leading-[1.5]">
+          <div className="text-cyan-400 font-bold text-4xl leading-[1.5] font-mono">
             {data.odds.toFixed(2)}×
           </div>
           <div className="inline-flex items-center">
-            <div className="text-[#00e701] font-bold whitespace-nowrap tabular-nums reward-amount heartbeat-glow">
+            <div className="text-cyan-400 font-bold whitespace-nowrap tabular-nums reward-amount heartbeat-glow font-mono">
               {data.profit}
             </div>
             <div className="w-[20px] px-1">

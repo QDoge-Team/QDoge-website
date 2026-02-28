@@ -23,33 +23,76 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const toastOptions = useMemo(() => ({
     duration: 4000,
     style: {
-      background: '#1a1a1a',
-      color: '#fff',
+      background: '#0a0a0a',
+      color: '#00f3ff',
     },
+    iconTheme: {
+      primary: '#00f3ff',
+      secondary: '#000000',
+    },
+    success: {
+      style: { background: '#0a0a0a', color: '#00f3ff' },
+      iconTheme: { primary: '#00f3ff', secondary: '#000000' }
+    },
+    error: {
+      style: { background: '#0a0a0a', color: '#00f3ff' },
+      iconTheme: { primary: '#00f3ff', secondary: '#000000' }
+    }
   }), []);
 
-  // ✅ Create socket ONCE inside useEffect (not at module scope)
+  // Pages that actually need the crash socket
+  const needsSocket = ['/crash', '/mine', '/slide', '/videopoker', '/landing'].some(
+    (p) => pathname?.startsWith(p)
+  );
+
+  // ✅ Create socket ONCE inside useEffect, only on game pages
   useEffect(() => {
+    if (!needsSocket) {
+      // Disconnect if navigating away from game pages
+      if (socketRef.current) {
+        socketRef.current.removeAllListeners();
+        socketRef.current.disconnect();
+        socketRef.current = null;
+        setCrashSocket(null);
+      }
+      return;
+    }
+
     if (socketRef.current) return;
 
-    // Force secure transports when page is served over HTTPS
-    const isSecure = typeof window !== "undefined" && window.location.protocol === "https:";
     const socketUrl = `${API_URL}/crashx`;
+    let errorCount = 0;
     
     const s = io(socketUrl, {
-      transports: ['polling', 'websocket'], // Try polling first, then websocket (better fallback)
-      upgrade: true, // Allow transport upgrades
+      transports: ['polling', 'websocket'],
+      upgrade: true,
       rememberUpgrade: false,
       withCredentials: true,
       reconnection: true,
-      reconnectionDelay: 1000,
-      reconnectionAttempts: 10,
-      timeout: 20000, // Increase timeout for connection attempts
+      reconnectionDelay: 2000,
+      reconnectionDelayMax: 30000,   // Cap backoff at 30s
+      reconnectionAttempts: Infinity, // Keep trying but with backoff
+      timeout: 20000,
+      autoConnect: true,
     });
 
-    // Add error handling
+    // Throttled error logging — only log first error and then every 10th
     s.on('connect_error', (error) => {
-      console.error('[Socket] Connection error:', error.message);
+      errorCount++;
+      if (errorCount === 1) {
+        console.warn('[Socket] Connection error (will retry silently):', error.message);
+      } else if (errorCount % 10 === 0) {
+        console.warn(`[Socket] Still unable to connect after ${errorCount} attempts:`, error.message);
+      }
+    });
+
+    s.on('connect', () => {
+      if (errorCount > 0) {
+        console.log(`[Socket] Connected after ${errorCount} failed attempt(s)`);
+      } else {
+        console.log('[Socket] Connected');
+      }
+      errorCount = 0;
     });
 
     s.on('disconnect', (reason) => {
@@ -65,7 +108,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       socketRef.current = null;
       setCrashSocket(null);
     };
-  }, []); // ✅ Empty dependency array - only run once on mount
+  }, [needsSocket]); // Reconnect when navigating to/from game pages
 
   return (
     <HeroUIProvider>

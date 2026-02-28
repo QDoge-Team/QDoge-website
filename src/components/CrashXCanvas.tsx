@@ -302,7 +302,7 @@ class CrashGameEngine {
                 let timeCount =
                     Math.floor((endTime.getTime() - currentTime) / 10) / 100;
                 if (timeCount < 0) {
-                    DISPLAY_PAYOUT = "waiting...";
+                    DISPLAY_PAYOUT = "__LOADING__";
                 } else {
                     DISPLAY_PAYOUT = `0${timeCount.toFixed(1)}`;
                     DISPLAY_STATUS = "Starting...";
@@ -312,76 +312,108 @@ class CrashGameEngine {
             //display game status
             const drawStatus = () => {
                 ctx.textAlign = "center";
-                ctx.fillStyle = "#faca15";
+                ctx.fillStyle = "#00f3ff";
                 ctx.save();
-                ctx.font = `${height * 0.16}px Unlock`;
-                ctx.fillText(DISPLAY_PAYOUT, width / 2, height * 0.23);
-                ctx.font = `${height * 0.04}px Unlock`;
-                ctx.fillText(DISPLAY_STATUS, width / 2, height * 0.3);
+
+                // Draw scale-bar loader animation instead of "waiting..." text
+                if (DISPLAY_PAYOUT === "__LOADING__") {
+                    // mimic main PageLoader: wider bars, centered on full canvas
+                    const barCount = 5;
+                    // medium bars for connecting loader
+                    const barWidth = 6; // px
+                    const barMaxH = 16; // px height
+                    const gap = 8; // px gap
+                    const totalW = barCount * barWidth + (barCount - 1) * gap;
+                    const startX = (width - totalW) / 2;  // center across full width
+                    const baseY = height / 2; // vertical centre
+                    const now = Date.now();
+
+                    for (let i = 0; i < barCount; i++) {
+                        const phase = (now / 400 + i * 0.8);
+                        const scale = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(phase));
+                        const barH = barMaxH * scale;
+                        // Glow effect
+                        ctx.shadowColor = "#00f3ff";
+                        ctx.shadowBlur = 8;
+                        ctx.fillStyle = "#00f3ff";
+                        ctx.fillRect(
+                            startX + i * (barWidth + gap),
+                            baseY - barH,
+                            barWidth,
+                            barH
+                        );
+                    }
+                    // Reset shadow
+                    ctx.shadowColor = "transparent";
+                    ctx.shadowBlur = 0;
+
+                    // "CONNECTING" text below bars
+                    ctx.fillStyle = "#00f3ff";
+                    ctx.font = `${Math.max(height * 0.02, 8)}px monospace`;
+                    ctx.letterSpacing = "3px";
+                    ctx.fillText("CONNECTING", width / 2, baseY + height * 0.02);
+                    ctx.letterSpacing = "0px";
+                } else {
+                    ctx.font = `${height * 0.16}px Unlock`;
+                    ctx.fillText(DISPLAY_PAYOUT, width / 2, height * 0.23);
+                    ctx.font = `${height * 0.04}px Unlock`;
+                    ctx.fillText(DISPLAY_STATUS, width / 2, height * 0.3);
+                }
+
                 ctx.restore();
                 ctx.lineWidth = 2;
-                ctx.strokeStyle = "#faca15";
+                ctx.strokeStyle = "#00f3ff";
                 ctx.textBaseline = "middle";
                 ctx.textAlign = "end";
             };
 
-            //display x , y ruler
+            // draw only payout labels on the right side with fixed half‑step spacing
             const drawRuler = () => {
-                ctx.strokeStyle = "#ff9600ee";
-                ctx.fillStyle = "#ff9600ee";
+                const panelWidth = 60;
+                // panel background
+                ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+                ctx.fillRect(width - panelWidth, 0, panelWidth, height);
+
+                // build array of values from 1.0 upward in 0.5 increments
+                const maxValue = Math.max(3, Math.ceil(this.PAY_OUT));
+                const values: number[] = [];
+                for (let v = 1.0; v <= maxValue; v += 0.5) {
+                    values.push(parseFloat(v.toFixed(1)));
+                }
+
+                const count = values.length;
+                if (count === 0) return;
+                const spacing = height / (count - 1);
+
+                // paint settings
+                ctx.strokeStyle = "#ffffffaa";
+                ctx.fillStyle = "#ffffff";
                 ctx.globalAlpha = 0.9;
-                ctx.font = `${height * 0.035}px Rubik`;
-                // x rule related by times
-                let _runtime = this.elapsed < 50 ? 50 : this.elapsed;
-                let rxn = _runtime / 10 / this.RX_N;
-                let rxw = width / rxn;
 
-                let mx = this.rule_x + width * 0.035 - 33;
-                if (rxw < width * 0.07) {
-                    this.RX_N += 4;
-                }
-                for (var r_x = 0; r_x <= Math.floor(rxn); r_x++) {
-                    ctx.fillText(
-                        `${(r_x * this.RX_N).toFixed(1)}s`,
-                        rxw * r_x + this.rule_x,
-                        canvasHeight - 20
-                    );
-                }
+                // center of panel for text
+                const mx = width - panelWidth / 2;
 
-                // y rule related by current payout
-                let ryn = this.PAY_OUT < 2 ? 2 / this.RY_N : this.PAY_OUT / this.RY_N;
-                let ryw = (height - height * 0.2) / ryn;
-                if (ryw < (height - height * 0.2) * 0.1) {
-                    this.RY_N += 1.7;
-                }
-                let _ryn = Math.floor(ryn) + 1;
+                values.forEach((val, idx) => {
+                    const y = height - idx * spacing;
+                    // tick line
+                    ctx.beginPath();
+                    ctx.moveTo(width - panelWidth + 5, y);
+                    ctx.lineTo(width - 5, y);
+                    ctx.stroke();
+                    ctx.closePath();
 
-                for (var r_y = _ryn; 0 <= r_y; r_y--) {
-                    if (r_y !== _ryn) {
-                        ctx.beginPath();
-                        let _ry1 = height - (ryw * r_y - ryw / 2);
-                        ctx.moveTo(mx, _ry1);
-                        ctx.lineTo(mx + 5, _ry1);
-                        ctx.closePath();
+                    // choose font size: half-step smaller
+                    if (val % 1 !== 0) {
+                        ctx.font = `${height * 0.025}px Rubik`;
+                    } else {
+                        ctx.font = `${height * 0.035}px Rubik`;
                     }
-                    ctx.fillText(
-                        `${((r_y + 1) * this.RY_N).toFixed(1)}x`,
-                        mx - 5,
-                        height - ryw * r_y
-                    );
-                    ctx.beginPath();
-                    let _ry3 = height - ryw * r_y;
-                    ctx.moveTo(mx, _ry3);
-                    ctx.lineTo(mx + 8, _ry3);
-                    ctx.stroke();
-                    ctx.closePath();
-                    ctx.beginPath();
-                    let _ry2 = height - (ryw * r_y + ryw / 2);
-                    ctx.moveTo(mx + 3, _ry2);
-                    ctx.lineTo(mx + 8, _ry2);
-                    ctx.closePath();
-                    ctx.stroke();
-                }
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText(`${val.toFixed(1)}x`, mx, y);
+                });
+
+                ctx.globalAlpha = 1;
             };
 
             // draw parabolic curve
@@ -398,8 +430,8 @@ class CrashGameEngine {
             const drawParabola = () => {
                 ctx.beginPath();
                 var gradient = ctx.createLinearGradient(startX, startY, endX, endY);
-                gradient.addColorStop(0, "#6eaace00");
-                gradient.addColorStop(1, "#faca15");
+                gradient.addColorStop(0, "#00f3ff00");
+                gradient.addColorStop(1, "#00f3ff");
                 ctx.strokeStyle = gradient;
                 ctx.moveTo(startX, startY);
                 const linewidth = crashWidth * 0.04 * this.scale;
@@ -569,7 +601,7 @@ const GameCanvas = (infos: any) => {
                 width: "100%",
                 height: "100%",
                 backgroundImage:
-                    "linear-gradient(227deg, #0e3b69f0, rgb(0, 0, 0))",
+                    "linear-gradient(227deg, rgba(0, 243, 255, 0.06), rgb(0, 0, 0))",
             }}
         />
     );

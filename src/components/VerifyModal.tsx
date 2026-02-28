@@ -57,7 +57,7 @@ const VerifyModal = ({ gameId, Label, setGameId }: any) => {
     }, [gameId])
 
 
-    return <Modal isOpen={verifyOpen} onClose={() => { setGameId(""); setVerifyOpen(false) }} className=" animate-zoomIn bg-[#2d2d2d] max-w-[530px] w-svw rounded-md border-[2px] border-[#ffe81a]">
+    return <Modal isOpen={verifyOpen} onClose={() => { setGameId(""); setVerifyOpen(false) }} className=" animate-zoomIn bg-black/95 backdrop-blur-xl max-w-[530px] w-svw rounded-xl border border-cyan-400/30">
         <div className="p-3">
             <div className="uppercase text-white font-bold">
                 <span>{Label}</span> Game
@@ -91,7 +91,7 @@ const VerifyModal = ({ gameId, Label, setGameId }: any) => {
                 </>
             }
         </div>
-        <div className="p-3 bg-[#000000]">
+        <div className="p-3 bg-black/80">
             {
                 loading ? <div className="flex items-center justify-center h-full">
                     <div className="flex space-x-2">

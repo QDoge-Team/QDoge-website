@@ -106,23 +106,23 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({ open, onClose }) => {
 
   return (
     <Modal isOpen={open} onClose={onClose}>
-      <div className="p-6 text-black bg-white rounded-lg w-full">
-        <h3 className="text-xl font-bold mb-4 text-black">Withdraw Funds</h3>
+      <div className="p-6 text-white bg-transparent rounded-xl w-full">
+        <h3 className="text-xl font-bold mb-4 text-cyan-400 font-mono tracking-wide">Withdraw Funds</h3>
 
         {/* Available Balance */}
-        <div className="mb-4 p-3 bg-gray-100 rounded-lg">
-          <p className="text-sm text-gray-700 mb-1">Available Balance</p>
+        <div className="mb-4 p-3 bg-cyan-400/5 border border-cyan-400/15 rounded-lg">
+          <p className="text-sm text-gray-400 mb-1 font-mono">Available Balance</p>
           <div className="flex justify-between items-center">
             <div>
-              <p className="text-lg font-bold text-black">QUBIC: {walletBalances.qubic.toLocaleString()}</p>
-              <p className="text-sm text-gray-700">QDoge: {walletBalances.qdoge.toLocaleString()}</p>
+              <p className="text-lg font-bold text-cyan-400 font-mono">QUBIC: {walletBalances.qubic.toLocaleString()}</p>
+              <p className="text-sm text-gray-400 font-mono">QDoge: {walletBalances.qdoge.toLocaleString()}</p>
             </div>
           </div>
         </div>
 
         {/* Token Type Selection */}
         <div className="mb-4">
-          <p className="text-sm text-gray-700 mb-2">Token Type</p>
+          <p className="text-sm text-gray-400 mb-2 font-mono">Token Type</p>
           <Tabs
             selectedKey={tokenType}
             onSelectionChange={(key) => {
@@ -131,9 +131,9 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({ open, onClose }) => {
             }}
             className="w-full"
             classNames={{
-              tabList: "gap-2 bg-gray-200 p-1 rounded-lg",
-              tab: "min-w-fit text-black",
-              cursor: "bg-white",
+              tabList: "gap-2 bg-black/60 border border-cyan-400/15 p-1 rounded-lg",
+              tab: "min-w-fit text-gray-400 font-mono",
+              cursor: "bg-cyan-400/15",
             }}
           >
             <Tab key="QUBIC" title="QUBIC" />
@@ -143,11 +143,11 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({ open, onClose }) => {
 
         {/* QDoge Price Display */}
         {tokenType === "QDoge" && (
-          <div className="mb-4 p-2 bg-blue-50 rounded text-sm">
+          <div className="mb-4 p-2 bg-cyan-400/5 border border-cyan-400/15 rounded text-sm">
             {priceLoading ? (
-              <p className="text-gray-700">Loading price...</p>
+              <p className="text-gray-400 font-mono">Loading price...</p>
             ) : (
-              <p className="text-blue-700">
+              <p className="text-cyan-400 font-mono">
                 1 QDoge = {qdogePrice.price.toFixed(2)} QUBIC
               </p>
             )}
@@ -157,8 +157,8 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({ open, onClose }) => {
         {/* Amount Input */}
         <div className="mb-4">
           <div className="flex justify-between items-center mb-2">
-            <p className="text-sm text-gray-700">Amount ({tokenType})</p>
-            <p className="text-xs text-gray-600">
+            <p className="text-sm text-gray-400 font-mono">Amount ({tokenType})</p>
+            <p className="text-xs text-cyan-400/50 font-mono">
               Minimum: {minWithdrawal.toLocaleString()} {tokenType}
             </p>
           </div>
@@ -169,17 +169,17 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({ open, onClose }) => {
             placeholder={`Enter amount (min: ${minWithdrawal.toLocaleString()})`}
             min={0}
             step={1}
-            className="text-black"
+            className="text-white font-mono"
             classNames={{
-              input: "text-black",
-              inputWrapper: "bg-gray-50 border border-gray-300",
+              input: "text-white",
+              inputWrapper: "bg-black/40 border border-cyan-400/15 hover:border-cyan-400/30",
             }}
             endContent={
               <Button
                 size="sm"
                 variant="light"
                 onPress={() => setAmount(Math.floor(availableBalance).toString())}
-                className="text-xs text-gray-600 hover:text-black"
+                className="text-xs text-cyan-400/60 hover:text-cyan-400 font-mono"
               >
                 MAX
               </Button>
@@ -188,13 +188,13 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({ open, onClose }) => {
         </div>
 
         {/* Transaction Fee */}
-        <div className="mb-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-700">Transaction Fee:</span>
-            <span className="text-yellow-700 font-bold">{TRANSACTION_FEE} QUBIC</span>
+        <div className="mb-4 p-3 bg-cyan-400/5 rounded-lg border border-cyan-400/15">
+          <div className="flex justify-between text-sm font-mono">
+            <span className="text-gray-400">Transaction Fee:</span>
+            <span className="text-cyan-400 font-bold">{TRANSACTION_FEE} QUBIC</span>
           </div>
           {tokenType === "QDoge" && amountInQubic > 0 && (
-            <div className="flex justify-between text-xs mt-1 text-gray-600">
+            <div className="flex justify-between text-xs mt-1 text-gray-500 font-mono">
               <span>Fee in QDoge:</span>
               <span>{Math.ceil(TRANSACTION_FEE / qdogePrice.price)} QDoge</span>
             </div>
@@ -203,10 +203,10 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({ open, onClose }) => {
 
         {/* Net Amount */}
         {amountInQubic > 0 && (
-          <div className="mb-4 p-3 bg-green-50 rounded-lg border border-green-200">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-700">You will receive:</span>
-              <span className="text-green-700 font-bold">
+          <div className="mb-4 p-3 bg-green-900/20 rounded-lg border border-green-500/30">
+            <div className="flex justify-between text-sm font-mono">
+              <span className="text-gray-400">You will receive:</span>
+              <span className="text-green-400 font-bold">
                 {tokenType === "QUBIC" 
                   ? `${netAmount.toLocaleString()} QUBIC`
                   : `${convertQubicToQDoge(netAmount, qdogePrice.price).toLocaleString()} QDoge (${netAmount.toLocaleString()} QUBIC)`}
@@ -217,7 +217,7 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({ open, onClose }) => {
 
         {/* Validation Messages */}
         {amountInQubic > 0 && !isValid && (
-          <div className="mb-4 p-2 bg-red-50 rounded border border-red-200 text-sm text-red-700">
+          <div className="mb-4 p-2 bg-red-900/20 rounded border border-red-500/30 text-sm text-red-400 font-mono">
             {amountInQubic < MIN_WITHDRAWAL && (
               <p>Minimum withdrawal is {MIN_WITHDRAWAL.toLocaleString()} QUBIC</p>
             )}
@@ -239,7 +239,7 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({ open, onClose }) => {
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="px-6 py-2.5 text-black font-semibold bg-gray-200 hover:bg-gray-300 rounded-lg shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="cyber-button cyber-button--secondary !text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>
@@ -247,7 +247,7 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({ open, onClose }) => {
             type="button"
             onClick={handleWithdraw}
             disabled={!isValid || loading}
-            className="px-6 py-2.5 text-white font-semibold bg-blue-600 hover:bg-blue-700 rounded-lg shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400"
+            className="cyber-button !text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Processing..." : "Withdraw"}
           </button>

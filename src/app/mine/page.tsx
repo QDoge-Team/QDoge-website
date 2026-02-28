@@ -347,15 +347,15 @@ const MineGame: React.FC = () => {
                 duration: 4000,
                 style: {
                     background: '#1a1a1a',
-                    color: '#ffa500',
-                    border: '2px solid #ffa500',
+                    color: '#00f3ff',
+                    border: '2px solid #00f3ff',
                     padding: '16px',
                     fontSize: '16px',
                     fontWeight: 'bold',
                     borderRadius: '8px',
                 },
                 iconTheme: {
-                    primary: '#ffa500',
+                    primary: '#00f3ff',
                     secondary: '#fff',
                 },
             });
@@ -791,15 +791,15 @@ const MineGame: React.FC = () => {
                                     duration: 3000,
                                     style: {
                                         background: '#1a1a1a',
-                                        color: '#00e701',
-                                        border: '2px solid #00e701',
+                                        color: '#00f3ff',
+                                        border: '2px solid #00f3ff',
                                         padding: '12px 16px',
                                         fontSize: '14px',
                                         fontWeight: 'bold',
                                         borderRadius: '8px',
                                     },
                                     iconTheme: {
-                                        primary: '#00e701',
+                                        primary: '#00f3ff',
                                         secondary: '#fff',
                                     },
                                 }
@@ -817,16 +817,16 @@ const MineGame: React.FC = () => {
                             {
                                 duration: 3000,
                                 style: {
-                                    background: '#1a1a1a',
-                                    color: '#00e701',
-                                    border: '2px solid #00e701',
+                                    background: '#0a0a0a',
+                                    color: '#00f3ff',
+                                    border: '2px solid #00f3ff',
                                     padding: '12px 16px',
                                     fontSize: '14px',
                                     fontWeight: 'bold',
                                     borderRadius: '8px',
                                 },
                                 iconTheme: {
-                                    primary: '#00e701',
+                                    primary: '#00f3ff',
                                     secondary: '#fff',
                                 },
                             }
@@ -933,12 +933,12 @@ const MineGame: React.FC = () => {
     // Render mine count slider
     const renderMineCount = () => (
         <div className="mt-2 flex flex-col">
-            <p className={`text-xs ${disabled ? "text-[#879097]" : "text-white"}`}>
+            <p className={`text-xs font-mono ${disabled ? "text-gray-500" : "text-gray-200"}`}>
                 Mines
             </p>
             <div
-                className={`flex items-center p-1.5 ${disabled ? "bg-[#172c38]" : "bg-[#0f212e]"
-                    } rounded-full border-[2px] border-[#2f4553] hover:border-[#557086]`}
+                className={`flex items-center p-1.5 ${disabled ? "bg-black/40" : "bg-black/60"
+                    } rounded-full border-[2px] border-cyan-400/15 hover:border-cyan-400/30`}
             >
                 <div className="px-4 w-[10px] text-white">{mineCount}</div>
                 <input
@@ -948,7 +948,7 @@ const MineGame: React.FC = () => {
                     disabled={disabled}
                     value={mineCount}
                     onChange={(e) => setMineCount(Number(e.target.value))}
-                    className="mx-2 w-full h-2 bg-[#879097] rounded-lg cursor-pointer "
+                    className="mx-2 w-full h-2 bg-cyan-400/30 rounded-lg cursor-pointer "
                 />
                 <div className="px-4 text-white">24</div>
             </div>
@@ -961,7 +961,7 @@ const MineGame: React.FC = () => {
             <div style={{ display: "grid" }}>
                 <div className="pr-2 flex flex-col" style={{ gridRow: 1 }}>
                     <p
-                        className={`text-sm w-full ${disabled ? "text-[#879097]" : "text-white"
+                        className={`text-sm w-full ${disabled ? "text-gray-500" : "text-white"
                             }`}
                     >
                         Mines
@@ -969,12 +969,12 @@ const MineGame: React.FC = () => {
                     <input
                         value={mineCount}
                         disabled
-                        className="bg-[#2f4553] text-white  border-[2px] border-[#2f4553] hover:border-[#557086] rounded w-full p-1.5 text-sm"
+                        className="bg-black/60 text-white  border-[2px] border-cyan-400/15 hover:border-cyan-400/30 rounded w-full p-1.5 text-sm"
                     />
                 </div>
                 <div className="pl-2 flex flex-col" style={{ gridRow: 1 }}>
                     <p
-                        className={`text-sm w-full ${disabled ? "text-[#879097]" : "text-white"
+                        className={`text-sm w-full ${disabled ? "text-gray-500" : "text-white"
                             }`}
                     >
                         Games
@@ -982,7 +982,7 @@ const MineGame: React.FC = () => {
                     <input
                         value={25 - mineCount - mineAreas.length}
                         disabled
-                        className="bg-[#2f4553] text-white  border-[2px] border-[#2f4553] hover:border-[#557086] rounded w-full p-1.5 text-sm"
+                        className="bg-black/60 text-white  border-[2px] border-cyan-400/15 hover:border-cyan-400/30 rounded w-full p-1.5 text-sm"
                     />
                 </div>
             </div>
@@ -1038,8 +1038,8 @@ const MineGame: React.FC = () => {
                             }
                         }
                     }}
-                    className={`${disabledbtn ? "bg-[#178317]" : "bg-[#00e701] hover:bg-[#00d600]"
-                        } text-black font-bold py-2 px-4 rounded-full w-full flex  justify-center text-center`}
+                    className={`${disabledbtn ? "bg-cyan-400/50" : "bg-cyan-400 hover:bg-cyan-300"
+                        } slide-bet-button`}
                 >
                     <div className="flex text-nowrap">
                         {status === GAME_STATUS.LIVE
@@ -1080,15 +1080,15 @@ const MineGame: React.FC = () => {
 
     return (
         <Layout>
-            <div className="flex w-full justify-center">
+            <div className="flex w-full justify-center p-2 sm:p-4">
                 <div
-                    className={` ${isMobile ? "flex flex-col  items-center" : "flex"
-                        } w-full rounded-md overflow-hidden`}
+                    className={` ${isMobile ? "flex flex-col items-center gap-4" : "flex gap-4"
+                        } w-full max-w-[1200px]`}
                 >
-                    {/* Main content */}
-                    <div className="flex items-center w-full">
+                    {/* Main content - Game Display */}
+                    <div className="game-display flex items-center w-full">
                         <div
-                            className={`${isMobile ? "w-11/12" : "w-[500px] xl:w-[630px]  p-5"} mx-auto relative`}
+                            className={`${isMobile ? "w-11/12" : "w-[500px] xl:w-[630px] p-5"} mx-auto relative`}
                         >
                             <div
                                 className={`grid grid-cols-5 gap-2.5 p-1.5 ${!areaFlag ? "animate-bounding2" : ""
@@ -1129,16 +1129,25 @@ const MineGame: React.FC = () => {
                         </div>
                     </div>
                     {!isMobile && (
-                        <div className={`xl:w-[300px]  bg-black/20 p-2 flex-shrink-0`}>
+                        <div className="game-panel xl:w-[320px] flex-shrink-0">
+                            <div className="game-panel-header">
+                                <div className="flex items-center gap-1.5">
+                                    <span className="terminal-dot" style={{background:'#ff5f57'}}></span>
+                                    <span className="terminal-dot" style={{background:'#febc2e'}}></span>
+                                    <span className="terminal-dot" style={{background:'#28c840'}}></span>
+                                </div>
+                                <span className="text-xs font-mono text-cyan-400/80 tracking-wider">💎 MINE</span>
+                            </div>
+                            <div className="game-panel-body">
                             {isAuto ? (
                                 <div className="flex flex-col">
-                                    <div className="flex items-center gap-4 mb-2 mt-3">
+                                    <div className="flex items-center gap-4 mb-2 mt-1">
                                         <div className="flex-1 [&>div]:mt-0">
                                     <SwitchTab onChange={handleTabChange} active={activeTab} disabled={disabled} />
                                         </div>
                                         <Button 
                                             onClick={() => setShowHelp(true)} 
-                                            className="w-[36px] h-[36px] min-w-[36px] p-0 text-base font-bold text-white bg-[#00e701] hover:bg-[#00d600] rounded-full flex-shrink-0 flex items-center justify-center"
+                                            className="w-[36px] h-[36px] min-w-[36px] p-0 text-base font-bold text-white bg-cyan-400 hover:bg-cyan-300 rounded-full flex-shrink-0 flex items-center justify-center"
                                             title="Game Help"
                                         >
                                             ?
@@ -1175,7 +1184,7 @@ const MineGame: React.FC = () => {
                                         </div>
                                         <Button 
                                             onClick={() => setShowHelp(true)} 
-                                            className="w-[36px] h-[36px] min-w-[36px] p-0 text-base font-bold text-white bg-[#00e701] hover:bg-[#00d600] rounded-full flex-shrink-0 flex items-center justify-center"
+                                            className="w-[36px] h-[36px] min-w-[36px] p-0 text-base font-bold text-white bg-cyan-400 hover:bg-cyan-300 rounded-full flex-shrink-0 flex items-center justify-center"
                                             title="Game Help"
                                         >
                                             ?
@@ -1197,22 +1206,22 @@ const MineGame: React.FC = () => {
                                     {renderBetBtn()}
                                 </div>
                             )}
+                            </div>
                         </div>
                     )}
 
                     {isMobile &&
                         (isAuto ? (
-                            <div className="w-11/12 bg-black/20 p-2">
-                                <div className="flex items-center justify-between mb-2">
-                                    <h3 className="text-white font-bold">MINE</h3>
-                                    <Button 
-                                        onClick={() => setShowHelp(true)} 
-                                        className="w-[36px] h-[36px] min-w-[36px] p-0 text-base font-bold text-white bg-[#00e701] hover:bg-[#00d600] rounded-full flex items-center justify-center"
-                                        title="Game Help"
-                                    >
-                                        ?
-                                    </Button>
+                            <div className="game-panel w-full">
+                                <div className="game-panel-header">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="terminal-dot" style={{background:'#ff5f57'}}></span>
+                                        <span className="terminal-dot" style={{background:'#febc2e'}}></span>
+                                        <span className="terminal-dot" style={{background:'#28c840'}}></span>
+                                    </div>
+                                    <span className="text-xs font-mono text-cyan-400/80 tracking-wider">💎 MINE</span>
                                 </div>
+                                <div className="game-panel-body">
                                 {renderBetBtn()}
                                 <AmountInput value={betAmount} onChange={handleAmountChange} disabled={disabled} />
                                 {renderMineCount()}
@@ -1236,19 +1245,19 @@ const MineGame: React.FC = () => {
                                 {renderStopProfitAmount()}
                                 {renderStopLossAmount()}
                                 <SwitchTab onChange={handleTabChange} active={activeTab} disabled={disabled} />
+                                </div>
                             </div>
                         ) : (
-                            <div className="w-11/12 bg-black/20 p-2">
-                                <div className="flex items-center justify-between mb-2">
-                                    <h3 className="text-white font-bold">MINE</h3>
-                                    <Button 
-                                        onClick={() => setShowHelp(true)} 
-                                        className="w-[36px] h-[36px] min-w-[36px] p-0 text-base font-bold text-white bg-[#00e701] hover:bg-[#00d600] rounded-full flex items-center justify-center"
-                                        title="Game Help"
-                                    >
-                                        ?
-                                    </Button>
+                            <div className="game-panel w-full">
+                                <div className="game-panel-header">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="terminal-dot" style={{background:'#ff5f57'}}></span>
+                                        <span className="terminal-dot" style={{background:'#febc2e'}}></span>
+                                        <span className="terminal-dot" style={{background:'#28c840'}}></span>
+                                    </div>
+                                    <span className="text-xs font-mono text-cyan-400/80 tracking-wider">💎 MINE</span>
                                 </div>
+                                <div className="game-panel-body">
                                 <AmountInput value={betAmount} onChange={handleAmountChange} disabled={disabled} />
                                 {renderBetBtn()}
                                 {status === GAME_STATUS.READY && renderMineCount()}
@@ -1261,6 +1270,7 @@ const MineGame: React.FC = () => {
                                         <QubSvg />
                                     } />}
                                 <SwitchTab onChange={handleTabChange} active={activeTab} disabled={disabled} />
+                                </div>
                             </div>
                         ))}
                 </div>
@@ -1270,7 +1280,7 @@ const MineGame: React.FC = () => {
 
             {/* Cashout Confirmation Modal */}
             <Modal isOpen={showCashoutConfirm} onClose={handleCashoutCancel}>
-                <div className="p-6 text-white bg-[#1a1a1a] rounded-lg border border-gray-700">
+                <div className="p-6 text-white bg-black/95 backdrop-blur-xl rounded-xl border border-cyan-400/20">
                     <h3 className="text-xl font-bold mb-4">Confirm Cashout</h3>
                     <p className="text-gray-300 mb-6">
                         Are you sure you want to cash out? This will end your current game and claim your rewards.
@@ -1286,7 +1296,7 @@ const MineGame: React.FC = () => {
                         <Button 
                             color="success" 
                             onPress={handleCashoutConfirm}
-                            className="text-white bg-[#00e701] hover:bg-[#00d600]"
+                            className="text-white bg-cyan-400 hover:bg-cyan-300"
                         >
                             Yes
                         </Button>
