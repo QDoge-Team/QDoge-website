@@ -760,16 +760,16 @@ const CrashGame = () => {
                     Loading...
                 </div>
             ) : (
-            <div className="flex w-full justify-center h-full p-2 sm:p-4">
+            <div className="flex w-full justify-center h-full p-1 sm:p-4">
                 <div className="w-full h-full flex justify-center max-w-[1400px]">
                     <div
                         className={` ${isMobile ? "flex flex-col items-center gap-4" : "flex gap-4"
                             } w-full`}
                     >
                         <div
-                            className={`game-display w-full gap-2 ${isMobile ? "p-1 w-full" : "p-0"
-                                } px-4 sm:px-0 ${isMobile ? "h-[300px] " : "min-h-[300px] "
-                                } relative h-full overflow-hidden`}
+                            className={`game-display gap-2 ${isMobile ? "p-1 w-full" : "p-0 w-full"
+                                } ${isMobile ? "" : "px-0"} ${isMobile ? "h-[45vw] max-h-[260px] min-h-[180px]" : "min-h-[300px] h-full"}
+                                 relative overflow-hidden`}
                         >
                             <div className="absolute top-4 z-10 left-5 max-w-[70%]">
                                 <div className="flex space-x-1 items-center">
@@ -851,7 +851,7 @@ const CrashGame = () => {
                             />
                         </div>
                         {!isMobile && (
-                            <div className="game-panel min-w-[300px] xl:min-w-[320px] min-h-[560px] flex flex-col justify-between">
+                            <div className="game-panel min-w-[300px] xl:min-w-[320px] flex flex-col justify-between">
                                 <div className="game-panel-header">
                                     <div className="flex items-center gap-1.5">
                                         <span className="terminal-dot" style={{background:'#ff5f57'}}></span>

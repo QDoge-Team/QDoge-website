@@ -415,7 +415,7 @@ const VideoPoker = () => {
     
     return (
         <Layout>
-            <div className="flex w-full justify-center p-2 sm:p-4">
+            <div className="flex w-full justify-center p-2 sm:p-4 pb-32">
                 <div
                     className={` ${isMobile ? "flex flex-col items-center gap-4" : "flex gap-4"
                         } w-full max-w-[1200px]`}
@@ -451,7 +451,7 @@ const VideoPoker = () => {
                         />
                     </div>
                     {!isMobile && (
-                        <div className="game-panel min-w-[280px] xl:min-w-[300px] min-h-[560px] flex flex-col justify-between">
+                        <div className="game-panel min-w-[280px] xl:min-w-[300px] flex flex-col justify-between">
                             <div className="game-panel-header">
                                 <div className="flex items-center gap-1.5">
                                     <span className="terminal-dot" style={{background:'#ff5f57'}}></span>
