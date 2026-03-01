@@ -415,100 +415,131 @@ const VideoPoker = () => {
     
     return (
         <Layout>
-            <div className="flex w-full justify-center p-2 sm:p-4 pb-32">
+            {/* ═══ Main scrollable content area ═══ */}
+            <div
+                className="flex flex-col lg:flex-row w-full max-w-[1200px] mx-auto gap-4 p-2 sm:p-4"
+                style={{ paddingBottom: isMobile ? 140 : 16 }}
+            >
+                {/* ─── Game Display: payout table + deal button + cards ─── */}
                 <div
-                    className={` ${isMobile ? "flex flex-col items-center gap-4" : "flex gap-4"
-                        } w-full max-w-[1200px]`}
+                    className="game-display flex-1 flex items-center justify-center w-full p-4 md:p-6 relative overflow-hidden"
+                    style={{ minHeight: isMobile ? 320 : 300 }}
                 >
-                    <div className={`game-display flex items-center justify-center w-full p-4 md:p-6 gap-2 ${isMobile ? "min-h-[350px] " : "min-h-[300px] "
-                        } relative h-full overflow-hidden`}>
-                        <CelebrationAnimations
-                            visible={showCelebration}
-                            onComplete={() => setShowCelebration(false)}
-                        />
-                        <div className="flex-col py-2 md:px-10 w-full md:w-auto">
-                            <PayoutTable ranking={ranking} betAmount={betAmount} dealing={dealing} />
-                            <div className="flex justify-center">
-                                <Button
-                                    onPress={handleDeal}
-                                    disabled={loading}
-                                    color="default"
-                                    className="synthwave-laser-button synthwave-laser-button--small mt-5 px-8 py-4 text-black"
-                                >
-                                    {dealing ? "Deal" : "Bet Again"}
-                                </Button>
-                            </div>
-                            <VideoPokerGameScreen cards={cards} holds={holds} onSelect={handleHolder} dealing={dealing} gamestart={gamestart} winningCards={winningCards} />
+                    <CelebrationAnimations
+                        visible={showCelebration}
+                        onComplete={() => setShowCelebration(false)}
+                    />
+
+                    <div className="flex flex-col py-2 md:px-10 w-full md:w-auto">
+                        <PayoutTable ranking={ranking} betAmount={betAmount} dealing={dealing} />
+
+                        <div className="flex justify-center">
+                            <Button
+                                onPress={handleDeal}
+                                disabled={loading}
+                                color="default"
+                                className="synthwave-laser-button synthwave-laser-button--small mt-5 px-8 py-4 text-black"
+                            >
+                                {dealing ? "Deal" : "Bet Again"}
+                            </Button>
                         </div>
-                        <ResultModal
-                            visible={!gamestart && winningCards.length > 0 && ranking !== ""}
-                            data={{
-                                odds: lastMultiplier || currentpayout?.multiplier || 0,
-                                profit: lastPayoutAmount,
-                                coin: "",
-                            }}
-                            Currency={""}
+
+                        <VideoPokerGameScreen
+                            cards={cards}
+                            holds={holds}
+                            onSelect={handleHolder}
+                            dealing={dealing}
+                            gamestart={gamestart}
+                            winningCards={winningCards}
                         />
                     </div>
-                    {!isMobile && (
-                        <div className="game-panel min-w-[280px] xl:min-w-[300px] flex flex-col justify-between">
-                            <div className="game-panel-header">
-                                <div className="flex items-center gap-1.5">
-                                    <span className="terminal-dot" style={{background:'#ff5f57'}}></span>
-                                    <span className="terminal-dot" style={{background:'#febc2e'}}></span>
-                                    <span className="terminal-dot" style={{background:'#28c840'}}></span>
-                                </div>
-                                <span className="text-xs font-mono text-cyan-400/80 tracking-wider">🂠 POKER</span>
-                            </div>
-                            <div className="game-panel-body flex flex-col gap-4">
-                                <div className="flex items-center gap-4 mt-1">
-                                    <div className="flex-1">
-                                        <AmountInput value={betAmount} onChange={setBetAmount} disabled={disabled} />
-                                    </div>
-                                    <Button 
-                                        onClick={() => setShowHelp(true)} 
-                                        className="w-[36px] h-[36px] min-w-[36px] p-0 text-base font-bold text-white bg-cyan-400 hover:bg-cyan-300 rounded-full flex-shrink-0 flex items-center justify-center"
-                                        title="Game Help"
-                                    >
-                                        ?
-                                    </Button>
-                                </div>
-                                <Button disabled={disabled} onPress={handleDeal} color="success" className="slide-bet-button">
-                                    Bet
-                                </Button>
-                            </div>
-                        </div>)}
-                    {isMobile && (
-                        <div className="game-panel w-full flex flex-col justify-between">
-                            <div className="game-panel-header">
-                                <div className="flex items-center gap-1.5">
-                                    <span className="terminal-dot" style={{background:'#ff5f57'}}></span>
-                                    <span className="terminal-dot" style={{background:'#febc2e'}}></span>
-                                    <span className="terminal-dot" style={{background:'#28c840'}}></span>
-                                </div>
-                                <span className="text-xs font-mono text-cyan-400/80 tracking-wider">🂠 POKER</span>
-                            </div>
-                            <div className="game-panel-body flex flex-col gap-4">
-                                <div className="flex items-center gap-4 mt-1">
-                                    <div className="flex-1">
-                                        <AmountInput value={betAmount} onChange={setBetAmount} disabled={disabled} />
-                                    </div>
-                                    <Button 
-                                        onClick={() => setShowHelp(true)} 
-                                        className="w-[36px] h-[36px] min-w-[36px] p-0 text-base font-bold text-white bg-cyan-400 hover:bg-cyan-300 rounded-full flex-shrink-0 flex items-center justify-center"
-                                        title="Game Help"
-                                    >
-                                        ?
-                                    </Button>
-                                </div>
-                                <Button disabled={disabled} onPress={handleDeal} color="success" className="bg-cyan-400 hover:bg-cyan-300 rounded-full uppercase font-bold px-8 py-4 text-black">
-                                    Bet
-                                </Button>
-                            </div>
-                        </div>)}
+
+                    <ResultModal
+                        visible={!gamestart && winningCards.length > 0 && ranking !== ""}
+                        data={{
+                            odds: lastMultiplier || currentpayout?.multiplier || 0,
+                            profit: lastPayoutAmount,
+                            coin: "",
+                        }}
+                        Currency={""}
+                    />
                 </div>
 
+                {/* ─── DESKTOP: Side bet panel (static, in-flow) ─── */}
+                {!isMobile && (
+                    <div className="game-panel min-w-[280px] xl:min-w-[300px] flex flex-col justify-between shrink-0">
+                        <div className="game-panel-header">
+                            <div className="flex items-center gap-1.5">
+                                <span className="terminal-dot" style={{ background: '#ff5f57' }} />
+                                <span className="terminal-dot" style={{ background: '#febc2e' }} />
+                                <span className="terminal-dot" style={{ background: '#28c840' }} />
+                            </div>
+                            <span className="text-xs font-mono text-cyan-400/80 tracking-wider">🂠 POKER</span>
+                        </div>
+                        <div className="game-panel-body flex flex-col gap-4">
+                            <div className="flex items-center gap-4 mt-1">
+                                <div className="flex-1">
+                                    <AmountInput value={betAmount} onChange={setBetAmount} disabled={disabled} />
+                                </div>
+                                <Button
+                                    onClick={() => setShowHelp(true)}
+                                    className="w-[36px] h-[36px] min-w-[36px] p-0 text-base font-bold text-white bg-cyan-400 hover:bg-cyan-300 rounded-full shrink-0 flex items-center justify-center"
+                                    title="Game Help"
+                                >
+                                    ?
+                                </Button>
+                            </div>
+                            <Button disabled={disabled} onPress={handleDeal} color="success" className="slide-bet-button">
+                                Bet
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </div>
+
+            {/* ═══ MOBILE: Fixed bottom bet bar — always visible, never hidden ═══ */}
+            {isMobile && (
+                <div
+                    style={{
+                        position: 'fixed',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        zIndex: 50,
+                        background: 'linear-gradient(to top, rgba(5,10,20,1) 70%, rgba(5,10,20,0.95) 85%, transparent)',
+                        borderTop: '1px solid rgba(0,243,255,0.12)',
+                        padding: '16px 16px env(safe-area-inset-bottom, 12px)',
+                    }}
+                >
+                    <div className="flex flex-col gap-3 max-w-[500px] mx-auto">
+                        <div className="flex items-center gap-3">
+                            <div className="flex-1">
+                                <AmountInput value={betAmount} onChange={setBetAmount} disabled={disabled} />
+                            </div>
+                            <Button
+                                onClick={() => setShowHelp(true)}
+                                className="w-[36px] h-[36px] min-w-[36px] p-0 text-base font-bold text-white bg-cyan-400 hover:bg-cyan-300 rounded-full shrink-0 flex items-center justify-center"
+                                title="Game Help"
+                            >
+                                ?
+                            </Button>
+                        </div>
+                        <Button
+                            disabled={disabled}
+                            onPress={handleDeal}
+                            color="success"
+                            className="w-full rounded-full uppercase font-bold py-4 text-black text-lg"
+                            style={{
+                                background: 'linear-gradient(135deg, #00f3ff 0%, #00d4e0 100%)',
+                                boxShadow: '0 0 20px rgba(0,243,255,0.3)',
+                            }}
+                        >
+                            Bet
+                        </Button>
+                    </div>
+                </div>
+            )}
+
             <GameGuide isOpen={showHelp} onClose={() => setShowHelp(false)} gameName="videopoker" />
         </Layout>
     )

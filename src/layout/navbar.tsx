@@ -160,10 +160,10 @@ const CustomNavbar = () => {
                         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                         onClick={() => setIsMenuOpen(false)}
                     />
-                    {/* Drawer panel — slides from left */}
+                    {/* Drawer panel — slides from left, fixed to viewport */}
                     <div 
-                        className="absolute top-0 left-0 h-full w-[280px] bg-black/95 backdrop-blur-xl border-r border-cyan-400/10 shadow-[4px_0_30px_rgba(0,0,0,0.8)] flex flex-col overflow-y-auto"
-                        style={{ animation: 'slideInLeft 0.25s ease-out' }}
+                        className="fixed top-0 left-0 bottom-0 w-[280px] bg-black/95 backdrop-blur-xl border-r border-cyan-400/10 shadow-[4px_0_30px_rgba(0,0,0,0.8)] flex flex-col overflow-y-auto z-[10000]"
+                        style={{ animation: 'slideInLeft 0.25s ease-out', height: '100dvh' }}
                     >
                         {/* Drawer header */}
                         <div className="flex items-center justify-between p-4 border-b border-cyan-400/10">
