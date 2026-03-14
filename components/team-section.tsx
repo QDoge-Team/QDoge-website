@@ -33,7 +33,16 @@ const teamMembers = [
     hoverBorder: 'hover:border-cyan-400/60',
   },
   {
-    name: '!Rakion',
+    name: 'CozyBeard',
+    role: 'CasinoGame Dev',
+    icon: Code,
+    color: 'text-cyan-400',
+    borderColor: 'border-cyan-400/30',
+    bgColor: 'bg-cyan-400/5',
+    hoverBorder: 'hover:border-cyan-400/60',
+  },
+  {
+    name: 'DoubleK',
     role: 'Backend Dev',
     icon: Server,
     color: 'text-purple-400',
