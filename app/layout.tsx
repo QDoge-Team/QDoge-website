@@ -11,14 +11,16 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'QDOGE',
   description: 'QDOGE AI CYBER SHIBA TRAINER',
+  /**
+   * No metadataBase: join icon URLs to it breaks favicons when the visit host
+   * does not match (custom domain vs VERCEL_URL, localhost vs 127.0.0.1, etc.).
+   */
   icons: {
     icon: [
-      { url: '/favicon.png' },
-      { url: '/favicon.png', type: 'image/png' },
+      { url: '/favicon.ico', sizes: '48x48' },
+      { url: '/icon.png', type: 'image/png', sizes: '512x512' },
     ],
-    apple: [
-      { url: '/logo.png', type: 'image/png' },
-    ],
+    apple: [{ url: '/apple-icon.png', type: 'image/png', sizes: '512x512' }],
   },
 };
 
