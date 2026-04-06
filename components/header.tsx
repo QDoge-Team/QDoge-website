@@ -20,7 +20,8 @@ type NavItem =
   | {
       label: string;
       href: string;
-      external: true;
+      external?: boolean;
+      isNew?: boolean;
     };
 
 /* ---------------- DATA ---------------- */
@@ -36,6 +37,7 @@ const navigationItems: NavItem[] = [
   { label: 'Airdrop', scrollTo: '#airdrop-mechanisms' },
   { label: 'Roadmap', scrollTo: '#roadmap' },
   { label: 'Faq', scrollTo: '#faq' },
+  { label: 'Doge Stats', href: '/doge-stats', isNew: true },
 ];
 
 /* ---------------- COMPONENT ---------------- */
@@ -107,7 +109,7 @@ export function Header() {
                   >
                     {item.label}
                   </button>
-                ) : (
+                ) : item.external ? (
                   <Link
                     key={item.label}
                     href={item.href}
@@ -116,6 +118,25 @@ export function Header() {
                     className='text-gray-300 hover:text-cyan-400 transition-colors text-sm uppercase tracking-wider'
                   >
                     {item.label}
+                  </Link>
+                ) : (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className={cn(
+                      'text-gray-300 hover:text-cyan-400 transition-colors text-sm uppercase tracking-wider',
+                      item.isNew && 'relative mr-2 inline-block pr-[3.25rem]'
+                    )}
+                  >
+                    {item.label}
+                    {item.isNew ? (
+                      <span
+                        className='pointer-events-none absolute -right-0.5 -top-2 flex h-5 min-w-[2.25rem] items-center justify-center rounded-md border border-cyan-400/70 bg-black px-1 text-[8px] font-extrabold leading-none tracking-wide text-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.45)] font-mono'
+                        title='Beta'
+                      >
+                        BETA
+                      </span>
+                    ) : null}
                   </Link>
                 )
               )}
@@ -161,7 +182,7 @@ export function Header() {
                 >
                   {item.label}
                 </button>
-              ) : (
+              ) : item.external ? (
                 <a
                   key={item.label}
                   href={item.href}
@@ -171,6 +192,26 @@ export function Header() {
                 >
                   {item.label}
                 </a>
+              ) : (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={cn(
+                    'block w-full text-left text-xl text-gray-300 hover:text-cyan-400',
+                    item.isNew && 'relative w-fit pr-[4.5rem]'
+                  )}
+                >
+                  {item.label}
+                  {item.isNew ? (
+                    <span
+                      className='pointer-events-none absolute -top-0.5 right-0 flex h-7 items-center justify-center rounded-md border border-cyan-400/70 bg-black px-2 text-[10px] font-extrabold leading-none tracking-wide text-cyan-300 shadow-[0_0_14px_rgba(34,211,238,0.45)] font-mono'
+                      title='Beta'
+                    >
+                      BETA
+                    </span>
+                  ) : null}
+                </Link>
               )
             )}
           </nav>
