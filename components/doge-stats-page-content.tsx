@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils';
 import {
   Activity,
   ArrowLeft,
+  BarChart3,
   Cpu,
   Globe,
   Network,
@@ -24,6 +25,7 @@ import {
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 type DispatcherPayload = {
@@ -107,25 +109,59 @@ type TickPayload = {
   error?: string;
 };
 
+type DogeTrackerPayload = {
+  currentHashrateHs?: number | null;
+  epochHashrateHs?: number | null;
+  athHashrateHs?: number | null;
+  poolSharePercent?: number | null;
+  epochSharePercent?: number | null;
+  athSharePercent?: number | null;
+  poolRank?: { rank: number; total: number } | null;
+  epochRank?: number | null;
+  bestRank?: number | null;
+  athEpoch?: number | null;
+  bestRankEpoch?: number | null;
+  poolRankingDoge?: Array<{
+    poolId: string;
+    name?: string;
+    hashrateHs: number;
+    rank: number;
+    url?: string | null;
+  }>;
+  currentPoolId?: string;
+  error?: string;
+};
+
+function formatPercent(value?: number | null, digits = 3): string {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return '—';
+  return `${value.toFixed(digits)}%`;
+}
+
 function MagicStat({
   label,
   value,
   sub,
+  subAtBottom,
+  subLines,
+  body,
   icon: Icon,
   gradientFrom,
   gradientTo,
 }: {
   label: string;
-  value: string;
+  value?: string;
   sub?: string;
+  subAtBottom?: boolean;
+  subLines?: Array<{ label: string; value: string }>;
+  body?: ReactNode;
   icon: typeof Activity;
   gradientFrom: string;
   gradientTo: string;
 }) {
   return (
-    <div className='rounded-2xl border border-white/10 bg-black/40 p-[1px] overflow-hidden shadow-[0_0_24px_rgba(0,243,255,0.06)]'>
+    <div className='flex h-full min-h-[130px] flex-col rounded-2xl border border-white/10 overflow-hidden shadow-[0_0_24px_rgba(0,243,255,0.06)]'>
       <MagicCard
-        className='rounded-2xl p-5 md:p-6 min-h-[130px] flex flex-col'
+        className='h-full min-h-[130px] flex-1 flex flex-col rounded-2xl p-5 md:p-6'
         gradientFrom={gradientFrom}
         gradientTo={gradientTo}
         gradientColor='rgba(0, 243, 255, 0.12)'
@@ -137,12 +173,37 @@ function MagicStat({
           </span>
           <Icon className='h-4 w-4 text-cyan-400/85 shrink-0' />
         </div>
-        <p className='text-xl sm:text-2xl font-bold tabular-nums text-white font-mono leading-tight'>
-          {value}
-        </p>
-        {sub ? (
-          <p className='text-[11px] text-gray-500 font-mono mt-2 leading-snug'>{sub}</p>
-        ) : null}
+        {body ? (
+          <div className='flex-1 flex flex-col'>{body}</div>
+        ) : (
+          <>
+            {value != null && value !== '' ? (
+              <p className='text-xl sm:text-2xl font-bold tabular-nums text-white font-mono leading-tight'>
+                {value}
+              </p>
+            ) : null}
+            {sub ? (
+              <p
+                className={cn(
+                  'text-[11px] text-gray-300 font-mono mt-2 leading-snug',
+                  subAtBottom ? 'mt-auto pt-2' : ''
+                )}
+              >
+                {sub}
+              </p>
+            ) : null}
+            {subLines?.length ? (
+              <div className='mt-2 space-y-1 font-mono'>
+                {subLines.map((line) => (
+                  <p key={line.label} className='text-[11px] leading-snug'>
+                    <span className='text-gray-500'>{line.label}</span>{' '}
+                    <span className='text-gray-300'>{line.value}</span>
+                  </p>
+                ))}
+              </div>
+            ) : null}
+          </>
+        )}
       </MagicCard>
     </div>
   );
@@ -157,6 +218,7 @@ export function DogeStatsPageContent() {
     null
   );
   const [tick, setTick] = useState<TickPayload | null>(null);
+  const [dogeTracker, setDogeTracker] = useState<DogeTrackerPayload | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
 
@@ -164,13 +226,14 @@ export function DogeStatsPageContent() {
     setLoadError(null);
     try {
       const id = encodeURIComponent(QDOGE_PUBLIC_MINER_ID);
-      const [dRes, pRes, hRes, aRes, ahRes, tRes] = await Promise.all([
+      const [dRes, pRes, hRes, aRes, ahRes, tRes, trRes] = await Promise.all([
         fetch('/api/mining/dispatcher'),
         fetch('/api/mining/pool'),
         fetch('/api/mining/pool/history'),
         fetch(`/api/mining/address/${id}`),
         fetch(`/api/mining/address/${id}/history?resolution=auto`),
         fetch('/api/mining/tick'),
+        fetch('/api/mining/doge-tracker'),
       ]);
 
       if (dRes.ok) setDispatcher(await dRes.json());
@@ -190,6 +253,9 @@ export function DogeStatsPageContent() {
 
       if (tRes.ok) setTick(await tRes.json());
       else setTick({ error: `tick ${tRes.status}` });
+
+      if (trRes.ok) setDogeTracker(await trRes.json());
+      else setDogeTracker({ error: `doge-tracker ${trRes.status}` });
 
       setUpdatedAt(new Date());
     } catch {
@@ -249,6 +315,28 @@ export function DogeStatsPageContent() {
     pool?.totalHashrateByType?.DOGE ??
     history?.current?.totalHashrateByType?.DOGE ??
     0;
+  const dogeAthHs = useMemo(() => {
+    const rows = history?.history;
+    let max = 0;
+    if (rows?.length) {
+      for (const row of rows) {
+        const hs = row.totalHashrateByType?.DOGE ?? 0;
+        if (hs > max) max = hs;
+      }
+    }
+    if (dogePoolHs > max) max = dogePoolHs;
+    return max > 0 ? max : null;
+  }, [history, dogePoolHs]);
+
+  const rankBest = useMemo(() => {
+    return dogeTracker?.bestRank ?? null;
+  }, [dogeTracker]);
+
+  const rankingRows = useMemo(() => {
+    const ranking = dogeTracker?.poolRankingDoge;
+    if (!ranking?.length) return [];
+    return [...ranking].sort((a, b) => a.rank - b.rank).slice(0, 3);
+  }, [dogeTracker]);
 
   const dispatcherMining = dispatcher?.mining;
   const showDispatcherError = dispatcher?.error && !dispatcherMining;
@@ -365,16 +453,104 @@ export function DogeStatsPageContent() {
 
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 mb-10'>
           <MagicStat
-            label='Dispatcher hashrate'
+            label='Hashrate'
             value={
-              dispatcherMining?.hashrate_display ??
-              (dispatcherMining?.hashrate
-                ? formatHashrateHs(dispatcherMining.hashrate)
-                : '—')
+              dogeTracker?.currentHashrateHs != null
+                ? formatHashrateHs(dogeTracker.currentHashrateHs)
+                : formatHashrateHs(dogePoolHs)
             }
-            sub='doge-connect dispatcher'
+            subLines={[
+              {
+                label: 'Epoch',
+                value:
+                  dogeTracker?.epochHashrateHs != null
+                    ? formatHashrateHs(dogeTracker.epochHashrateHs)
+                    : '—',
+              },
+              {
+                label: 'ATH',
+                value: `${dogeTracker?.athHashrateHs != null
+                  ? formatHashrateHs(dogeTracker.athHashrateHs)
+                  : dogeAthHs
+                    ? formatHashrateHs(dogeAthHs)
+                    : '—'}${dogeTracker?.athEpoch != null ? ` · E${dogeTracker.athEpoch}` : ''}`,
+              },
+            ]}
             icon={Pickaxe}
             gradientFrom='rgba(251, 191, 36, 0.25)'
+            gradientTo='rgba(10, 10, 10, 0.95)'
+          />
+          <MagicStat
+            label='POOL SHARE OF NETWORK'
+            value={formatPercent(dogeTracker?.poolSharePercent)}
+            subLines={[
+              { label: 'Epoch', value: formatPercent(dogeTracker?.epochSharePercent) },
+              {
+                label: 'ATH',
+                value: `${formatPercent(dogeTracker?.athSharePercent)}${
+                  dogeTracker?.athEpoch != null ? ` · E${dogeTracker.athEpoch}` : ''
+                }`,
+              },
+            ]}
+            icon={Globe}
+            gradientFrom='rgba(34, 197, 94, 0.2)'
+            gradientTo='rgba(10, 10, 10, 0.95)'
+          />
+          <MagicStat
+            label='POOL RANK (DOGE)'
+            value={dogeTracker?.poolRank ? `#${dogeTracker.poolRank.rank}` : '—'}
+            subLines={[
+              {
+                label: 'Epoch',
+                value: dogeTracker?.epochRank != null ? `#${dogeTracker.epochRank}` : '—',
+              },
+              {
+                label: 'Best',
+                value: `${rankBest != null ? `#${rankBest}` : '—'}${
+                  dogeTracker?.bestRankEpoch != null ? ` · E${dogeTracker.bestRankEpoch}` : ''
+                }`,
+              },
+            ]}
+            icon={Activity}
+            gradientFrom='rgba(168, 85, 247, 0.24)'
+            gradientTo='rgba(10, 10, 10, 0.95)'
+          />
+          <MagicStat
+            label='Pool Ranking (DOGE)'
+            body={
+              rankingRows.length > 0 ? (
+                <div className='space-y-2 flex-1'>
+                  {rankingRows.map((row) => {
+                    const isCurrent =
+                      (dogeTracker?.currentPoolId ?? 'qubic.org') === row.poolId ||
+                      row.name?.includes('qubic.org');
+                    return (
+                      <div
+                        key={`${row.rank}-${row.poolId}`}
+                        className={cn(
+                          'flex items-center justify-between rounded-lg px-3 py-2 font-mono text-sm',
+                          isCurrent
+                            ? 'border border-cyan-400/35 bg-cyan-400/10'
+                            : 'border border-white/10 bg-black/30'
+                        )}
+                      >
+                        <span className='text-gray-300'>
+                          <span className='text-amber-200/90 mr-2'>#{row.rank}</span>
+                          {row.name ?? row.poolId}
+                        </span>
+                        <span className='text-cyan-200/90 tabular-nums'>
+                          {formatHashrateHs(row.hashrateHs)}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className='text-[11px] text-gray-500 font-mono'>Ranking feed unavailable</p>
+              )
+            }
+            icon={BarChart3}
+            gradientFrom='rgba(59, 130, 246, 0.22)'
             gradientTo='rgba(10, 10, 10, 0.95)'
           />
           <MagicStat
@@ -385,6 +561,7 @@ export function DogeStatsPageContent() {
                 : '—'
             }
             sub='Live from dispatcher'
+            subAtBottom
             icon={Cpu}
             gradientFrom='rgba(0, 243, 255, 0.22)'
             gradientTo='rgba(10, 10, 10, 0.95)'
@@ -397,8 +574,9 @@ export function DogeStatsPageContent() {
                 : '—'
             }
             sub='Dispatcher pipeline'
+            subAtBottom
             icon={Activity}
-            gradientFrom='rgba(57, 255, 20, 0.18)'
+            gradientFrom='rgba(0, 243, 255, 0.22)'
             gradientTo='rgba(10, 10, 10, 0.95)'
           />
           <MagicStat
@@ -433,7 +611,7 @@ export function DogeStatsPageContent() {
                 : 'P2P connectivity'
             }
             icon={Network}
-            gradientFrom='rgba(34, 211, 238, 0.18)'
+            gradientFrom='rgba(0, 243, 255, 0.22)'
             gradientTo='rgba(10, 10, 10, 0.95)'
           />
         </div>
