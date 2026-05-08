@@ -64,6 +64,7 @@ type PoolCurrent = {
   totalWorkers?: number;
   activeUsers?: number;
   totalSharesByType?: Record<string, number>;
+  totalSolutionsByType?: Record<string, number>;
   error?: string;
 };
 
@@ -121,6 +122,9 @@ type DogeTrackerPayload = {
   bestRank?: number | null;
   athEpoch?: number | null;
   bestRankEpoch?: number | null;
+  blocksFoundTotal?: number | null;
+  blocksFoundRecent?: number | null;
+  expectedBlocks?: number | null;
   poolRankingDoge?: Array<{
     poolId: string;
     name?: string;
@@ -315,18 +319,22 @@ export function DogeStatsPageContent() {
     pool?.totalHashrateByType?.DOGE ??
     history?.current?.totalHashrateByType?.DOGE ??
     0;
+  const dogeCurrentHs = dogeTracker?.currentHashrateHs ?? dogePoolHs;
   const dogeAthHs = useMemo(() => {
     const rows = history?.history;
-    let max = 0;
+    let max = Math.max(
+      dogeCurrentHs ?? 0,
+      dogeTracker?.epochHashrateHs ?? 0,
+      dogeTracker?.athHashrateHs ?? 0
+    );
     if (rows?.length) {
       for (const row of rows) {
         const hs = row.totalHashrateByType?.DOGE ?? 0;
         if (hs > max) max = hs;
       }
     }
-    if (dogePoolHs > max) max = dogePoolHs;
     return max > 0 ? max : null;
-  }, [history, dogePoolHs]);
+  }, [history, dogeCurrentHs, dogeTracker?.epochHashrateHs, dogeTracker?.athHashrateHs]);
 
   const rankBest = useMemo(() => {
     return dogeTracker?.bestRank ?? null;
@@ -337,6 +345,8 @@ export function DogeStatsPageContent() {
     if (!ranking?.length) return [];
     return [...ranking].sort((a, b) => a.rank - b.rank).slice(0, 3);
   }, [dogeTracker]);
+  const dogeBlocksFoundEpoch =
+    pool?.totalSolutionsByType?.DOGE ?? history?.current?.totalSolutionsByType?.DOGE ?? null;
 
   const dispatcherMining = dispatcher?.mining;
   const showDispatcherError = dispatcher?.error && !dispatcherMining;
@@ -435,9 +445,16 @@ export function DogeStatsPageContent() {
                 </span>
               ) : null}
             </div>
-            <div className='text-xs text-gray-400'>
-              Pool DOGE:{' '}
-              <span className='text-amber-200'>{formatHashrateHs(dogePoolHs)}</span>
+            <div className='flex flex-wrap items-center gap-3 text-xs text-gray-400'>
+              {dogeTracker?.poolRank ? (
+                <span className='text-cyan-300 text-lg font-bold tabular-nums'>
+                  #{dogeTracker.poolRank.rank}
+                </span>
+              ) : null}
+              <span>
+                Pool DOGE:{' '}
+                <span className='text-amber-200'>{formatHashrateHs(dogePoolHs)}</span>
+              </span>
             </div>
           </div>
           <div className='mt-4 h-2 w-full rounded-full bg-gray-900 overflow-hidden border border-white/5'>
@@ -454,11 +471,7 @@ export function DogeStatsPageContent() {
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 mb-10'>
           <MagicStat
             label='Hashrate'
-            value={
-              dogeTracker?.currentHashrateHs != null
-                ? formatHashrateHs(dogeTracker.currentHashrateHs)
-                : formatHashrateHs(dogePoolHs)
-            }
+            value={formatHashrateHs(dogeCurrentHs)}
             subLines={[
               {
                 label: 'Epoch',
@@ -469,11 +482,12 @@ export function DogeStatsPageContent() {
               },
               {
                 label: 'ATH',
-                value: `${dogeTracker?.athHashrateHs != null
-                  ? formatHashrateHs(dogeTracker.athHashrateHs)
-                  : dogeAthHs
-                    ? formatHashrateHs(dogeAthHs)
-                    : '—'}${dogeTracker?.athEpoch != null ? ` · E${dogeTracker.athEpoch}` : ''}`,
+                value: `${dogeAthHs ? formatHashrateHs(dogeAthHs) : '—'}${
+                  dogeTracker?.athEpoch != null &&
+                  dogeTracker?.athHashrateHs === dogeAthHs
+                    ? ` · E${dogeTracker.athEpoch}`
+                    : ''
+                }`,
               },
             ]}
             icon={Pickaxe}
@@ -551,6 +565,29 @@ export function DogeStatsPageContent() {
             }
             icon={BarChart3}
             gradientFrom='rgba(59, 130, 246, 0.22)'
+            gradientTo='rgba(10, 10, 10, 0.95)'
+          />
+          <MagicStat
+            label='Blocks found'
+            value={
+              dogeBlocksFoundEpoch != null ? formatCompact(dogeBlocksFoundEpoch) : '—'
+            }
+            subLines={[
+              {
+                label: 'Current epoch',
+                value:
+                  dogeBlocksFoundEpoch != null ? formatCompact(dogeBlocksFoundEpoch) : '—',
+              },
+              {
+                label: 'Overall total',
+                value:
+                  dogeTracker?.blocksFoundTotal != null
+                    ? formatCompact(dogeTracker.blocksFoundTotal)
+                    : '—',
+              },
+            ]}
+            icon={Pickaxe}
+            gradientFrom='rgba(251, 191, 36, 0.22)'
             gradientTo='rgba(10, 10, 10, 0.95)'
           />
           <MagicStat

@@ -11,6 +11,9 @@ type JetskiStatsPayload = {
     hashrate?: number;
     hashrate_average_1h?: number;
     history?: number[];
+    blocks_nr?: number;
+    blocks_1000?: number;
+    expected_blocks?: number;
   }>;
   hashrate?: number;
 };
@@ -147,7 +150,11 @@ export async function GET() {
 
       const currentHashrateHs = s.currentStats?.pool_hashrate ?? null;
       const epochHashrateHs = s.hashrateStats?.pool?.avg_1h ?? currentHashrateHs;
-      const athHashrateHs = s.hashrateStats?.pool?.max_24h ?? currentHashrateHs;
+      const athHashrateHs = Math.max(
+        currentHashrateHs ?? 0,
+        epochHashrateHs ?? 0,
+        s.hashrateStats?.pool?.max_24h ?? 0
+      );
       const poolSharePercent = computeSharePercent(
         currentHashrateHs ?? undefined,
         s.currentStats?.network_hashrate
@@ -194,6 +201,9 @@ export async function GET() {
         bestRank: q?.rank ?? null,
         athEpoch: null,
         bestRankEpoch: null,
+        blocksFoundTotal: null,
+        blocksFoundRecent: null,
+        expectedBlocks: null,
         poolRankingDoge: ranking.slice(0, 3),
         source: 'jetski-fallback',
       });
@@ -223,7 +233,7 @@ export async function GET() {
         ? qubic.hashrate_average_1h
         : currentHashrateHs;
 
-    let athHashrateHs = currentHashrateHs;
+    let athHashrateHs = Math.max(currentHashrateHs ?? 0, epochHashrateHs ?? 0);
     if (Array.isArray(qubic.history) && qubic.history.length > 0) {
       let rolling = qubic.history[0] ?? 0;
       let max = rolling;
@@ -231,7 +241,9 @@ export async function GET() {
         rolling += qubic.history[i] ?? 0;
         if (rolling > max) max = rolling;
       }
-      if (typeof max === 'number' && Number.isFinite(max)) athHashrateHs = max;
+      if (typeof max === 'number' && Number.isFinite(max)) {
+        athHashrateHs = Math.max(athHashrateHs, max);
+      }
     }
 
     const poolSharePercent = computeSharePercent(currentHashrateHs ?? undefined, networkHashrate ?? undefined);
@@ -320,6 +332,18 @@ export async function GET() {
       bestRank,
       athEpoch,
       bestRankEpoch,
+      blocksFoundTotal:
+        typeof qubic.blocks_nr === 'number' && Number.isFinite(qubic.blocks_nr)
+          ? qubic.blocks_nr
+          : null,
+      blocksFoundRecent:
+        typeof qubic.blocks_1000 === 'number' && Number.isFinite(qubic.blocks_1000)
+          ? qubic.blocks_1000
+          : null,
+      expectedBlocks:
+        typeof qubic.expected_blocks === 'number' && Number.isFinite(qubic.expected_blocks)
+          ? qubic.expected_blocks
+          : null,
       poolRankingDoge: around.length > 0 ? around : fullRanking.slice(0, 3),
     });
   } catch {
