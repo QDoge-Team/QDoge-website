@@ -38,6 +38,7 @@ const navigationItems: NavItem[] = [
   { label: 'Roadmap', scrollTo: '#roadmap' },
   { label: 'Faq', scrollTo: '#faq' },
   { label: 'Doge Stats', href: '/doge-stats', isNew: true },
+  { label: 'Holders', href: '/holders', isNew: true },
 ];
 
 /* ---------------- COMPONENT ---------------- */
