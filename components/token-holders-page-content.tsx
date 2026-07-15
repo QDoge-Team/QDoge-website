@@ -62,13 +62,19 @@ function explorerUrl(identity: string): string {
   return `https://explorer.qubic.org/network/address/${identity}`;
 }
 
-/** Rank-based cell color: cyan for whales fading to deep purple for minnows. */
-function cellColor(holder: HolderRow, t: number): string {
-  if (holder.isIssuer) return 'hsl(40 85% 45%)';
-  if (holder.label?.includes('Locked')) return 'hsl(150 60% 32%)';
+/** Rank-based cell tint: cyan for whales fading to deep purple for minnows. */
+function cellTint(holder: HolderRow, t: number): { bg: string; border: string } {
+  if (holder.isIssuer) {
+    return { bg: 'hsl(40 60% 14%)', border: 'hsl(40 85% 45%)' };
+  }
+  if (holder.label?.includes('Locked')) {
+    return { bg: 'hsl(150 45% 12%)', border: 'hsl(150 60% 38%)' };
+  }
   const hue = 187 + (275 - 187) * t;
-  const lightness = 52 - 22 * t;
-  return `hsl(${hue} 75% ${lightness}%)`;
+  return {
+    bg: `hsl(${hue} 55% 13%)`,
+    border: `hsl(${hue} 75% ${48 - 14 * t}%)`,
+  };
 }
 
 /* ---------------- STAT CARD ---------------- */
@@ -191,9 +197,11 @@ function squarify(
 function DistributionTreemap({
   holders,
   supply,
+  logoSrc,
 }: {
   holders: HolderRow[];
   supply: number;
+  logoSrc: string;
 }) {
   const [mapSize, setMapSize] = useState<(typeof MAP_SIZES)[number]>(100);
 
@@ -236,28 +244,41 @@ function DistributionTreemap({
           {cells.map((cell) => {
             const pct = supply > 0 ? (cell.holder.balance / supply) * 100 : 0;
             const t = shown.length > 1 ? (cell.rank - 1) / (shown.length - 1) : 0;
-            const showText = cell.w > 88 && cell.h > 34;
+            const tint = cellTint(cell.holder, t);
+            const w = Math.max(cell.w - 1.5, 0.5);
+            const h = Math.max(cell.h - 1.5, 0.5);
+            const showText = w > 88 && h > 46;
+            // Logo scales with the cell so area still reads as share size.
+            const textPad = showText ? 30 : 0;
+            const logoSize = Math.max(Math.min(w, h - textPad) * 0.78, 4);
+            const logoX = cell.x + (w - logoSize) / 2;
+            const logoY = cell.y + textPad + (h - textPad - logoSize) / 2;
             return (
-              <g key={cell.holder.identity}>
+              <g key={cell.holder.identity} className='transition-opacity hover:opacity-70'>
                 <rect
                   x={cell.x}
                   y={cell.y}
-                  width={Math.max(cell.w - 1.5, 0.5)}
-                  height={Math.max(cell.h - 1.5, 0.5)}
+                  width={w}
+                  height={h}
                   rx={3}
-                  fill={cellColor(cell.holder, t)}
-                  className='transition-opacity hover:opacity-75'
-                >
-                  <title>
-                    {`#${cell.rank} ${cell.holder.label ?? cell.holder.identity}\n${formatUnits(cell.holder.balance)} (${pct.toFixed(2)}%)`}
-                  </title>
-                </rect>
+                  fill={tint.bg}
+                  stroke={tint.border}
+                  strokeWidth={1}
+                />
+                <image
+                  href={logoSrc}
+                  x={logoX}
+                  y={logoY}
+                  width={logoSize}
+                  height={logoSize}
+                  pointerEvents='none'
+                />
                 {showText ? (
                   <>
                     <text
                       x={cell.x + 8}
-                      y={cell.y + 18}
-                      fill='rgba(0,0,0,0.85)'
+                      y={cell.y + 17}
+                      fill='rgba(255,255,255,0.92)'
                       fontSize='12'
                       fontFamily='monospace'
                       fontWeight='bold'
@@ -267,8 +288,8 @@ function DistributionTreemap({
                     </text>
                     <text
                       x={cell.x + 8}
-                      y={cell.y + 33}
-                      fill='rgba(0,0,0,0.65)'
+                      y={cell.y + 32}
+                      fill='rgba(255,255,255,0.6)'
                       fontSize='11'
                       fontFamily='monospace'
                       pointerEvents='none'
@@ -277,6 +298,17 @@ function DistributionTreemap({
                     </text>
                   </>
                 ) : null}
+                <rect
+                  x={cell.x}
+                  y={cell.y}
+                  width={w}
+                  height={h}
+                  fill='transparent'
+                >
+                  <title>
+                    {`#${cell.rank} ${cell.holder.label ?? cell.holder.identity}\n${formatUnits(cell.holder.balance)} (${pct.toFixed(2)}%)`}
+                  </title>
+                </rect>
               </g>
             );
           })}
@@ -288,14 +320,16 @@ function DistributionTreemap({
       )}
       <div className='mt-3 flex flex-wrap gap-4 font-mono text-[10px] text-gray-500'>
         <span className='flex items-center gap-1.5'>
-          <span className='h-2.5 w-2.5 rounded-sm bg-[hsl(150_60%_32%)]' /> Locked (MsVault)
+          <span className='h-2.5 w-2.5 rounded-sm border border-[hsl(150_60%_38%)] bg-[hsl(150_45%_12%)]' />{' '}
+          Locked (MsVault)
         </span>
         <span className='flex items-center gap-1.5'>
-          <span className='h-2.5 w-2.5 rounded-sm bg-[hsl(40_85%_45%)]' /> Issuer
+          <span className='h-2.5 w-2.5 rounded-sm border border-[hsl(40_85%_45%)] bg-[hsl(40_60%_14%)]' />{' '}
+          Issuer
         </span>
         <span className='flex items-center gap-1.5'>
           <span className='h-2.5 w-2.5 rounded-sm bg-linear-to-r from-cyan-400 to-purple-500' />{' '}
-          Holders (by rank)
+          Holders (by rank) · logo scales with share
         </span>
       </div>
     </div>
@@ -334,6 +368,8 @@ export function TokenHoldersPageContent() {
   const [search, setSearch] = useState('');
   const [pageSize, setPageSize] = useState<(typeof PAGE_SIZES)[number]>(50);
   const [whalesOnly, setWhalesOnly] = useState(false);
+
+  const logoSrc = asset === 'QTREAT' ? '/qtreat-logo.png' : '/qdoge-logo.png';
 
   const load = useCallback(async (target: TokenAsset) => {
     setLoadError(null);
@@ -516,7 +552,7 @@ export function TokenHoldersPageContent() {
 
         {/* Treemap */}
         <div className='mb-10'>
-          <DistributionTreemap holders={holders} supply={supply} />
+          <DistributionTreemap holders={holders} supply={supply} logoSrc={logoSrc} />
         </div>
 
         {/* Controls */}
