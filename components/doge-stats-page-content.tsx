@@ -2,16 +2,10 @@
 
 import { MagicCard } from '@/components/ui/magic-card';
 import {
-  MinerHashrateHistoryChart,
-  MinerWorkersTable,
-  type MinerHistoryPoint,
-  type MinerWorkerRow,
-} from '@/components/miner-workers-and-chart';
-import {
   MiningPoolCharts,
   type HashrateChartPoint,
 } from '@/components/mining-pool-charts';
-import { QDOGE_PUBLIC_MINER_ID } from '@/lib/mining/constants';
+import { ViaBtcMinerSection } from '@/components/viabtc-miner-section';
 import { formatCompact, formatHashrateHs } from '@/lib/mining/format';
 import { cn } from '@/lib/utils';
 import {
@@ -75,30 +69,6 @@ type PoolHistoryPayload = {
     epoch: number;
     totalHashrateByType?: Record<string, number>;
     totalWorkers?: number;
-  }>;
-  error?: string;
-};
-
-type AddressPayload = {
-  userId?: string;
-  hashrateByType?: Record<string, number>;
-  stats?: {
-    sharesByType?: Record<string, number>;
-    workers?: number;
-    solutions?: number;
-    estimatedRevenueByType?: Record<string, number>;
-  };
-  workers?: MinerWorkerRow[];
-  error?: string;
-};
-
-type AddressHistoryPayload = {
-  userId?: string;
-  resolution?: string;
-  data?: Array<{
-    timestamp: number;
-    epoch: number;
-    hashrateByType?: Record<string, number>;
   }>;
   error?: string;
 };
@@ -217,10 +187,6 @@ export function DogeStatsPageContent() {
   const [dispatcher, setDispatcher] = useState<DispatcherPayload | null>(null);
   const [pool, setPool] = useState<PoolCurrent | null>(null);
   const [history, setHistory] = useState<PoolHistoryPayload | null>(null);
-  const [address, setAddress] = useState<AddressPayload | null>(null);
-  const [addressHistory, setAddressHistory] = useState<AddressHistoryPayload | null>(
-    null
-  );
   const [tick, setTick] = useState<TickPayload | null>(null);
   const [dogeTracker, setDogeTracker] = useState<DogeTrackerPayload | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -229,13 +195,10 @@ export function DogeStatsPageContent() {
   const load = useCallback(async () => {
     setLoadError(null);
     try {
-      const id = encodeURIComponent(QDOGE_PUBLIC_MINER_ID);
-      const [dRes, pRes, hRes, aRes, ahRes, tRes, trRes] = await Promise.all([
+      const [dRes, pRes, hRes, tRes, trRes] = await Promise.all([
         fetch('/api/mining/dispatcher'),
         fetch('/api/mining/pool'),
         fetch('/api/mining/pool/history'),
-        fetch(`/api/mining/address/${id}`),
-        fetch(`/api/mining/address/${id}/history?resolution=auto`),
         fetch('/api/mining/tick'),
         fetch('/api/mining/doge-tracker'),
       ]);
@@ -248,12 +211,6 @@ export function DogeStatsPageContent() {
 
       if (hRes.ok) setHistory(await hRes.json());
       else setHistory({ error: `history ${hRes.status}` });
-
-      if (aRes.ok) setAddress(await aRes.json());
-      else setAddress({ error: `address ${aRes.status}` });
-
-      if (ahRes.ok) setAddressHistory(await ahRes.json());
-      else setAddressHistory({ error: `address history ${ahRes.status}` });
 
       if (tRes.ok) setTick(await tRes.json());
       else setTick({ error: `tick ${tRes.status}` });
@@ -273,26 +230,6 @@ export function DogeStatsPageContent() {
     const id = setInterval(() => void load(), 30_000);
     return () => clearInterval(id);
   }, [load]);
-
-  const minerHistoryChart: MinerHistoryPoint[] = useMemo(() => {
-    const rows = addressHistory?.data;
-    if (!rows?.length) return [];
-    const sorted = [...rows].sort((a, b) => a.timestamp - b.timestamp);
-    return sorted.map((row) => {
-      const dogeHs = row.hashrateByType?.DOGE ?? 0;
-      const d = new Date(row.timestamp * 1000);
-      return {
-        label: d.toLocaleString(undefined, {
-          month: 'short',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-        dogeHs,
-        dogeThs: dogeHs / 1e12,
-      };
-    });
-  }, [addressHistory]);
 
   const chartData: HashrateChartPoint[] = useMemo(() => {
     const rows = history?.history;
@@ -660,85 +597,7 @@ export function DogeStatsPageContent() {
           <MiningPoolCharts data={chartData} />
         </div>
 
-        <div className='mb-6'>
-          <h2 className='font-mono text-xs uppercase tracking-[0.25em] text-gray-400 mb-4'>
-            QDoge public miner
-          </h2>
-          <div className='rounded-2xl border border-cyan-400/25 bg-black/50 p-5 sm:p-6 backdrop-blur-sm'>
-            <div className='flex flex-wrap items-start justify-between gap-4'>
-              <div>
-                <p className='text-[10px] uppercase tracking-widest text-gray-500 font-mono'>
-                  Identity
-                </p>
-                <p className='mt-1 font-mono text-xs sm:text-sm text-cyan-100/90 break-all max-w-xl'>
-                  {address?.userId ?? QDOGE_PUBLIC_MINER_ID}
-                </p>
-                {address?.error ? (
-                  <p className='mt-2 text-xs text-amber-300 font-mono'>{address.error}</p>
-                ) : null}
-              </div>
-              <a
-                href={`https://platform.qubic.li/public/id/${QDOGE_PUBLIC_MINER_ID}`}
-                target='_blank'
-                rel='noreferrer'
-                className='shrink-0 rounded-lg border border-cyan-400/40 px-3 py-1.5 text-[11px] font-mono uppercase tracking-wider text-cyan-300 hover:bg-cyan-400/10 transition-colors'
-              >
-                Open on qubic.li
-              </a>
-            </div>
-            <div className='mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4'>
-              <div className='rounded-xl border border-white/10 bg-black/40 p-4'>
-                <p className='text-[10px] text-gray-500 font-mono uppercase tracking-wider'>
-                  DOGE hashrate
-                </p>
-                <p className='mt-2 text-lg font-mono text-amber-200'>
-                  {address?.hashrateByType?.DOGE != null
-                    ? formatHashrateHs(address.hashrateByType.DOGE)
-                    : '—'}
-                </p>
-              </div>
-              <div className='rounded-xl border border-white/10 bg-black/40 p-4'>
-                <p className='text-[10px] text-gray-500 font-mono uppercase tracking-wider'>
-                  DOGE shares (stats)
-                </p>
-                <p className='mt-2 text-lg font-mono text-cyan-200'>
-                  {address?.stats?.sharesByType?.DOGE != null
-                    ? formatCompact(address.stats.sharesByType.DOGE)
-                    : '—'}
-                </p>
-              </div>
-              <div className='rounded-xl border border-white/10 bg-black/40 p-4'>
-                <p className='text-[10px] text-gray-500 font-mono uppercase tracking-wider'>
-                  Workers
-                </p>
-                <p className='mt-2 text-lg font-mono text-purple-200'>
-                  {address?.stats?.workers != null ? String(address.stats.workers) : '—'}
-                </p>
-              </div>
-            </div>
-
-            {addressHistory?.error ? (
-              <p className='mt-4 text-xs font-mono text-amber-300'>
-                Hashrate history: {addressHistory.error}
-              </p>
-            ) : null}
-
-            <div className='mt-8 space-y-6'>
-              <div>
-                <h3 className='font-mono text-xs uppercase tracking-[0.2em] text-gray-400 mb-3'>
-                  Workers list
-                </h3>
-                <MinerWorkersTable workers={address?.workers ?? []} />
-              </div>
-              <div>
-                <MinerHashrateHistoryChart
-                  data={minerHistoryChart}
-                  resolution={addressHistory?.resolution}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+        <ViaBtcMinerSection />
 
         {/* <div className='rounded-xl border border-white/10 bg-black/30 px-4 py-5 font-mono text-[11px] text-gray-500 leading-relaxed'>
           <p className='flex items-start gap-2'>
