@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { DiscordLogoIcon } from '@radix-ui/react-icons';
 import { Menu, MessageCircle, X, Zap } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 /* ---------------- TYPES ---------------- */
@@ -21,7 +22,8 @@ type NavItem =
       label: string;
       href: string;
       external?: boolean;
-      isNew?: boolean;
+      /** Only shown on the home page — e.g. links to a section that lives there. */
+      homeOnly?: boolean;
     };
 
 /* ---------------- DATA ---------------- */
@@ -32,19 +34,25 @@ const navigationItems: NavItem[] = [
     label: 'Kennel Club',
     href: 'https://kennelclub.qdogeonqubic.com/',
     external: true,
+    homeOnly: true,
   },
   { label: 'Tokenomics', scrollTo: '#tokenomics' },
   { label: 'Airdrop', scrollTo: '#airdrop-mechanisms' },
   { label: 'Roadmap', scrollTo: '#roadmap' },
   { label: 'Faq', scrollTo: '#faq' },
-  { label: 'Doge Stats', href: '/doge-stats', isNew: true },
-  { label: 'Holders', href: '/holders', isNew: true },
-  { label: 'Dividends', href: '/dividends', isNew: true },
+  { label: 'Doge Stats', href: '/doge-stats' },
+  { label: 'Holders', href: '/holders' },
+  { label: 'Dividends', href: '/dividends' },
 ];
 
 /* ---------------- COMPONENT ---------------- */
 
 export function Header() {
+  const pathname = usePathname();
+  const isHome = pathname === '/';
+  const visibleNavItems = navigationItems.filter(
+    (item) => isHome || (!('scrollTo' in item) && !item.homeOnly)
+  );
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -102,7 +110,7 @@ export function Header() {
 
             {/* DESKTOP NAV */}
             <nav className='hidden md:flex items-center space-x-6'>
-              {navigationItems.map((item) =>
+              {visibleNavItems.map((item) =>
                 'scrollTo' in item ? (
                   <button
                     key={item.label}
@@ -125,20 +133,9 @@ export function Header() {
                   <Link
                     key={item.label}
                     href={item.href}
-                    className={cn(
-                      'text-gray-300 hover:text-cyan-400 transition-colors text-sm uppercase tracking-wider',
-                      item.isNew && 'relative mr-2 inline-block pr-[3.25rem]'
-                    )}
+                    className='text-gray-300 hover:text-cyan-400 transition-colors text-sm uppercase tracking-wider'
                   >
                     {item.label}
-                    {item.isNew ? (
-                      <span
-                        className='pointer-events-none absolute -right-0.5 -top-2 flex h-5 min-w-[2.25rem] items-center justify-center rounded-md border border-cyan-400/70 bg-black px-1 text-[8px] font-extrabold leading-none tracking-wide text-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.45)] font-mono'
-                        title='Beta'
-                      >
-                        BETA
-                      </span>
-                    ) : null}
                   </Link>
                 )
               )}
@@ -175,7 +172,7 @@ export function Header() {
       {isMobileMenuOpen && (
         <div className='fixed inset-0 z-40 md:hidden bg-black/90 backdrop-blur-xl pt-20 px-6'>
           <nav className='space-y-6'>
-            {navigationItems.map((item) =>
+            {visibleNavItems.map((item) =>
               'scrollTo' in item ? (
                 <button
                   key={item.label}
@@ -199,20 +196,9 @@ export function Header() {
                   key={item.label}
                   href={item.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={cn(
-                    'block w-full text-left text-xl text-gray-300 hover:text-cyan-400',
-                    item.isNew && 'relative w-fit pr-[4.5rem]'
-                  )}
+                  className='block w-full text-left text-xl text-gray-300 hover:text-cyan-400'
                 >
                   {item.label}
-                  {item.isNew ? (
-                    <span
-                      className='pointer-events-none absolute -top-0.5 right-0 flex h-7 items-center justify-center rounded-md border border-cyan-400/70 bg-black px-2 text-[10px] font-extrabold leading-none tracking-wide text-cyan-300 shadow-[0_0_14px_rgba(34,211,238,0.45)] font-mono'
-                      title='Beta'
-                    >
-                      BETA
-                    </span>
-                  ) : null}
                 </Link>
               )
             )}
