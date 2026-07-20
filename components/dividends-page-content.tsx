@@ -4,11 +4,13 @@ import { MagicCard } from '@/components/ui/magic-card';
 import {
   DIVIDEND_PROJECTS,
   EPOCH_FROM,
+  QTREAT_MAX_SUPPLY,
+  QTREAT_SUPPLY_BY_EPOCH,
   type DividendProject,
 } from '@/lib/dividends/data';
 import { formatCompact } from '@/lib/mining/format';
 import { cn } from '@/lib/utils';
-import { ArrowLeft, Coins, Crown, Hourglass, PiggyBank } from 'lucide-react';
+import { ArrowLeft, Coins, Crown, Hourglass, PiggyBank, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
@@ -22,15 +24,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-
-/**
- * QTREAT max supply vs what is actually circulating — tokens are released
- * gradually, a few each epoch. Because the float has grown over time and we
- * only store per-token payouts, the cumulative qu paid across all holders is
- * NOT derivable here; only per-token figures and the latest epoch are exact.
- */
-const QTREAT_MAX_SUPPLY = 6000;
-const QTREAT_CIRCULATING = 2493;
 
 const axisStyle = { fill: '#9ca3af', fontSize: 11 };
 const gridColor = 'rgba(34, 211, 238, 0.08)';
@@ -167,7 +160,16 @@ export function DividendsPageContent() {
   const epochsPaid = qtreat.epochs.filter((v) => v != null).length;
   const latestPerToken = epochChart.at(-1)?.payout ?? 0;
   const latestEpoch = epochChart.at(-1)?.epoch ?? '—';
-  const latestTotal = latestPerToken * QTREAT_CIRCULATING;
+  const latestSupply = QTREAT_SUPPLY_BY_EPOCH[Number(latestEpoch)] ?? 0;
+  const latestTotal = latestPerToken * latestSupply;
+
+  // Cumulative qu paid across all holders: payout per token times that
+  // epoch's actual circulating supply, summed only over epochs where both
+  // are known (supply history is tracked from epoch 198 onward).
+  const totalDistributed = epochChart.reduce((sum, { epoch, payout }) => {
+    const supply = QTREAT_SUPPLY_BY_EPOCH[Number(epoch)];
+    return supply ? sum + payout * supply : sum;
+  }, 0);
 
   return (
     <div className='relative'>
@@ -201,19 +203,26 @@ export function DividendsPageContent() {
           </p>
         </div>
 
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-10'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-5 mb-10'>
           <StatCard
-            label='Paid per token'
-            value={`${formatQu(qtreat.totalDividends)} qu`}
-            sub={`${epochsPaid} straight epochs since ${firstPayoutEpoch} · avg ${formatQu(qtreat.avgWeekly)} qu / week`}
+            label='Total distributed'
+            value={`${formatCompact(totalDistributed)} qu`}
+            sub={`Across all holders, ${epochsPaid} epochs since ${firstPayoutEpoch}`}
             icon={PiggyBank}
             gradientFrom='rgba(251, 191, 36, 0.24)'
           />
           <StatCard
+            label='Paid per token'
+            value={`${formatQu(qtreat.totalDividends)} qu`}
+            sub={`Avg ${formatQu(qtreat.avgWeekly)} qu / week`}
+            icon={Coins}
+            gradientFrom='rgba(0, 243, 255, 0.22)'
+          />
+          <StatCard
             label={`Latest epoch (${latestEpoch})`}
             value={`${formatQu(latestPerToken)} qu`}
-            sub={`≈ ${formatCompact(latestTotal)} qu across ${QTREAT_CIRCULATING.toLocaleString('en-US')} circulating of ${QTREAT_MAX_SUPPLY.toLocaleString('en-US')} max`}
-            icon={Coins}
+            sub={`≈ ${formatCompact(latestTotal)} qu across ${latestSupply.toLocaleString('en-US')} circulating of ${QTREAT_MAX_SUPPLY.toLocaleString('en-US')} max`}
+            icon={Sparkles}
             gradientFrom='rgba(0, 243, 255, 0.22)'
           />
           <StatCard

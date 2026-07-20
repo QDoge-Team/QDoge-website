@@ -392,3 +392,39 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
 ];
+
+/**
+ * QTREAT circulating supply at the end of each epoch (from the team's
+ * "dividends" sheet emission log, cross-checked against a live RPC balance
+ * query on 2026-07-20 — epoch 221's figure matched the live circulating
+ * supply exactly). Tokens release gradually; max supply is fixed at 6,000.
+ * Only defined for epochs QTREAT has actually paid (198 onward).
+ */
+export const QTREAT_MAX_SUPPLY = 6000;
+
+export const QTREAT_SUPPLY_BY_EPOCH: Record<number, number> = {
+  198: 166,
+  199: 234,
+  200: 319,
+  201: 543,
+  202: 609,
+  203: 683,
+  204: 752,
+  205: 821,
+  206: 1004,
+  207: 1154,
+  208: 1247,
+  209: 1463,
+  210: 1539,
+  211: 1682,
+  212: 1865,
+  213: 2105,
+  214: 2103,
+  215: 2111,
+  216: 2197,
+  217: 2364,
+  218: 2376,
+  219: 2428,
+  220: 2493,
+  221: 2610,
+};
