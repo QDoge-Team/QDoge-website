@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { Rocket, Trophy, Gamepad2, Palette, Gift } from 'lucide-react';
+import { Rocket, Trophy, Gamepad2, Palette, Gift, Lock } from 'lucide-react';
 import { MagicCard } from '@/components/ui/magic-card';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
@@ -60,15 +60,27 @@ const RoadmapSection: React.FC = () => {
       quarter: 'Q2 2026',
       items: [
         {
-          icon: Gamepad2,
-          text: 'P2E Game #2',
-          epoch: '209',
+          icon: Trophy,
+          text: 'P2P Listing',
+          epoch: '224',
           status: 'upcoming',
         },
         {
           icon: Palette,
           text: 'NFT Collection #2',
-          epoch: '214',
+          epoch: '226',
+          status: 'upcoming',
+        },
+        {
+          icon: Lock,
+          text: 'QTREAT SC & Staking',
+          epoch: '226',
+          status: 'upcoming',
+        },
+        {
+          icon: Gamepad2,
+          text: 'P2E Game #2',
+          epoch: '229',
           status: 'upcoming',
         },
       ],
@@ -80,13 +92,13 @@ const RoadmapSection: React.FC = () => {
         {
           icon: Palette,
           text: 'NFT Collection #3',
-          epoch: '225',
+          epoch: '240',
           status: 'upcoming',
         },
         {
           icon: Gift,
           text: 'Kennel List Airdrop #1',
-          epoch: '231',
+          epoch: '246',
           status: 'upcoming',
         },
       ],
@@ -99,19 +111,19 @@ const RoadmapSection: React.FC = () => {
         {
           icon: Gift,
           text: 'Kennel Airdrop #2',
-          epoch: '236',
+          epoch: '251',
           status: 'upcoming',
         },
         {
           icon: Gift,
           text: 'Kennel Airdrop #3',
-          epoch: '241',
+          epoch: '256',
           status: 'upcoming',
         },
         {
           icon: Gift,
           text: 'Kennel Airdrop #4',
-          epoch: '246',
+          epoch: '261',
           status: 'upcoming',
         },
       ],

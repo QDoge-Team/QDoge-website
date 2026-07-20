@@ -51,7 +51,7 @@ const teamMembers = [
     hoverBorder: 'hover:border-purple-400/60',
   },
   {
-    name: 'Rayyan',
+    name: 'Sunrise',
     role: 'Discord Moderator',
     icon: MessageSquare,
     color: 'text-blue-400',
@@ -69,7 +69,7 @@ const teamMembers = [
     hoverBorder: 'hover:border-emerald-400/60',
   },
   {
-    name: 'Salar',
+    name: 'SpikeinJapan',
     role: 'MSVAULT Signer',
     icon: Shield,
     color: 'text-emerald-400',
