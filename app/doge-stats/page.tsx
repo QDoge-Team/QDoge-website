@@ -7,7 +7,7 @@ import PageLoader from '@/components/page-loader';
 export const metadata: Metadata = {
   title: 'Doge Mining Stats | QDOGE',
   description:
-    'Live Qubic × DOGE mining stats: dispatcher feed, Qubic.li pool metrics, history charts, and QDoge public miner.',
+    'Live stats for the QDoge ASIC miner on ViaBTC: hashrate, workers, and DOGE merged-mining earnings.',
 };
 
 export default function DogeStatsPage() {
