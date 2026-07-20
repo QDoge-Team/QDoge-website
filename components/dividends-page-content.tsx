@@ -4,16 +4,26 @@ import { MagicCard } from '@/components/ui/magic-card';
 import {
   DIVIDEND_PROJECTS,
   EPOCH_FROM,
+  EPOCH_TO,
   QTREAT_MAX_SUPPLY,
   QTREAT_SUPPLY_BY_EPOCH,
   type DividendProject,
 } from '@/lib/dividends/data';
 import { formatCompact } from '@/lib/mining/format';
 import { cn } from '@/lib/utils';
-import { ArrowLeft, Coins, Crown, Hourglass, PiggyBank, Sparkles } from 'lucide-react';
+import {
+  ArrowLeft,
+  ChevronDown,
+  Coins,
+  Crown,
+  Download,
+  Hourglass,
+  PiggyBank,
+  Sparkles,
+} from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   Bar,
   BarChart,
@@ -123,8 +133,14 @@ function YieldTooltip({
   );
 }
 
+const ALL_EPOCHS_DESC = Array.from(
+  { length: EPOCH_TO - EPOCH_FROM + 1 },
+  (_, i) => EPOCH_TO - i
+);
+
 export function DividendsPageContent() {
   const qtreat = DIVIDEND_PROJECTS.find((p) => p.name === 'QTREAT') as DividendProject;
+  const [showRaw, setShowRaw] = useState(false);
 
   const ranked = useMemo(
     () =>
@@ -171,6 +187,45 @@ export function DividendsPageContent() {
     return supply ? sum + payout * supply : sum;
   }, 0);
 
+  const exportCsv = useCallback(() => {
+    const header = [
+      'project',
+      'kind',
+      'sc_index',
+      'price_qu',
+      'avg_weekly_qu',
+      'total_paid_qu',
+      'weekly_yield_pct',
+      'annual_yield_pct',
+      'payback_weeks',
+      ...ALL_EPOCHS_DESC.map((e) => `epoch_${e}`),
+    ];
+    const rows = DIVIDEND_PROJECTS.map((p) => {
+      const byEpoch = new Map(p.epochs.map((v, i) => [EPOCH_FROM + i, v]));
+      return [
+        p.name,
+        p.kind,
+        p.scIndex ?? '',
+        p.price,
+        p.avgWeekly,
+        p.totalDividends,
+        p.weeklyYieldPct,
+        p.annualYieldPct,
+        p.paybackWeeks ?? '',
+        ...ALL_EPOCHS_DESC.map((e) => byEpoch.get(e) ?? ''),
+      ].join(',');
+    });
+    const blob = new Blob([[header.join(','), ...rows].join('\n')], {
+      type: 'text/csv',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `qubic-dividends-comparison-epoch${EPOCH_FROM}-${EPOCH_TO}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, []);
+
   return (
     <div className='relative'>
       <div className='absolute inset-0 bg-linear-to-br from-gray-900 via-black to-gray-900 pointer-events-none' />
@@ -186,21 +241,30 @@ export function DividendsPageContent() {
           Back to home
         </Link>
 
-        <div className='max-w-3xl mb-10'>
-          <p className='inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-black/70 px-4 py-1 text-[11px] tracking-[0.28em] uppercase text-cyan-300 font-mono mb-5'>
-            <span className='h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse' />
-            Weekly payouts
-          </p>
-          <h1 className='text-4xl sm:text-5xl md:text-6xl font-bold font-mono text-white tracking-tight mb-3'>
-            QTREAT{' '}
-            <span className='bg-linear-to-r from-cyan-400 via-purple-400 to-amber-300 bg-clip-text text-transparent'>
-              Dividends
-            </span>
-          </h1>
-          <p className='text-gray-400 text-sm font-mono'>
-            Every epoch, QTREAT holders receive QUBIC dividends — the highest yield of
-            any dividend-paying project on the network.
-          </p>
+        <div className='flex flex-wrap items-end justify-between gap-6 mb-10'>
+          <div className='max-w-3xl'>
+            <p className='inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-black/70 px-4 py-1 text-[11px] tracking-[0.28em] uppercase text-cyan-300 font-mono mb-5'>
+              <span className='h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse' />
+              Weekly payouts
+            </p>
+            <h1 className='text-4xl sm:text-5xl md:text-6xl font-bold font-mono text-white tracking-tight mb-3'>
+              QTREAT{' '}
+              <span className='bg-linear-to-r from-cyan-400 via-purple-400 to-amber-300 bg-clip-text text-transparent'>
+                Dividends
+              </span>
+            </h1>
+            <p className='text-gray-400 text-sm font-mono'>
+              Every epoch, QTREAT holders receive QUBIC dividends — the highest yield of
+              any dividend-paying project on the network.
+            </p>
+          </div>
+          <button
+            onClick={exportCsv}
+            className='inline-flex items-center gap-2 rounded-xl border border-white/15 bg-black/55 px-4 py-2 font-mono text-xs uppercase tracking-wider text-gray-300 hover:text-cyan-300 hover:border-cyan-400/40 transition-colors shrink-0'
+          >
+            <Download className='h-3.5 w-3.5' />
+            Export raw data (CSV)
+          </button>
         </div>
 
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-5 mb-10'>
@@ -408,6 +472,87 @@ export function DividendsPageContent() {
           <p className='px-4 py-3 font-mono text-[11px] text-gray-500 border-t border-white/10'>
             Per-share figures in qu · epochs {EPOCH_FROM}–{EPOCH_FROM + qtreat.epochs.length - 1}{' '}
             · prices are a QX snapshot, yields move with price
+          </p>
+        </div>
+
+        <div className='rounded-2xl border border-white/10 bg-black/55 backdrop-blur-sm overflow-hidden mb-6'>
+          <button
+            onClick={() => setShowRaw((v) => !v)}
+            className='flex w-full items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4 text-left'
+          >
+            <div>
+              <h2 className='font-mono text-xs uppercase tracking-[0.2em] text-gray-400'>
+                Raw per-epoch data
+              </h2>
+              <p className='mt-1 text-sm text-cyan-100/70 font-mono'>
+                Every project, every epoch — the actual source behind the numbers above
+              </p>
+            </div>
+            <ChevronDown
+              className={cn(
+                'h-4 w-4 text-gray-400 shrink-0 transition-transform',
+                showRaw ? 'rotate-180' : ''
+              )}
+            />
+          </button>
+          {showRaw ? (
+            <div className='overflow-x-auto border-t border-white/10'>
+              <table className='w-full font-mono text-xs'>
+                <thead>
+                  <tr className='border-b border-white/10 text-[9px] uppercase tracking-[0.12em] text-gray-500'>
+                    <th className='sticky left-0 bg-black/95 px-4 py-2 text-left font-medium'>
+                      Project
+                    </th>
+                    {ALL_EPOCHS_DESC.map((e) => (
+                      <th key={e} className='px-3 py-2 text-right font-medium whitespace-nowrap'>
+                        E{e}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {DIVIDEND_PROJECTS.map((p) => {
+                    const isQtreat = p.name === 'QTREAT';
+                    const byEpoch = new Map(p.epochs.map((v, i) => [EPOCH_FROM + i, v]));
+                    return (
+                      <tr
+                        key={p.name}
+                        className={cn(
+                          'border-b border-white/5',
+                          isQtreat && 'bg-amber-400/[0.06]'
+                        )}
+                      >
+                        <td
+                          className={cn(
+                            'sticky left-0 px-4 py-2 text-left whitespace-nowrap',
+                            isQtreat ? 'bg-black/95 text-amber-300 font-bold' : 'bg-black/95 text-gray-300'
+                          )}
+                        >
+                          {p.name}
+                        </td>
+                        {ALL_EPOCHS_DESC.map((e) => {
+                          const v = byEpoch.get(e);
+                          return (
+                            <td
+                              key={e}
+                              className='px-3 py-2 text-right tabular-nums text-gray-400 whitespace-nowrap'
+                            >
+                              {v != null ? formatQu(v) : '—'}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ) : null}
+          <p className='px-4 py-3 font-mono text-[11px] text-gray-500 border-t border-white/10'>
+            qu paid per share, per epoch · dashes mean no dividend paid that epoch ·{' '}
+            <button onClick={exportCsv} className='underline hover:text-cyan-300'>
+              download full CSV
+            </button>
           </p>
         </div>
 
