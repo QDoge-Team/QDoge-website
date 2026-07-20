@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { Rocket, Trophy, Gamepad2, Palette, Gift } from 'lucide-react';
+import { Rocket, Trophy, Gamepad2, Palette, Gift, Lock } from 'lucide-react';
 import { MagicCard } from '@/components/ui/magic-card';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
@@ -60,12 +60,6 @@ const RoadmapSection: React.FC = () => {
       quarter: 'Q2 2026',
       items: [
         {
-          icon: Gamepad2,
-          text: 'P2E Game #2',
-          epoch: '224',
-          status: 'upcoming',
-        },
-        {
           icon: Trophy,
           text: 'P2P Listing',
           epoch: '224',
@@ -74,6 +68,18 @@ const RoadmapSection: React.FC = () => {
         {
           icon: Palette,
           text: 'NFT Collection #2',
+          epoch: '226',
+          status: 'upcoming',
+        },
+        {
+          icon: Lock,
+          text: 'QTREAT SC & Staking',
+          epoch: '226',
+          status: 'upcoming',
+        },
+        {
+          icon: Gamepad2,
+          text: 'P2E Game #2',
           epoch: '229',
           status: 'upcoming',
         },
