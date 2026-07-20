@@ -39,6 +39,7 @@ const navigationItems: NavItem[] = [
   { label: 'Faq', scrollTo: '#faq' },
   { label: 'Doge Stats', href: '/doge-stats', isNew: true },
   { label: 'Holders', href: '/holders', isNew: true },
+  { label: 'Dividends', href: '/dividends', isNew: true },
 ];
 
 /* ---------------- COMPONENT ---------------- */
