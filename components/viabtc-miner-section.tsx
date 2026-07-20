@@ -23,6 +23,12 @@ type ViaBtcWorker = {
   lastActive: number | null;
 };
 
+type ViaBtcCoinProfit = {
+  coin: string;
+  profitYesterday: string;
+  profitTotal: string;
+};
+
 type ViaBtcPayload = {
   coin: string;
   hashrate: {
@@ -34,7 +40,8 @@ type ViaBtcPayload = {
   } | null;
   workers: ViaBtcWorker[];
   chart: Array<{ timestamp: number; hashrateHs: number; rejectRatePercent: number }>;
-  profit: Record<string, { totalProfit: string; pplnsProfit: string } | null>;
+  mainProfit: ViaBtcCoinProfit | null;
+  giftProfits: ViaBtcCoinProfit[];
   error?: string;
 };
 
@@ -141,8 +148,9 @@ export function ViaBtcMinerSection() {
     }));
   }, [data]);
 
-  const dogeProfit = data?.profit?.DOGE;
-  const coinProfit = data?.coin ? data.profit?.[data.coin] : null;
+  const dogeProfit = data?.giftProfits?.find((g) => g.coin === 'DOGE');
+  const otherGiftProfits = data?.giftProfits?.filter((g) => g.coin !== 'DOGE') ?? [];
+  const coinProfit = data?.mainProfit;
 
   return (
     <div className='mb-6'>
@@ -201,19 +209,28 @@ export function ViaBtcMinerSection() {
           />
           <StatTile
             label='Total earned (DOGE)'
-            value={dogeProfit ? `${formatProfit(dogeProfit.totalProfit)} DOGE` : '—'}
+            value={dogeProfit ? `${formatProfit(dogeProfit.profitTotal)} DOGE` : '—'}
             accent='text-amber-200'
           />
           <StatTile
             label={`Total earned (${data?.coin ?? 'LTC'})`}
             value={
               coinProfit
-                ? `${formatProfit(coinProfit.totalProfit)} ${data?.coin ?? 'LTC'}`
+                ? `${formatProfit(coinProfit.profitTotal)} ${data?.coin ?? 'LTC'}`
                 : '—'
             }
             accent='text-cyan-200'
           />
         </div>
+
+        {otherGiftProfits.length ? (
+          <p className='mt-4 text-[11px] font-mono text-gray-500'>
+            Also merged-mined:{' '}
+            {otherGiftProfits
+              .map((g) => `${formatProfit(g.profitTotal)} ${g.coin}`)
+              .join(' · ')}
+          </p>
+        ) : null}
 
         <div className='mt-8 space-y-6'>
           <div>
