@@ -23,8 +23,14 @@ import {
   YAxis,
 } from 'recharts';
 
-/** QTREAT on-chain supply — used to scale per-token payouts to the whole float. */
-const QTREAT_SUPPLY = 6000;
+/**
+ * QTREAT max supply vs what is actually circulating — tokens are released
+ * gradually, a few each epoch. Because the float has grown over time and we
+ * only store per-token payouts, the cumulative qu paid across all holders is
+ * NOT derivable here; only per-token figures and the latest epoch are exact.
+ */
+const QTREAT_MAX_SUPPLY = 6000;
+const QTREAT_CIRCULATING = 2493;
 
 const axisStyle = { fill: '#9ca3af', fontSize: 11 };
 const gridColor = 'rgba(34, 211, 238, 0.08)';
@@ -158,7 +164,10 @@ export function DividendsPageContent() {
   );
 
   const firstPayoutEpoch = EPOCH_FROM + qtreat.epochs.findIndex((v) => v != null);
-  const totalDistributed = qtreat.totalDividends * QTREAT_SUPPLY;
+  const epochsPaid = qtreat.epochs.filter((v) => v != null).length;
+  const latestPerToken = epochChart.at(-1)?.payout ?? 0;
+  const latestEpoch = epochChart.at(-1)?.epoch ?? '—';
+  const latestTotal = latestPerToken * QTREAT_CIRCULATING;
 
   return (
     <div className='relative'>
@@ -194,16 +203,16 @@ export function DividendsPageContent() {
 
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-10'>
           <StatCard
-            label='Total distributed'
-            value={`${formatCompact(totalDistributed)} qu`}
-            sub={`Across all ${QTREAT_SUPPLY.toLocaleString('en-US')} tokens since epoch ${firstPayoutEpoch}`}
+            label='Paid per token'
+            value={`${formatQu(qtreat.totalDividends)} qu`}
+            sub={`${epochsPaid} straight epochs since ${firstPayoutEpoch} · avg ${formatQu(qtreat.avgWeekly)} qu / week`}
             icon={PiggyBank}
             gradientFrom='rgba(251, 191, 36, 0.24)'
           />
           <StatCard
-            label='Paid per token'
-            value={`${formatQu(qtreat.totalDividends)} qu`}
-            sub={`Avg ${formatQu(qtreat.avgWeekly)} qu / week`}
+            label={`Latest epoch (${latestEpoch})`}
+            value={`${formatQu(latestPerToken)} qu`}
+            sub={`≈ ${formatCompact(latestTotal)} qu across ${QTREAT_CIRCULATING.toLocaleString('en-US')} circulating of ${QTREAT_MAX_SUPPLY.toLocaleString('en-US')} max`}
             icon={Coins}
             gradientFrom='rgba(0, 243, 255, 0.22)'
           />
