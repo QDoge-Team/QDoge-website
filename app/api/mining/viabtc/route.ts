@@ -1,9 +1,12 @@
+import {
+  VIABTC_OBSERVER_ACCESS_KEY,
+  VIABTC_OBSERVER_BASE,
+  VIABTC_OBSERVER_COIN,
+} from '@/lib/mining/constants';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
-
-const VIABTC_BASE = 'https://www.viabtc.com/res/openapi/v1';
 
 type ViaBtcEnvelope<T> = {
   code?: number;
@@ -11,38 +14,45 @@ type ViaBtcEnvelope<T> = {
   data?: T;
 };
 
-type AccountHashrateData = {
-  coin?: string;
+type ObserverHomeData = {
   hashrate_10min?: string;
   hashrate_1hour?: string;
-  hashrate_24hour?: string;
-  active_workers?: number;
-  unactive_workers?: number;
+  hashrate_1day?: string;
+  total_active?: number;
+  total_unactive?: number;
 };
 
-type WorkerData = {
-  worker_id?: number;
-  worker_name?: string;
-  worker_status?: string;
+type ObserverWorkerRow = {
+  name?: string;
+  status?: string;
   hashrate_10min?: string;
   hashrate_1hour?: string;
-  hashrate_24hour?: string;
+  hashrate_1day?: string;
   reject_rate?: string;
   last_active?: number;
 };
 
-type ChartPointData = {
-  timestamp?: number;
-  hashrate?: string;
-  reject_rate?: string;
+type ObserverWorkerList = {
+  data?: ObserverWorkerRow[];
 };
 
-type ProfitData = {
+type ObserverHashrateChart = {
+  start?: number;
+  unit?: string;
+  hashrate?: number[];
+  reject_rate?: number[];
+};
+
+type ObserverCoinProfit = {
   coin?: string;
-  pplns_profit?: string;
-  pps_profit?: string;
-  solo_profit?: string;
-  total_profit?: string;
+  profit_yesterday?: string;
+  profit_total?: string;
+};
+
+type ObserverProfitSummary = {
+  profit_yesterday?: string;
+  profit_total?: string;
+  gift_profits?: ObserverCoinProfit[];
 };
 
 export type ViaBtcWorker = {
@@ -53,6 +63,12 @@ export type ViaBtcWorker = {
   hashrate24hourHs: number;
   rejectRatePercent: number;
   lastActive: number | null;
+};
+
+export type ViaBtcCoinProfit = {
+  coin: string;
+  profitYesterday: string;
+  profitTotal: string;
 };
 
 export type ViaBtcPayload = {
@@ -66,24 +82,41 @@ export type ViaBtcPayload = {
   } | null;
   workers: ViaBtcWorker[];
   chart: Array<{ timestamp: number; hashrateHs: number; rejectRatePercent: number }>;
-  profit: Record<string, { totalProfit: string; pplnsProfit: string } | null>;
+  mainProfit: ViaBtcCoinProfit | null;
+  giftProfits: ViaBtcCoinProfit[];
   error?: string;
 };
 
-function toNumber(value: unknown): number {
-  const n = Number(value);
-  return Number.isFinite(n) ? n : 0;
+const UNIT_MULTIPLIER: Record<string, number> = {
+  K: 1e3,
+  M: 1e6,
+  G: 1e9,
+  T: 1e12,
+  P: 1e15,
+};
+
+/** Parses ViaBTC hashrate strings like "6.528G" or a raw H/s number string. */
+function parseHashrate(value: string | undefined): number {
+  if (!value) return 0;
+  const match = /^([\d.]+)\s*([KMGTP])?$/i.exec(value.trim());
+  if (!match) return 0;
+  const n = Number(match[1]);
+  if (!Number.isFinite(n)) return 0;
+  const unit = match[2]?.toUpperCase();
+  return unit ? n * (UNIT_MULTIPLIER[unit] ?? 1) : n;
 }
 
-async function viaBtcGet<T>(
+async function observerGet<T>(
   path: string,
-  params: Record<string, string>,
-  apiKey: string
+  params: Record<string, string>
 ): Promise<T | null> {
   try {
-    const query = new URLSearchParams(params).toString();
-    const res = await fetch(`${VIABTC_BASE}${path}?${query}`, {
-      headers: { 'X-API-KEY': apiKey, Accept: 'application/json' },
+    const query = new URLSearchParams({
+      access_key: VIABTC_OBSERVER_ACCESS_KEY,
+      ...params,
+    }).toString();
+    const res = await fetch(`${VIABTC_OBSERVER_BASE}${path}?${query}`, {
+      headers: { Accept: 'application/json' },
       next: { revalidate: 60 },
     });
     if (!res.ok) return null;
@@ -96,87 +129,88 @@ async function viaBtcGet<T>(
 }
 
 export async function GET() {
-  const apiKey = process.env.VIABTC_API_KEY;
-  // ASIC mines scrypt (LTC) with DOGE merged-mining rewards.
-  const coin = process.env.VIABTC_COIN ?? 'LTC';
+  const coin = VIABTC_OBSERVER_COIN;
 
-  if (!apiKey) {
-    return NextResponse.json(
-      { error: 'VIABTC_API_KEY is not configured' },
-      { status: 503 }
-    );
-  }
-
-  const [account, workersPage, chart, profitCoin, profitDoge] = await Promise.all([
-    viaBtcGet<AccountHashrateData>('/hashrate', { coin }, apiKey),
-    viaBtcGet<{ data?: WorkerData[] }>(
-      '/hashrate/worker',
-      { coin, limit: '50' },
-      apiKey
-    ),
-    viaBtcGet<ChartPointData[]>(
-      '/hashrate/chart',
-      { coin, interval: 'hour' },
-      apiKey
-    ),
-    viaBtcGet<ProfitData>('/profit', { coin }, apiKey),
-    coin === 'DOGE'
-      ? Promise.resolve(null)
-      : viaBtcGet<ProfitData>('/profit', { coin: 'DOGE' }, apiKey),
+  const [home, workerList, chartRaw, profitSummary] = await Promise.all([
+    observerGet<ObserverHomeData>('/home', { coin }),
+    observerGet<ObserverWorkerList>('/worker', {
+      coin,
+      sort_by: 'hashrate_10min',
+      sort_order: 'desc',
+      page: '1',
+      limit: '50',
+      is_summary: 'false',
+      group_id: '-1',
+    }),
+    observerGet<ObserverHashrateChart>('/hashrate/chart', {
+      coin,
+      interval: 'hour',
+      utc: 'true',
+    }),
+    observerGet<ObserverProfitSummary>(`/profit/${coin}/summary/dashboard`, {
+      utc: 'false',
+    }),
   ]);
 
-  if (!account && !workersPage && !chart) {
+  if (!home && !workerList && !chartRaw) {
     return NextResponse.json(
       { error: 'ViaBTC upstream unavailable' },
       { status: 502 }
     );
   }
 
-  const workers: ViaBtcWorker[] = (workersPage?.data ?? []).map((w) => ({
-    name: w.worker_name ?? String(w.worker_id ?? '—'),
-    status: w.worker_status ?? 'unknown',
-    hashrate10minHs: toNumber(w.hashrate_10min),
-    hashrate1hourHs: toNumber(w.hashrate_1hour),
-    hashrate24hourHs: toNumber(w.hashrate_24hour),
-    rejectRatePercent: toNumber(w.reject_rate) * 100,
+  const workers: ViaBtcWorker[] = (workerList?.data ?? []).map((w) => ({
+    name: w.name ?? '—',
+    status: w.status ?? 'unknown',
+    hashrate10minHs: parseHashrate(w.hashrate_10min),
+    hashrate1hourHs: parseHashrate(w.hashrate_1hour),
+    hashrate24hourHs: parseHashrate(w.hashrate_1day),
+    rejectRatePercent: Number(w.reject_rate ?? 0) * 100,
     lastActive: typeof w.last_active === 'number' ? w.last_active : null,
   }));
 
-  const profit: ViaBtcPayload['profit'] = {};
-  if (profitCoin) {
-    profit[coin] = {
-      totalProfit: profitCoin.total_profit ?? '0',
-      pplnsProfit: profitCoin.pplns_profit ?? '0',
-    };
-  }
-  if (profitDoge) {
-    profit.DOGE = {
-      totalProfit: profitDoge.total_profit ?? '0',
-      pplnsProfit: profitDoge.pplns_profit ?? '0',
-    };
-  }
+  const chartUnitMultiplier = UNIT_MULTIPLIER[chartRaw?.unit?.toUpperCase() ?? 'G'] ?? 1e9;
+  const startSeconds = Math.floor((chartRaw?.start ?? 0) / 1000);
+  const chart = (chartRaw?.hashrate ?? []).map((hs, i) => ({
+    timestamp: startSeconds + i * 3600,
+    hashrateHs: hs * chartUnitMultiplier,
+    rejectRatePercent: (chartRaw?.reject_rate?.[i] ?? 0) * 100,
+  }));
+
+  const mainProfit: ViaBtcCoinProfit | null = profitSummary
+    ? {
+        coin,
+        profitYesterday: profitSummary.profit_yesterday ?? '0',
+        profitTotal: profitSummary.profit_total ?? '0',
+      }
+    : null;
+
+  const giftProfits: ViaBtcCoinProfit[] = (profitSummary?.gift_profits ?? []).map(
+    (g) => ({
+      coin: g.coin ?? '—',
+      profitYesterday: g.profit_yesterday ?? '0',
+      profitTotal: g.profit_total ?? '0',
+    })
+  );
 
   const body: ViaBtcPayload = {
     coin,
-    hashrate: account
+    hashrate: home
       ? {
-          current10minHs: toNumber(account.hashrate_10min),
-          hour1Hs: toNumber(account.hashrate_1hour),
-          hour24Hs: toNumber(account.hashrate_24hour),
-          activeWorkers: account.active_workers ?? 0,
-          unactiveWorkers: account.unactive_workers ?? 0,
+          current10minHs: parseHashrate(home.hashrate_10min),
+          hour1Hs: parseHashrate(home.hashrate_1hour),
+          hour24Hs: parseHashrate(home.hashrate_1day),
+          activeWorkers: home.total_active ?? 0,
+          unactiveWorkers: home.total_unactive ?? 0,
         }
       : null,
     workers,
-    chart: (chart ?? [])
-      .map((p) => ({
-        timestamp: p.timestamp ?? 0,
-        hashrateHs: toNumber(p.hashrate),
-        rejectRatePercent: toNumber(p.reject_rate) * 100,
-      }))
-      .sort((a, b) => a.timestamp - b.timestamp),
-    profit,
+    chart,
+    mainProfit,
+    giftProfits,
   };
 
-  return NextResponse.json(body);
+  return NextResponse.json(body, {
+    headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=180' },
+  });
 }
