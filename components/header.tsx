@@ -30,15 +30,6 @@ type NavItem =
 
 const navigationItems: NavItem[] = [
   { label: 'About', scrollTo: '#about' },
-  {
-    label: 'Kennel Club',
-    href: 'https://kennelclub.qdogeonqubic.com/',
-    external: true,
-    homeOnly: true,
-  },
-  { label: 'Tokenomics', scrollTo: '#tokenomics' },
-  { label: 'Airdrop', scrollTo: '#airdrop-mechanisms' },
-  { label: 'Roadmap', scrollTo: '#roadmap' },
   { label: 'Faq', scrollTo: '#faq' },
   { label: 'Doge Stats', href: '/doge-stats' },
   { label: 'Holders', href: '/holders' },
