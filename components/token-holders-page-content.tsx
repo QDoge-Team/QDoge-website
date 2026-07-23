@@ -435,8 +435,13 @@ export function TokenHoldersPageContent() {
     const a = document.createElement('a');
     a.href = url;
     a.download = `${asset.toLowerCase()}-holders-${new Date().toISOString().slice(0, 10)}.csv`;
+    // The anchor must be in the DOM for the click to trigger a download in
+    // some browsers (e.g. Firefox); revoke on the next tick so the download
+    // has a chance to start before the object URL is released.
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 0);
   }, [holders, supply, asset]);
 
   const circulatingPct =
