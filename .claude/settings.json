@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status*)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git show *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git fetch origin *)",
+      "Bash(git push -u origin claude/qubic-move-to-earn-app-hk0k9k)",
+      "Bash(git checkout -B claude/qubic-move-to-earn-app-hk0k9k origin/claude/qubic-move-to-earn-app-hk0k9k)",
+      "Bash(git reset --hard origin/claude/qubic-move-to-earn-app-hk0k9k)",
+      "Bash(npm install*)",
+      "Bash(npm run *)",
+      "Bash(npx eslint *)",
+      "Bash(npx tsc *)",
+      "Bash(node *)"
+    ]
+  }
+}
