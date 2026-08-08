@@ -82,8 +82,22 @@ authority kill the industrial attacks; caps bound whatever slips through.
 1. **Website (this repo, done):** program page at `/move-to-earn` with the
    live payout simulator running the real engine; community onboarding via
    Discord.
-2. **Backend:** activity API, validation pipeline, epoch settlement against
-   the payout wallet, review queue. The engine module lifts out unchanged.
+2. **Backend (scaffolded in this repo):** activity API, validation
+   pipeline, and epoch settlement are implemented as Next.js routes over a
+   swappable Store interface (`lib/move-to-earn/store.ts`):
+   - `POST /api/move-to-earn/register` — create an account for a Qubic
+     wallet ID (probation trust score)
+   - `POST /api/move-to-earn/activity` — submit session telemetry; the
+     server validates and credits steps (never a bare step count)
+   - `GET /api/move-to-earn/account/{id}` — today's credit, trust,
+     pending payouts
+   - `POST /api/move-to-earn/epoch/settle` — admin-only (M2E_ADMIN_TOKEN
+     bearer), idempotent epoch settlement into pending payouts
+   - `GET /api/move-to-earn/epoch/{n}` — public settlement summary
+   Before launch: swap the in-memory Store for a real database, gate
+   registration/activity behind device attestation + request signing, read
+   rig income from the payout wallet on-chain, and add the release step
+   that sends the actual Qubic transfers after fraud review.
 3. **Mobile app (separate repo):** React Native + HealthKit/Health Connect,
    wallet-ID linking, attestation. No miner code in the client, ever.
 4. **Scale:** more rig capacity, third-party miner revenue-share, sponsored
