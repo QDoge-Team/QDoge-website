@@ -7,6 +7,7 @@
     "userInterfaceStyle": "dark",
     "backgroundColor": "#000000",
     "ios": {
+      "bundleIdentifier": "com.qdoge.movetoearn",
       "supportsTablet": false,
       "infoPlist": {
         "NSMotionUsageDescription": "Step counting powers your Move to Earn rewards.",
