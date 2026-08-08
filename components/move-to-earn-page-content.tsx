@@ -5,8 +5,10 @@ import {
   DAILY_FULL_CREDIT_STEPS,
   DAILY_HARD_CAP_STEPS,
   DEFAULT_COMMUNITY_SHARE,
+  HOLDER_BOOST_TIERS,
   INDOOR_RATE,
   estimateEpochPayoutQus,
+  holderBoostMultiplier,
 } from '@/lib/move-to-earn/engine';
 import { formatCompact } from '@/lib/mining/format';
 import {
@@ -21,6 +23,7 @@ import {
   HeartPulse,
   Hourglass,
   PiggyBank,
+  Rocket,
   ShieldCheck,
   Users,
   Wallet,
@@ -152,6 +155,7 @@ function Slider({
 function PayoutSimulator() {
   const [rigIncome, setRigIncome] = useState(500_000_000);
   const [yourSteps, setYourSteps] = useState(8_000);
+  const [yourQdoge, setYourQdoge] = useState(0);
   const [participants, setParticipants] = useState(250);
   const [crowdSteps, setCrowdSteps] = useState(6_000);
 
@@ -160,13 +164,15 @@ function PayoutSimulator() {
       estimateEpochPayoutQus({
         rigIncomeQus: rigIncome,
         yourDailySteps: yourSteps,
+        yourQdogeBalance: yourQdoge,
         otherParticipants: participants,
         othersAvgDailySteps: crowdSteps,
       }),
-    [rigIncome, yourSteps, participants, crowdSteps]
+    [rigIncome, yourSteps, yourQdoge, participants, crowdSteps]
   );
 
   const communityPool = Math.floor(rigIncome * DEFAULT_COMMUNITY_SHARE);
+  const boost = holderBoostMultiplier(yourQdoge);
 
   return (
     <div className='rounded-2xl border border-white/10 overflow-hidden shadow-[0_0_24px_rgba(0,243,255,0.06)]'>
@@ -198,6 +204,15 @@ function PayoutSimulator() {
               onChange={setYourSteps}
             />
             <Slider
+              label='Your QDOGE holdings'
+              value={yourQdoge}
+              min={0}
+              max={150_000_000}
+              step={1_000_000}
+              format={formatCompact}
+              onChange={setYourQdoge}
+            />
+            <Slider
               label='Other participants'
               value={participants}
               min={10}
@@ -224,6 +239,18 @@ function PayoutSimulator() {
               {formatCompact(payout)}
             </div>
             <span className='mt-1 text-xs text-gray-400'>QUBIC</span>
+            <div
+              className={
+                boost > 1
+                  ? 'mt-3 inline-flex items-center justify-center gap-1.5 self-center rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-300'
+                  : 'mt-3 text-xs text-gray-500'
+              }
+            >
+              <Rocket className='inline h-3.5 w-3.5' />
+              {boost > 1
+                ? `Holder boost active: ${boost.toFixed(2)}x`
+                : 'No holder boost'}
+            </div>
             <div className='mt-4 border-t border-white/10 pt-4 text-xs text-gray-400'>
               Community pool this epoch:{' '}
               <span className='text-gray-200 font-semibold'>
@@ -390,6 +417,45 @@ export function MoveToEarnPageContent() {
           epochs
         </div>
         <PayoutSimulator />
+      </section>
+
+      {/* Holder boost */}
+      <section className='mb-16'>
+        <SectionHeading
+          title='Hold QDOGE, earn more'
+          subtitle='Holding QDOGE in your linked wallet multiplies your share of every epoch pool. The boost applies to the minimum balance you held across the whole epoch — flash-buying before a payout earns nothing.'
+        />
+        <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+          <div className='rounded-2xl border border-white/10 bg-white/[0.02] p-5 md:p-6 text-center'>
+            <div className='text-[10px] uppercase tracking-[0.18em] text-gray-400 font-mono'>
+              Base
+            </div>
+            <div className='mt-3 text-3xl font-bold text-white'>1.00x</div>
+            <div className='mt-2 text-xs text-gray-400'>no QDOGE required</div>
+          </div>
+          {HOLDER_BOOST_TIERS.map((tier) => (
+            <div
+              key={tier.minQdoge}
+              className='rounded-2xl border border-amber-400/25 bg-amber-400/[0.04] p-5 md:p-6 text-center'
+            >
+              <div className='text-[10px] uppercase tracking-[0.18em] text-amber-300/90 font-mono'>
+                {formatCompact(tier.minQdoge)}+ QDOGE
+              </div>
+              <div className='mt-3 text-3xl font-bold text-amber-300'>
+                {tier.multiplier.toFixed(2)}x
+              </div>
+              <div className='mt-2 text-xs text-gray-400'>
+                held for the full epoch
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className='mt-4 text-xs leading-relaxed text-gray-500'>
+          The boost multiplies your share weight inside the fixed pool, so it
+          never inflates total payouts — and it&apos;s capped at{' '}
+          {HOLDER_BOOST_TIERS[HOLDER_BOOST_TIERS.length - 1].multiplier.toFixed(2)}
+          x so moving stays the primary way to earn.
+        </p>
       </section>
 
       {/* Anti-cheat */}

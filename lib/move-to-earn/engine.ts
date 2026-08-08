@@ -42,6 +42,35 @@ export const DEFAULT_COMMUNITY_SHARE = 0.6;
 /** Payouts smaller than this stay pending and roll into the next epoch (qus). */
 export const MIN_PAYOUT_QUS = 1_000;
 
+/**
+ * QDOGE holder boost: holding QDOGE in the linked wallet multiplies your
+ * share weight. Measured against the MINIMUM balance held across the whole
+ * epoch (on-chain snapshot per tick range), so flash-buying before a payout
+ * earns nothing. Capped at 1.5x — movement stays the primary earner.
+ */
+export interface HolderBoostTier {
+  /** Minimum QDOGE balance held for the full epoch. */
+  minQdoge: number;
+  /** Share-weight multiplier granted at this tier. */
+  multiplier: number;
+}
+
+/** Ordered lowest tier first; the highest qualifying tier applies. */
+export const HOLDER_BOOST_TIERS: HolderBoostTier[] = [
+  { minQdoge: 1_000_000, multiplier: 1.1 },
+  { minQdoge: 10_000_000, multiplier: 1.25 },
+  { minQdoge: 100_000_000, multiplier: 1.5 },
+];
+
+/** Returns the boost multiplier (>= 1) for a QDOGE balance. */
+export function holderBoostMultiplier(qdogeBalance: number): number {
+  let multiplier = 1;
+  for (const tier of HOLDER_BOOST_TIERS) {
+    if (qdogeBalance >= tier.minQdoge) multiplier = tier.multiplier;
+  }
+  return multiplier;
+}
+
 /* ---------------- TYPES ---------------- */
 
 export interface SessionTelemetry {
@@ -80,6 +109,8 @@ export interface ParticipantActivity {
   effectiveSteps: number;
   /** Anti-cheat trust score in [0, 1]; scales the participant's share. */
   trustScore: number;
+  /** Minimum QDOGE held in the linked wallet across the epoch (default 0). */
+  qdogeBalance?: number;
 }
 
 export interface EpochDistribution {
@@ -178,7 +209,8 @@ export function computeEpochDistribution(
     id: p.id,
     weight:
       Math.max(0, p.effectiveSteps) *
-      Math.min(1, Math.max(0, p.trustScore)),
+      Math.min(1, Math.max(0, p.trustScore)) *
+      holderBoostMultiplier(p.qdogeBalance ?? 0),
   }));
   const totalWeight = weights.reduce((sum, w) => sum + w.weight, 0);
 
@@ -225,6 +257,8 @@ export function estimateEpochPayoutQus(params: {
   yourDailySteps: number;
   otherParticipants: number;
   othersAvgDailySteps: number;
+  yourQdogeBalance?: number;
+  othersAvgQdogeBalance?: number;
   daysPerEpoch?: number;
   communityShare?: number;
 }): number {
@@ -233,6 +267,7 @@ export function estimateEpochPayoutQus(params: {
     id: 'you',
     effectiveSteps: dailyEffectiveSteps(params.yourDailySteps) * days,
     trustScore: 1,
+    qdogeBalance: params.yourQdogeBalance ?? 0,
   };
   const crowd: ParticipantActivity[] = Array.from(
     { length: Math.max(0, Math.floor(params.otherParticipants)) },
@@ -240,6 +275,7 @@ export function estimateEpochPayoutQus(params: {
       id: `p${i}`,
       effectiveSteps: dailyEffectiveSteps(params.othersAvgDailySteps) * days,
       trustScore: 1,
+      qdogeBalance: params.othersAvgQdogeBalance ?? 0,
     })
   );
   const result = computeEpochDistribution(

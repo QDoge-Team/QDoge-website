@@ -53,6 +53,11 @@ mobile app ──► telemetry ──► backend validation ──► activity l
   10,000–20,000, nothing beyond. Caps every account's daily earning power.
 - **Indoor rate:** no-GPS sessions (treadmills) earn 50% — real users aren't
   punished, phone-in-a-sock pays poorly.
+- **Holder boost:** holding QDOGE in the linked wallet multiplies share
+  weight — 1M+ → 1.10x, 10M+ → 1.25x, 100M+ → 1.50x (cap). The qualifying
+  balance is the *minimum* held across the whole epoch, verified on-chain,
+  so flash-buying before settlement earns nothing. The boost redistributes
+  within the fixed pool; it never inflates total payouts.
 - **Distribution:** shares proportional to trust-weighted effective steps;
   integer qus with largest-remainder rounding so payouts sum exactly to the
   pool; payouts under 1,000 qus roll into the next epoch.
