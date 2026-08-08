@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "QDOGE Move to Earn",
+    "slug": "qdoge-move-to-earn",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#000000",
+    "ios": {
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSMotionUsageDescription": "Step counting powers your Move to Earn rewards.",
+        "NSLocationWhenInUseUsageDescription": "Distance verification keeps rewards fair for everyone."
+      }
+    },
+    "android": {
+      "permissions": [
+        "android.permission.ACTIVITY_RECOGNITION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ],
+      "package": "com.qdoge.movetoearn"
+    },
+    "plugins": ["expo-location", "expo-sensors"]
+  }
+}
