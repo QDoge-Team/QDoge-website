@@ -299,7 +299,7 @@ export function DividendsPageContent() {
           <StatCard
             label='Payback period'
             value={`${Math.round(qtreat.paybackWeeks ?? 0)} weeks`}
-            sub={`At ${formatCompact(qtreat.price)} qu / token (QX)`}
+            sub={`At ${formatCompact(qtreat.price)} qu / token`}
             icon={Hourglass}
             gradientFrom='rgba(34, 197, 94, 0.2)'
           />
@@ -471,7 +471,7 @@ export function DividendsPageContent() {
           </div>
           <p className='px-4 py-3 font-mono text-[11px] text-gray-500 border-t border-white/10'>
             Per-share figures in qu · epochs {EPOCH_FROM}–{EPOCH_FROM + qtreat.epochs.length - 1}{' '}
-            · prices are a QX snapshot, yields move with price
+            · prices are a live snapshot, yields move with price
           </p>
         </div>
 
