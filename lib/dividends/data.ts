@@ -38,23 +38,22 @@ export type DividendProject = {
   /** Dividends per share per epoch (qu); null = no data / not live yet. */
   epochs: Array<number | null>;
 };
-
 export const EPOCH_FROM = 184;
-export const EPOCH_TO = 225;
+export const EPOCH_TO = 226;
 
 export const DIVIDEND_PROJECTS: DividendProject[] = [
   {
     name: 'QTREAT',
     kind: 'token',
     scIndex: null,
-    weeklyYieldPct: 0.5493,
-    annualYieldPct: 28.56,
-    paybackWeeks: 182.1,
-    avgWeekly: 123034.32,
-    totalDividends: 3444961,
+    weeklyYieldPct: 0.5407,
+    annualYieldPct: 28.12,
+    paybackWeeks: 185,
+    avgWeekly: 121112.93,
+    totalDividends: 3512275,
     price: 22400000,
-    // epochs 184..225
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, 39961, 36029, 55400, 288032, 318896, 248096, 232384, 210612, 189123, 156286, 154599, 127903, 118250, 123493, 102582, 89501, 88599, 87597, 89761, 81669, 80190, 79419, 83782, 73448, 73727, 76858, 67710, 71054],
+    // epochs 184..226
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, 39961, 36029, 55400, 288032, 318896, 248096, 232384, 210612, 189123, 156286, 154599, 127903, 118250, 123493, 102582, 89501, 88599, 87597, 89761, 81669, 80190, 79419, 83782, 73448, 73727, 76858, 67710, 71054, 67314],
   },
   {
     name: 'QIP',
@@ -66,8 +65,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 807848.31,
     totalDividends: 12925573,
     price: 379000000,
-    // epochs 184..225
-    epochs: [null, null, null, null, null, null, null, null, null, null, 545018, 2208906, 32098, 167337, 2695350, 7094101, 26088, 100134, 1849, 53900, 423, 369, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, 0],
+    // epochs 184..226
+    epochs: [null, null, null, null, null, null, null, null, null, null, 545018, 2208906, 32098, 167337, 2695350, 7094101, 26088, 100134, 1849, 53900, 423, 369, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null],
   },
   {
     name: 'QMINE',
@@ -79,8 +78,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 1.89,
     totalDividends: 71.91,
     price: 4369,
-    // epochs 184..225
-    epochs: [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 5, 2, 5, 2, 3, 2, 1.03, 0.93, 0.96, 1.72, 3.21, 1.47, 1.31, 0.1, 1.59, 1.22, 0.25, 1.84, 1.72, 1.65, 1.54, 1.37, null, null, null, null],
+    // epochs 184..226
+    epochs: [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 5, 2, 5, 2, 3, 2, 1.03, 0.93, 0.96, 1.72, 3.21, 1.47, 1.31, 0.1, 1.59, 1.22, 0.25, 1.84, 1.72, 1.65, 1.54, 1.37, null, null, null, null, null],
   },
   {
     name: 'RL',
@@ -92,8 +91,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 60635.43,
     totalDividends: 1697792,
     price: 150000000,
-    // epochs 184..225
-    epochs: [19526, 10355, 31656, 163461, 616863, 261834, 143491, 77218, 72781, 7100, 94523, 46004, 24800, 47928, 27958, 81, 0, 3041, 10651, 5570, 5240, 1930, 16277, 9504, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, 0],
+    // epochs 184..226
+    epochs: [19526, 10355, 31656, 163461, 616863, 261834, 143491, 77218, 72781, 7100, 94523, 46004, 24800, 47928, 27958, 81, 0, 3041, 10651, 5570, 5240, 1930, 16277, 9504, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null],
   },
   {
     name: 'QRWA',
@@ -105,8 +104,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 257452.72,
     totalDividends: 7466129,
     price: 787499999,
-    // epochs 184..225
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, 263942, 254398, 232495, 617160, 849655, 277462, 282033, 230109, 321229, 209494, 146136, 143511, 130547, 134017, 240396, 215543, 193635, 220435, 171224, 309069, 440522, 326556, 254747, 226589, 200882, 184860, 217033, 172450, 0],
+    // epochs 184..226
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, 263942, 254398, 232495, 617160, 849655, 277462, 282033, 230109, 321229, 209494, 146136, 143511, 130547, 134017, 240396, 215543, 193635, 220435, 171224, 309069, 440522, 326556, 254747, 226589, 200882, 184860, 217033, 172450, 0, null],
   },
   {
     name: 'QX',
@@ -118,21 +117,21 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 2361531.24,
     totalDividends: 99184312,
     price: 9000000000,
-    // epochs 184..225
-    epochs: [353352, 5213601, 2122733, 846164, 645950, 882189, 2248160, 722157, 3607086, 480634, 3887334, 2108958, 681487, 12098906, 10715776, 8506098, 6829267, 9715154, 6379210, 944134, 2194350, 4688782, 3147873, 612702, 727820, 582077, 431974, 336943, 426051, 243880, 378977, 359969, 182740, 1812708, 1432197, 819827, 376294, 583775, 227400, 230360, 399257, 6],
+    // epochs 184..226
+    epochs: [353352, 5213601, 2122733, 846164, 645950, 882189, 2248160, 722157, 3607086, 480634, 3887334, 2108958, 681487, 12098906, 10715776, 8506098, 6829267, 9715154, 6379210, 944134, 2194350, 4688782, 3147873, 612702, 727820, 582077, 431974, 336943, 426051, 243880, 378977, 359969, 182740, 1812708, 1432197, 819827, 376294, 583775, 227400, 230360, 399257, 6, null],
   },
   {
     name: 'QCAP',
     kind: 'token',
     scIndex: null,
-    weeklyYieldPct: 0.0236,
-    annualYieldPct: 1.23,
-    paybackWeeks: 4240.4,
-    avgWeekly: 67.21,
-    totalDividends: 2554,
+    weeklyYieldPct: 0.022,
+    annualYieldPct: 1.14,
+    paybackWeeks: 4542.3,
+    avgWeekly: 62.74,
+    totalDividends: 2698,
     price: 285000,
-    // epochs 184..225
-    epochs: [49, 8, 3, 5, 148, 55, 48, 16, 28, 5, 124, 90, 31, 128, 323, 525, 14, 311, 92, 37, 35, 73, 63, 32, 16, 24, 36, 19, 8, 5, 29, 14, 20, 45, 34, 21, 24, 16, null, null, null, null],
+    // epochs 184..226
+    epochs: [49, 8, 3, 5, 148, 55, 48, 16, 28, 5, 124, 90, 31, 128, 323, 525, 14, 311, 92, 37, 35, 73, 63, 32, 16, 24, 36, 19, 8, 5, 29, 14, 20, 45, 34, 21, 24, 16, 15, 20, 34, 32, 43],
   },
   {
     name: 'NOST',
@@ -144,8 +143,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 10118.2,
     totalDividends: 101182,
     price: 200100000,
-    // epochs 184..225
-    epochs: [5325, null, null, 1331, null, null, null, null, null, 42603, 7988, null, null, null, 1332, null, 42603, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, 0],
+    // epochs 184..226
+    epochs: [5325, null, null, 1331, null, null, null, null, null, 42603, 7988, null, null, null, 1332, null, 42603, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null],
   },
   {
     name: 'VOTTUN',
@@ -157,8 +156,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 148704.21,
     totalDividends: 2825380,
     price: 1289166666,
-    // epochs 184..225
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 332, 147618, 200236, 210980, 157664, 77554, 26662, 77045, 99285, 159990, 429484, 15641, 31009, 66240, 39736, 78460, 254475, 712415, 40554],
+    // epochs 184..226
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 332, 147618, 200236, 210980, 157664, 77554, 26662, 77045, 99285, 159990, 429484, 15641, 31009, 66240, 39736, 78460, 254475, 712415, 40554, null],
   },
   {
     name: 'QSWAP',
@@ -170,8 +169,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 128581.83,
     totalDividends: 5400437,
     price: 1250000000,
-    // epochs 184..225
-    epochs: [9829, 330231, 26405, 39146, 27016, 25393, 327367, 344659, 39095, 29006, 38327, 14741, 22956, 64749, 899266, 9769, 306435, 355547, 337457, 321340, 43044, 319003, 24886, 34597, 19946, 23493, 605917, 16260, 25448, 12816, 16561, 25669, 35011, 42333, 44260, 31029, 45760, 38899, 29162, 29364, 26563, 341682],
+    // epochs 184..226
+    epochs: [9829, 330231, 26405, 39146, 27016, 25393, 327367, 344659, 39095, 29006, 38327, 14741, 22956, 64749, 899266, 9769, 306435, 355547, 337457, 321340, 43044, 319003, 24886, 34597, 19946, 23493, 605917, 16260, 25448, 12816, 16561, 25669, 35011, 42333, 44260, 31029, 45760, 38899, 29162, 29364, 26563, 341682, null],
   },
   {
     name: 'QRAFFLE',
@@ -183,8 +182,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 2129.09,
     totalDividends: 70260,
     price: 35000002,
-    // epochs 184..225
-    epochs: [null, null, null, null, null, null, null, null, 7988, 4205, 2196, 1420, null, 2130, 2218, 1331, 887, 1020, 221, 1331, 221, 4437, 44, 443, 1331, 1420, 2958, 2366, 4260, 4615, 946, 4733, 4970, 2366, 473, 591, 710, 591, 828, 5236, 946, 828],
+    // epochs 184..226
+    epochs: [null, null, null, null, null, null, null, null, 7988, 4205, 2196, 1420, null, 2130, 2218, 1331, 887, 1020, 221, 1331, 221, 4437, 44, 443, 1331, 1420, 2958, 2366, 4260, 4615, 946, 4733, 4970, 2366, 473, 591, 710, 591, 828, 5236, 946, 828, null],
   },
   {
     name: 'QBAY',
@@ -196,8 +195,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 21925.26,
     totalDividends: 855085,
     price: 598000000,
-    // epochs 184..225
-    epochs: [162630, 53461, 4881, 47736, 171183, 24717, 66234, 118, 27943, 13357, 1005, null, null, 11449, 2500, 1967, 1183, 39511, 10806, 12507, 8579, 1997, 4881, 7011, 17869, 118, 19881, 4637, 18713, 18047, 0, 369, 43890, 939, 27943, 562, null, 7396, 1612, 0, 11183, 6270],
+    // epochs 184..226
+    epochs: [162630, 53461, 4881, 47736, 171183, 24717, 66234, 118, 27943, 13357, 1005, null, null, 11449, 2500, 1967, 1183, 39511, 10806, 12507, 8579, 1997, 4881, 7011, 17869, 118, 19881, 4637, 18713, 18047, 0, 369, 43890, 939, 27943, 562, null, 7396, 1612, 0, 11183, 6270, null],
   },
   {
     name: 'QVAULT',
@@ -209,8 +208,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 16774.29,
     totalDividends: 704520,
     price: 350000000,
-    // epochs 184..225
-    epochs: [10981, 1941, 791, 1200, 33742, 12582, 15032, 2218, 6915, 1360, 15554, 12420, 12420, 17663, 44544, 75409, 14266, 44679, 13223, 5493, 5255, 84839, 24457, 19786, 17264, 18496, 5662, 2926, 1348, 862, 4520, 2231, 47587, 80878, 5378, 3382, 3778, 17367, 2393, 3183, 5450, 5045],
+    // epochs 184..226
+    epochs: [10981, 1941, 791, 1200, 33742, 12582, 15032, 2218, 6915, 1360, 15554, 12420, 12420, 17663, 44544, 75409, 14266, 44679, 13223, 5493, 5255, 84839, 24457, 19786, 17264, 18496, 5662, 2926, 1348, 862, 4520, 2231, 47587, 80878, 5378, 3382, 3778, 17367, 2393, 3183, 5450, 5045, null],
   },
   {
     name: 'MSVAULT',
@@ -222,8 +221,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 6786.32,
     totalDividends: 271453,
     price: 332816000,
-    // epochs 184..225
-    epochs: [50000, 3255, 31952, 2223, 2662, 2219, null, null, 2663, 2219, 1775, 1480, 1479, 1775, 18195, 2219, 28255, 5029, 4290, 3994, 3254, 23373, 5030, 5029, 5622, 4289, 4438, 5917, 3846, 3255, 3698, 3402, 3255, 3550, 3550, 3551, 3550, 3254, 3551, 3106, 3846, 3403],
+    // epochs 184..226
+    epochs: [50000, 3255, 31952, 2223, 2662, 2219, null, null, 2663, 2219, 1775, 1480, 1479, 1775, 18195, 2219, 28255, 5029, 4290, 3994, 3254, 23373, 5030, 5029, 5622, 4289, 4438, 5917, 3846, 3255, 3698, 3402, 3255, 3550, 3550, 3551, 3550, 3254, 3551, 3106, 3846, 3403, null],
   },
   {
     name: 'QTRY',
@@ -235,8 +234,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 5554.71,
     totalDividends: 38883,
     price: 615100000,
-    // epochs 184..225
-    epochs: [3698, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 9838, 25347, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, 0],
+    // epochs 184..226
+    epochs: [3698, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 9838, 25347, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null],
   },
   {
     name: 'RANDOM',
@@ -248,8 +247,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 2820000000,
-    // epochs 184..225
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..226
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'QUTIL',
@@ -261,8 +260,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 30000002,
-    // epochs 184..225
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..226
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'MLM',
@@ -274,8 +273,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 2700000004,
-    // epochs 184..225
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..226
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'QEARN',
@@ -287,8 +286,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 56500000,
-    // epochs 184..225
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..226
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'QDRAW',
@@ -300,8 +299,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 12500000,
-    // epochs 184..225
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..226
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'QBOND',
@@ -313,8 +312,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 67499999.5,
-    // epochs 184..225
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..226
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'QRP',
@@ -326,8 +325,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 9400000,
-    // epochs 184..225
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..226
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'QTF',
@@ -339,8 +338,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 6000000,
-    // epochs 184..225
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..226
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'QDUEL',
@@ -352,8 +351,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 4800004,
-    // epochs 184..225
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..226
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'PULSE',
@@ -365,8 +364,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 42200000,
-    // epochs 184..225
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..226
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'QUSINO',
@@ -378,8 +377,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 68000000,
-    // epochs 184..225
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..226
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'ESCROW',
@@ -391,8 +390,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 159000000,
-    // epochs 184..225
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..226
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'GGWP',
@@ -404,8 +403,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 140999999,
-    // epochs 184..225
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..226
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
 ];
 

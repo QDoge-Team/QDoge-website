@@ -176,7 +176,15 @@ export function DividendsPageContent() {
   const epochsPaid = qtreat.epochs.filter((v) => v != null).length;
   const latestPerToken = epochChart.at(-1)?.payout ?? 0;
   const latestEpoch = epochChart.at(-1)?.epoch ?? '—';
-  const latestSupply = QTREAT_SUPPLY_BY_EPOCH[Number(latestEpoch)] ?? 0;
+  const knownSupplyEpochs = Object.keys(QTREAT_SUPPLY_BY_EPOCH)
+    .map(Number)
+    .sort((a, b) => a - b);
+  const exactSupply = QTREAT_SUPPLY_BY_EPOCH[Number(latestEpoch)];
+  // Supply is reported a little behind payouts sometimes; fall back to the
+  // most recent known figure (flagged as approximate) rather than showing 0.
+  const fallbackSupplyEpoch = knownSupplyEpochs.filter((e) => e <= Number(latestEpoch)).at(-1);
+  const latestSupply = exactSupply ?? (fallbackSupplyEpoch ? QTREAT_SUPPLY_BY_EPOCH[fallbackSupplyEpoch] : 0);
+  const latestSupplyIsExact = exactSupply != null;
   const latestTotal = latestPerToken * latestSupply;
 
   // Cumulative qu paid across all holders: payout per token times that
@@ -285,7 +293,11 @@ export function DividendsPageContent() {
           <StatCard
             label={`Latest epoch (${latestEpoch})`}
             value={`${formatQu(latestPerToken)} qu`}
-            sub={`≈ ${formatCompact(latestTotal)} qu across ${latestSupply.toLocaleString('en-US')} circulating of ${QTREAT_MAX_SUPPLY.toLocaleString('en-US')} max`}
+            sub={
+              latestSupply > 0
+                ? `≈ ${formatCompact(latestTotal)} qu across ${latestSupply.toLocaleString('en-US')}${latestSupplyIsExact ? '' : ' (est.)'} circulating of ${QTREAT_MAX_SUPPLY.toLocaleString('en-US')} max`
+                : 'Circulating supply for this epoch not yet available'
+            }
             icon={Sparkles}
             gradientFrom='rgba(0, 243, 255, 0.22)'
           />
