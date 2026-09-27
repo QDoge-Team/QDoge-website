@@ -62,7 +62,7 @@ export function Header() {
   };
 
   const joinDiscord = () => {
-    window.open('https://discord.gg/rZd5JW4Vjt', '_blank');
+    window.open('https://discord.gg/2VvEuzzUSM', '_blank');
   };
 
   return (

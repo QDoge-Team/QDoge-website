@@ -33,7 +33,7 @@ const FooterSection: React.FC = () => {
     },
     {
       name: 'Discord',
-      href: 'https://discord.gg/rZd5JW4Vjt',
+      href: 'https://discord.gg/2VvEuzzUSM',
       icon: DiscordLogoIcon,
       color: 'hover:text-blue-400',
     },
