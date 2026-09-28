@@ -34,6 +34,7 @@ const navigationItems: NavItem[] = [
   { label: 'Doge Stats', href: '/doge-stats' },
   { label: 'Holders', href: '/holders' },
   { label: 'Dividends', href: '/dividends' },
+  { label: 'Staking', href: '/staking' },
 ];
 
 /* ---------------- COMPONENT ---------------- */
