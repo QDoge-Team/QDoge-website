@@ -1,5 +1,7 @@
-// Keeps Discord voice channels updated as live price tickers, one per asset
-// listed in scripts/lib/discord-ticker-core.mjs's TICKERS.
+// Keeps Discord voice channels updated as live tickers, one per entry
+// listed in scripts/lib/discord-ticker-core.mjs's TICKERS: QDOGE/QTREAT/
+// QPAY/QPAYHUB prices, the current Qubic epoch, and that epoch's
+// airdrop/fetch amounts from EPOCH_SCHEDULE.
 //
 // This is the standalone, long-running version -- for running it as a
 // Netlify scheduled function instead (recommended if the site is already on
@@ -9,6 +11,12 @@
 // most recent entry is a rolling average of today's trades on QX (updates as
 // trades happen), not a single last-trade tick -- a steadier number for a
 // ticker than the raw order book, and it needs no wallet/signing setup.
+// The epoch comes straight from Qubic network status (rpc.qubic.org) --
+// epochs change weekly, around Wednesday 12:00 UTC. Airdrop/fetch amounts
+// are a fixed, team-supplied table in EPOCH_SCHEDULE (not a formula, even
+// though the values happen to decay geometrically) -- once the current
+// epoch runs past the table's last row, that ticker logs a clear error
+// until new rows are added, rather than extrapolating.
 //
 // One bot token can manage any number of channels, in the same server or
 // across several servers -- you don't need a bot per channel. The only
