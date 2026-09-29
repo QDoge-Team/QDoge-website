@@ -9,7 +9,7 @@
     "lint": "eslint",
     "icons:round": "node scripts/round-icon.mjs",
     "icons:ico": "node scripts/favicon-ico.mjs",
-    "discord:price-ticker": "node scripts/discord-price-ticker.mjs"
+    "discord:price-ticker": "node --env-file=.env scripts/discord-price-ticker.mjs"
   },
   "dependencies": {
     "@qubic-lib/qubic-ts-library": "^0.1.6",
