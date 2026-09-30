@@ -42,6 +42,17 @@ function formatQu(n: number | null | undefined): string {
   return Math.round(n).toLocaleString('en-US');
 }
 
+/** Comma-formats a raw digit string for display (e.g. "10000000" -> "10,000,000"). */
+function formatAmountInput(value: string): string {
+  if (!value) return '';
+  return Number(value).toLocaleString('en-US');
+}
+
+/** Strips everything but digits, so pasted/typed commas don't end up in state. */
+function parseAmountInput(value: string): string {
+  return value.replace(/\D/g, '');
+}
+
 const TICK_OFFSET = 15;
 
 function StatCard({
@@ -333,10 +344,10 @@ export function StakingPageContent() {
                   </label>
                   <div className="mt-1.5 flex gap-2">
                     <input
-                      type="number"
-                      min={QTREAT_MIN_STAKE}
-                      value={stakeAmount}
-                      onChange={(e) => setStakeAmount(e.target.value)}
+                      type="text"
+                      inputMode="numeric"
+                      value={formatAmountInput(stakeAmount)}
+                      onChange={(e) => setStakeAmount(parseAmountInput(e.target.value))}
                       placeholder={formatQu(QTREAT_MIN_STAKE)}
                       className="flex-1 rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-sm text-white font-mono outline-none focus:border-cyan-400/50"
                     />
@@ -360,10 +371,10 @@ export function StakingPageContent() {
                   </label>
                   <div className="mt-1.5 flex gap-2">
                     <input
-                      type="number"
-                      max={staking?.staked ?? undefined}
-                      value={unstakeAmount}
-                      onChange={(e) => setUnstakeAmount(e.target.value)}
+                      type="text"
+                      inputMode="numeric"
+                      value={formatAmountInput(unstakeAmount)}
+                      onChange={(e) => setUnstakeAmount(parseAmountInput(e.target.value))}
                       placeholder="Amount to unstake"
                       className="flex-1 rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-sm text-white font-mono outline-none focus:border-amber-400/50"
                     />
