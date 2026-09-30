@@ -31,6 +31,21 @@ export const QTREAT_UNSTAKE_DELAY_EPOCHS = 2;
 /** qu fee required as invocationReward on RequestUnstake/ClaimQtreatBonus (covers QX's release-shares fee). */
 export const QTREAT_QX_TRANSFER_FEE = 100;
 
+/**
+ * Growth streak: each epoch a staker both (a) raises their staked amount by
+ * at least QTREAT_PROGRESSIVE_MIN_STEP over the previous epoch and (b) hits a
+ * new personal all-time-high in total holdings (staked + pending unstake +
+ * wallet QDOGE), their streak count goes up by 1, up to
+ * QTREAT_PROGRESSIVE_MAX_STREAK. Any epoch that doesn't clear both bars
+ * resets the streak to 0. Each streak point adds
+ * QTREAT_PROGRESSIVE_BONUS_PERMILLE/1000 (2.5%) to that staker's *weight* in
+ * the per-epoch qu staking-fund payout -- so a maxed-out streak is +50%
+ * weight versus an identical stake with no streak.
+ */
+export const QTREAT_PROGRESSIVE_MIN_STEP = 1_000_000;
+export const QTREAT_PROGRESSIVE_BONUS_PERMILLE = 25;
+export const QTREAT_PROGRESSIVE_MAX_STREAK = 20;
+
 export const QTREAT_STAKE_ASSET = { name: 'QDOGE', issuer: QDOGE_ISSUER_ID };
 export const QTREAT_BONUS_ASSET = { name: 'QTREAT', issuer: QDOGE_ISSUER_ID };
 

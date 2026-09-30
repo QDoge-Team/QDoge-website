@@ -5,6 +5,9 @@ import { ConnectWalletButton } from '@/components/connect/ConnectWalletButton';
 import { useQubicConnect } from '@/components/connect/QubicConnectContext';
 import {
   QTREAT_MIN_STAKE,
+  QTREAT_PROGRESSIVE_BONUS_PERMILLE,
+  QTREAT_PROGRESSIVE_MAX_STREAK,
+  QTREAT_PROGRESSIVE_MIN_STEP,
   QTREAT_QX_TRANSFER_FEE,
   QTREAT_STAKE_ASSET,
   QTREAT_BONUS_ASSET,
@@ -28,6 +31,7 @@ import {
   ArrowLeft,
   CheckCircle2,
   Coins,
+  Flame,
   Gift,
   Loader2,
   Lock,
@@ -360,11 +364,33 @@ export function StakingPageContent() {
                   <span className="text-gray-500">Pending QTREAT bonus</span>
                   <span className="text-purple-300 font-bold">{formatQu(staking?.pendingBonus)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Growth streak</span>
-                  <span className="text-gray-300">{formatQu(staking?.growthStreak)} epochs</span>
-                </div>
               </div>
+
+              {(() => {
+                const streak = staking?.growthStreak ?? 0;
+                const atMax = streak >= QTREAT_PROGRESSIVE_MAX_STREAK;
+                const bonusPct = (streak * QTREAT_PROGRESSIVE_BONUS_PERMILLE) / 10;
+                const maxBonusPct = (QTREAT_PROGRESSIVE_MAX_STREAK * QTREAT_PROGRESSIVE_BONUS_PERMILLE) / 10;
+                return (
+                  <div className="mt-4 rounded-xl border border-orange-400/30 bg-orange-400/5 p-3.5">
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-orange-300/90 font-mono">
+                        <Flame className="h-3.5 w-3.5 text-orange-400" />
+                        Growth streak
+                      </span>
+                      <span className="font-mono text-sm font-bold text-orange-300">
+                        {streak} epoch{streak === 1 ? '' : 's'}
+                        {streak > 0 ? ` · +${bonusPct}% reward weight` : ''}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-[11px] text-orange-200/70 font-mono leading-snug">
+                      {atMax
+                        ? `Maxed out! You're earning +${maxBonusPct}% weight in every epoch's staking-fund payout -- keep growing your stake to hold it.`
+                        : `Raise your total staked QDOGE by ${formatQu(QTREAT_PROGRESSIVE_MIN_STEP)}+ every epoch to build this streak -- each epoch adds +${QTREAT_PROGRESSIVE_BONUS_PERMILLE / 10}% weight in the qu staking-fund payout, up to +${maxBonusPct}% at a ${QTREAT_PROGRESSIVE_MAX_STREAK}-epoch streak. Skip an epoch's increase and it resets to 0.`}
+                    </p>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Actions */}
