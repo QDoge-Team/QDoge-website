@@ -9,6 +9,7 @@ import {
   QTREAT_STAKE_ASSET,
   QTREAT_BONUS_ASSET,
   QTREAT_UNSTAKE_DELAY_EPOCHS,
+  QX_CONTRACT_INDEX,
   buildClaimBonusTx,
   buildFinalizeUnstakeTx,
   buildRequestUnstakeTx,
@@ -109,6 +110,7 @@ export function StakingPageContent() {
   const [funds, setFunds] = useState<FundsInfo | null>(null);
   const [staking, setStaking] = useState<StakingInfo | null>(null);
   const [qdogeBalance, setQdogeBalance] = useState<number | null>(null);
+  const [qxManagedQdoge, setQxManagedQdoge] = useState<number | null>(null);
   const [qtreatBalance, setQtreatBalance] = useState<number | null>(null);
   const [tick, setTick] = useState<TickInfo | null>(null);
   const [hasCheckedActivation, setHasCheckedActivation] = useState(false);
@@ -136,16 +138,22 @@ export function StakingPageContent() {
     if (!wallet) {
       setStaking(null);
       setQdogeBalance(null);
+      setQxManagedQdoge(null);
       setQtreatBalance(null);
       return;
     }
-    const [info, qdoge, qtreat] = await Promise.all([
+    const [info, qdoge, qxManaged, qtreat] = await Promise.all([
       getStakingInfo(wallet.publicKey),
       fetchAssetBalance(wallet.publicKey, QTREAT_STAKE_ASSET.name),
+      // Only QDOGE currently under QX's own management is eligible to stake --
+      // QX's TransferShareManagementRights silently no-ops (transfers 0, no
+      // error) for any amount beyond that, even though the tx still confirms.
+      fetchAssetBalance(wallet.publicKey, QTREAT_STAKE_ASSET.name, QX_CONTRACT_INDEX),
       fetchAssetBalance(wallet.publicKey, QTREAT_BONUS_ASSET.name),
     ]);
     setStaking(info);
     setQdogeBalance(qdoge);
+    setQxManagedQdoge(qxManaged);
     setQtreatBalance(qtreat);
   }, [wallet]);
 
@@ -162,7 +170,15 @@ export function StakingPageContent() {
   }, [loadWalletInfo]);
 
   const submit = useCallback(
-    async (label: string, build: (sourceId: string, targetTick: number) => Promise<Parameters<typeof getSignedTx>[0]>) => {
+    async (
+      label: string,
+      build: (sourceId: string, targetTick: number) => Promise<Parameters<typeof getSignedTx>[0]>,
+      // Runs after the tx confirms, to check the state actually changed as
+      // expected -- QX's share-management transfer silently no-ops (no
+      // error, no revert) when the requested amount exceeds what it
+      // currently manages, so a confirmed tx is NOT proof the action worked.
+      verify?: () => Promise<{ ok: boolean; message: string }>
+    ) => {
       if (!wallet) return;
       setAction({ status: 'signing', message: `Sign the ${label} transaction in your wallet…` });
       try {
@@ -174,12 +190,19 @@ export function StakingPageContent() {
         const result = await broadcastTx(signed);
         if (!result.transactionId) throw new Error('Broadcast did not return a transaction ID');
         setAction({ status: 'confirming', message: `Waiting for tick ${targetTick} to confirm…` });
-        pollTxStatus(result.transactionId, (ok) => {
-          setAction(
-            ok
-              ? { status: 'ok', message: `${label} confirmed.` }
-              : { status: 'error', message: `${label} did not confirm in time. Check the explorer before retrying.` }
-          );
+        pollTxStatus(result.transactionId, async (ok) => {
+          if (!ok) {
+            setAction({ status: 'error', message: `${label} did not confirm in time. Check the explorer before retrying.` });
+          } else if (verify) {
+            const verification = await verify();
+            setAction(
+              verification.ok
+                ? { status: 'ok', message: `${label} confirmed.` }
+                : { status: 'error', message: verification.message }
+            );
+          } else {
+            setAction({ status: 'ok', message: `${label} confirmed.` });
+          }
           void loadWalletInfo();
           void loadContractInfo();
         });
@@ -298,6 +321,16 @@ export function StakingPageContent() {
                   <span className="text-white">{formatQu(qdogeBalance)}</span>
                 </div>
                 <div className="flex justify-between">
+                  <span className="text-gray-500">Available to stake</span>
+                  <span className={cn(
+                    qxManagedQdoge != null && qdogeBalance != null && qxManagedQdoge < qdogeBalance
+                      ? 'text-amber-300'
+                      : 'text-white'
+                  )}>
+                    {formatQu(qxManagedQdoge)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-gray-500">Wallet QTREAT</span>
                   <span className="text-white">{formatQu(qtreatBalance)}</span>
                 </div>
@@ -352,17 +385,45 @@ export function StakingPageContent() {
                       className="flex-1 rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-sm text-white font-mono outline-none focus:border-cyan-400/50"
                     />
                     <button
-                      disabled={busy || !isLive || !stakeAmount || Number(stakeAmount) < QTREAT_MIN_STAKE}
-                      onClick={() =>
-                        submit('Stake', (sourceId, targetTick) =>
-                          buildStakeTx({ sourceId, amount: Number(stakeAmount), tick: targetTick })
-                        )
+                      disabled={
+                        busy ||
+                        !isLive ||
+                        !stakeAmount ||
+                        Number(stakeAmount) < QTREAT_MIN_STAKE ||
+                        (qxManagedQdoge != null && Number(stakeAmount) > qxManagedQdoge)
                       }
+                      onClick={() => {
+                        const amount = Number(stakeAmount);
+                        const baselineStaked = staking?.staked ?? 0;
+                        void submit(
+                          'Stake',
+                          (sourceId, targetTick) => buildStakeTx({ sourceId, amount, tick: targetTick }),
+                          async () => {
+                            const fresh = await getStakingInfo(wallet!.publicKey);
+                            const gained = (fresh?.staked ?? 0) - baselineStaked;
+                            if (gained >= amount) return { ok: true, message: '' };
+                            return {
+                              ok: false,
+                              message:
+                                gained > 0
+                                  ? `Only ${formatQu(gained)} of the ${formatQu(amount)} QDOGE actually staked -- the rest wasn't managed by QX at the time. Staked balance updated; try staking the remainder after moving it under QX.`
+                                  : `Transaction confirmed, but nothing was staked -- that QDOGE wasn't managed by QX at the time (see "Available to stake" above). No funds moved; safe to retry with a lower amount.`,
+                            };
+                          }
+                        );
+                      }}
                       className="rounded-lg border border-cyan-400/40 bg-cyan-400/10 px-4 py-2 text-xs font-bold uppercase tracking-wider text-cyan-300 hover:bg-cyan-400/20 disabled:opacity-40 font-mono"
                     >
                       Stake
                     </button>
                   </div>
+                  {qxManagedQdoge != null && qdogeBalance != null && qxManagedQdoge < qdogeBalance ? (
+                    <p className="mt-1.5 text-[11px] text-amber-400/80 font-mono leading-snug">
+                      Only {formatQu(qxManagedQdoge)} of your {formatQu(qdogeBalance)} QDOGE is currently managed by
+                      QX and eligible to stake -- the rest is managed elsewhere (e.g. another contract or listing)
+                      and needs to move back under QX first.
+                    </p>
+                  ) : null}
                 </div>
 
                 <div>
