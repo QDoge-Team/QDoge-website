@@ -13,6 +13,7 @@ import {
   QTREAT_BONUS_ASSET,
   QTREAT_UNSTAKE_DELAY_EPOCHS,
   QX_CONTRACT_INDEX,
+  NULL_ID,
   buildClaimBonusTx,
   buildFinalizeUnstakeTx,
   buildRequestUnstakeTx,
@@ -125,29 +126,39 @@ export function StakingPageContent() {
 
   const loadContractInfo = useCallback(async () => {
     try {
-      const [p, f, t] = await Promise.all([getPhaseInfo(), getFundsInfo(), fetchTickInfo()]);
+      // totalStaked/stakingFund are network-wide fields that GetStakingInfo
+      // sets regardless of whether the queried identity is a real staker, so
+      // this loads even when no wallet is connected (using NULL_ID) -- the
+      // "Total Staked" stat card shouldn't require a personal wallet
+      // connection just to show a network-wide number.
+      const [p, f, t, s] = await Promise.all([
+        getPhaseInfo(),
+        getFundsInfo(),
+        fetchTickInfo(),
+        getStakingInfo(wallet?.publicKey ?? NULL_ID),
+      ]);
       setPhase(p);
       setFunds(f);
       setTick(t);
+      setStaking(s);
     } catch (err) {
-      // Leave phase/funds as-is (don't clobber a previous good read with a
-      // transient blip) -- the retry banner below covers the first-load case.
+      // Leave phase/funds/staking as-is (don't clobber a previous good read
+      // with a transient blip) -- the retry banner below covers the
+      // first-load case.
       console.error('Failed to load QTREAT contract info:', err);
     } finally {
       setHasCheckedActivation(true);
     }
-  }, []);
+  }, [wallet?.publicKey]);
 
   const loadWalletInfo = useCallback(async () => {
     if (!wallet) {
-      setStaking(null);
       setQdogeBalance(null);
       setQxManagedQdoge(null);
       setQtreatBalance(null);
       return;
     }
-    const [info, qdoge, qxManaged, qtreat] = await Promise.all([
-      getStakingInfo(wallet.publicKey),
+    const [qdoge, qxManaged, qtreat] = await Promise.all([
       fetchAssetBalance(wallet.publicKey, QTREAT_STAKE_ASSET.name),
       // Only QDOGE currently under QX's own management is eligible to stake --
       // QX's TransferShareManagementRights silently no-ops (transfers 0, no
@@ -155,7 +166,6 @@ export function StakingPageContent() {
       fetchAssetBalance(wallet.publicKey, QTREAT_STAKE_ASSET.name, QX_CONTRACT_INDEX),
       fetchAssetBalance(wallet.publicKey, QTREAT_BONUS_ASSET.name),
     ]);
-    setStaking(info);
     setQdogeBalance(qdoge);
     setQxManagedQdoge(qxManaged);
     setQtreatBalance(qtreat);
