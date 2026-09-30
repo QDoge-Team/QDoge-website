@@ -22,12 +22,11 @@
  * accurate source (it doesn't sample/estimate), so those epochs were
  * corrected in place rather than left inconsistent.
  *
- * QTREAT epoch 226 remains flagged, unresolved: our existing team-supplied
- * epoch-226 figure (67,314) is suspiciously identical to the new tab's own
- * epoch-227 figure. QCAP -- reported by the team in the same batch -- had
- * zero such issue, so this looks like a one-epoch mislabel specific to that
- * one message rather than a systemic offset. Left as-is (226=67314, 227=null)
- * pending confirmation; epochs 228-232 are unaffected either way.
+ * QTREAT epoch 226: resolved (confirmed 2026-09-30) -- the 67,314 figure
+ * originally reported to us as epoch 226 was actually epoch 227's payout, a
+ * one-message mislabel (QCAP, reported in the same batch, had no such
+ * issue). Moved to epoch 227; epoch 226 itself has no known source and is
+ * left null rather than guessed.
  *
  * Prices are each asset's live "Last Price" (qu) on qxboard.com as of
  * 2026-09-01 -- qx.qubic.org itself remains deprecated (see prior note).
@@ -70,8 +69,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 113190.03,
     totalDividends: 3848461,
     price: 45000003,
-    // epochs 184..232 -- epoch 226/227 flagged, see file header
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, 39961, 36029, 55400, 288032, 318896, 248096, 232384, 210612, 189123, 156286, 154599, 127903, 118250, 123493, 102582, 89501, 88599, 87597, 89761, 81669, 80190, 79419, 83782, 73448, 73727, 76858, 67710, 71054, 67314, null, 66925, 65470, 68681, 67559, 67551],
+    // epochs 184..232 -- epoch 226 unknown (see file header: the 67314 previously recorded there was actually epoch 227's payout)
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, 39961, 36029, 55400, 288032, 318896, 248096, 232384, 210612, 189123, 156286, 154599, 127903, 118250, 123493, 102582, 89501, 88599, 87597, 89761, 81669, 80190, 79419, 83782, 73448, 73727, 76858, 67710, 71054, null, 67314, 66925, 65470, 68681, 67559, 67551],
   },
   {
     name: 'QIP',
