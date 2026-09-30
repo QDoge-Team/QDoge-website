@@ -27,6 +27,12 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
   const [qrCode, setQrCode] = useState('');
   const [connectionUri, setConnectionUri] = useState('');
   const [accounts, setAccounts] = useState<Account[]>([]);
+  // Which flow produced the current `accounts` list -- recorded once, at the
+  // moment that flow succeeds, rather than re-derived from a live value at
+  // click time (wcIsConnected can be true for an unrelated earlier session,
+  // wrongly mislabeling a vault-file selection as 'walletconnect' or vice
+  // versa).
+  const [accountSource, setAccountSource] = useState<'walletconnect' | 'vault' | null>(null);
 
   useEffect(() => {
     if (!open) {
@@ -39,6 +45,7 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
       setSeedError('');
       setQrCode('');
       setConnectionUri('');
+      setAccountSource(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   }, [open]);
@@ -47,6 +54,7 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
     if (wcIsConnected && mode === 'walletconnect') {
       requestAccounts().then((accs) => {
         setAccounts(accs.map((a) => ({ publicId: a.address, alias: a.name })));
+        setAccountSource('walletconnect');
         setMode('account-select');
       });
     }
@@ -260,6 +268,7 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
                     const vault = await vaultFileConnect(selectedFile, password);
                     const seeds = vault.getSeeds() as Account[];
                     setAccounts(seeds);
+                    setAccountSource('vault');
                     setMode('account-select');
                   } catch (err) {
                     const msg = err instanceof Error ? err.message : String(err);
@@ -289,7 +298,7 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
                   key={acc.publicId}
                   onClick={() => {
                     connect({
-                      connectType: wcIsConnected ? 'walletconnect' : 'vault',
+                      connectType: accountSource === 'walletconnect' ? 'walletconnect' : 'vault',
                       publicKey: acc.publicId,
                       alias: acc.alias,
                     });
