@@ -107,11 +107,18 @@ export function StakingPageContent() {
   const [action, setAction] = useState<ActionState>({ status: 'idle' });
 
   const loadContractInfo = useCallback(async () => {
-    const [p, f, t] = await Promise.all([getPhaseInfo(), getFundsInfo(), fetchTickInfo()]);
-    setPhase(p);
-    setFunds(f);
-    setTick(t);
-    setHasCheckedActivation(true);
+    try {
+      const [p, f, t] = await Promise.all([getPhaseInfo(), getFundsInfo(), fetchTickInfo()]);
+      setPhase(p);
+      setFunds(f);
+      setTick(t);
+    } catch (err) {
+      // Leave phase/funds as-is (don't clobber a previous good read with a
+      // transient blip) -- the retry banner below covers the first-load case.
+      console.error('Failed to load QTREAT contract info:', err);
+    } finally {
+      setHasCheckedActivation(true);
+    }
   }, []);
 
   const loadWalletInfo = useCallback(async () => {
@@ -172,14 +179,12 @@ export function StakingPageContent() {
     [wallet, getSignedTx, loadWalletInfo, loadContractInfo]
   );
 
+  // Mirrors FinalizeUnstake's own guard (qpi.epoch() < unstakeEpoch + QTREAT_UNSTAKE_DELAY_EPOCHS -> revert).
   const canFinalize =
     !!staking &&
     staking.unstakeAmount > 0 &&
-    !!phase &&
     tick != null &&
-    // stakingStartEpoch/epoch aren't directly comparable to tick.epoch here without an extra fetch,
-    // so this gates on the delay having plausibly elapsed; the contract itself is the final authority.
-    true;
+    tick.epoch >= staking.unstakeEpoch + QTREAT_UNSTAKE_DELAY_EPOCHS;
 
   const busy = action.status === 'signing' || action.status === 'broadcasting' || action.status === 'confirming';
   // The contract is in its IPO phase until it activates -- until then every
@@ -225,11 +230,10 @@ export function StakingPageContent() {
           <div className="mb-10 rounded-2xl border border-amber-400/30 bg-amber-400/5 p-5 sm:p-6 backdrop-blur-sm flex items-start gap-3">
             <Timer className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
             <div>
-              <p className="font-mono text-sm font-bold text-amber-300">Contract in IPO phase</p>
+              <p className="font-mono text-sm font-bold text-amber-300">Couldn&apos;t load contract data</p>
               <p className="font-mono text-xs text-amber-200/80 mt-1 leading-relaxed">
-                QTREAT (contract index {30}) hasn&apos;t activated yet — expected Wednesday 12:30 UTC. Stats below
-                will read as placeholders and actions are disabled until then; this page will pick it up
-                automatically once it goes live.
+                The QTREAT contract didn&apos;t respond just now — this page keeps retrying automatically every
+                minute. Stats below will stay blank and actions disabled until it comes back.
               </p>
             </div>
           </div>
@@ -299,7 +303,12 @@ export function StakingPageContent() {
                   <div className="flex justify-between">
                     <span className="text-gray-500">Unstake requested at epoch</span>
                     <span className="text-gray-300">
-                      {staking.unstakeEpoch} (+{QTREAT_UNSTAKE_DELAY_EPOCHS} epoch delay)
+                      {staking.unstakeEpoch}{' '}
+                      {canFinalize ? (
+                        <span className="text-green-400">(ready to finalize)</span>
+                      ) : (
+                        <span>(unlocks epoch {staking.unstakeEpoch + QTREAT_UNSTAKE_DELAY_EPOCHS})</span>
+                      )}
                     </span>
                   </div>
                 ) : null}
