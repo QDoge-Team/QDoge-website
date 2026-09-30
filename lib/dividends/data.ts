@@ -1,21 +1,39 @@
 /**
  * Per-share dividend history (in qu) for Qubic tokens and smart contracts,
- * epochs 184-227. Base history (184-221) from the QTREAT dividends comparison
- * sheet. Epochs 222-227 for the smart-contract projects verified from
- * dividends.qubic.tools's "Old version" tab (the estimator derived from
- * balance changes -- cross-checked epoch 227 QRWA/QVAULT/MSVAULT/QBAY against
- * the site's newer chain-event-log "Dividends" tab and they matched exactly).
- * That site does NOT track QTREAT/QMINE/QCAP via the old estimator (they pay
- * via direct issuer transfers, not the SC dividend mechanism); its new tab
- * now lists them but the numbers didn't reconcile with our historical totals
- * (e.g. QRAFFLE's cumulative was far off), so untrusted for now. QTREAT/QCAP's
- * epoch 222-226 figures were supplied directly by the team; epoch 227 for all
- * three is pending.
+ * epochs 184-232 (232 is the last complete epoch as of 2026-09-30; 233 is
+ * still in progress). Base history (184-221) from the QTREAT dividends
+ * comparison sheet. Epochs 222-232 verified per-asset from
+ * dividends.qubic.tools's "Dividends" tab (v0.4.2, reads chain event logs
+ * directly -- confirmed far more reliable than the old balance-change
+ * estimator: QCAP/QRWA/QBAY/QVAULT/MSVAULT matched our existing figures
+ * exactly at every overlapping epoch). Falls back to the "Old version"
+ * estimator tab only for contracts the new tab hasn't started tracking yet
+ * (QIP, QTRY -- both confirmed flat 0 through 232 either way).
+ *
+ * This pass also found three projects wrongly marked as permanent
+ * zero-payers that have real, previously-missed histories: GGWP (paying
+ * since epoch 219), ESCROW (since 214), and QTF (since 225) -- backfilled
+ * here from the chain log, aggregates now computed from real data.
+ *
+ * QX and QSWAP (very high payout-count epochs, 100s-1000s of individual
+ * transactions each) showed real, non-trivial differences between the old
+ * estimator and the new chain-log read for a couple of already-recorded
+ * epochs (e.g. QX epoch 225: 6 -> 81,507). The chain-log read is the more
+ * accurate source (it doesn't sample/estimate), so those epochs were
+ * corrected in place rather than left inconsistent.
+ *
+ * QTREAT epoch 226 remains flagged, unresolved: our existing team-supplied
+ * epoch-226 figure (67,314) is suspiciously identical to the new tab's own
+ * epoch-227 figure. QCAP -- reported by the team in the same batch -- had
+ * zero such issue, so this looks like a one-epoch mislabel specific to that
+ * one message rather than a systemic offset. Left as-is (226=67314, 227=null)
+ * pending confirmation; epochs 228-232 are unaffected either way.
  *
  * Prices are each asset's live "Last Price" (qu) on qxboard.com as of
  * 2026-09-01 -- qx.qubic.org itself remains deprecated (see prior note).
  * Yields and payback periods move with price, so these drift out of date;
- * re-pull from qxboard.com (or whatever succeeds it) on refresh.
+ * re-pull from qxboard.com (or whatever succeeds it) on refresh. Not
+ * refreshed in this pass (out of scope -- only the epoch series changed).
  * Aggregates (total/avg/yields/payback) are recomputed from the per-epoch
  * series rather than taken from any summary columns, which lag the epoch
  * data. Regenerate when a new snapshot lands.
@@ -39,203 +57,203 @@ export type DividendProject = {
 };
 
 export const EPOCH_FROM = 184;
-export const EPOCH_TO = 227;
+export const EPOCH_TO = 232;
 
 export const DIVIDEND_PROJECTS: DividendProject[] = [
   {
     name: 'QTREAT',
     kind: 'token',
     scIndex: null,
-    weeklyYieldPct: 0.2691,
-    annualYieldPct: 14,
-    paybackWeeks: 371.6,
-    avgWeekly: 121112.93,
-    totalDividends: 3512275,
+    weeklyYieldPct: 0.2515,
+    annualYieldPct: 13.08,
+    paybackWeeks: 397.6,
+    avgWeekly: 113190.03,
+    totalDividends: 3848461,
     price: 45000003,
-    // epochs 184..227
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, 39961, 36029, 55400, 288032, 318896, 248096, 232384, 210612, 189123, 156286, 154599, 127903, 118250, 123493, 102582, 89501, 88599, 87597, 89761, 81669, 80190, 79419, 83782, 73448, 73727, 76858, 67710, 71054, 67314, null],
+    // epochs 184..232 -- epoch 226/227 flagged, see file header
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, 39961, 36029, 55400, 288032, 318896, 248096, 232384, 210612, 189123, 156286, 154599, 127903, 118250, 123493, 102582, 89501, 88599, 87597, 89761, 81669, 80190, 79419, 83782, 73448, 73727, 76858, 67710, 71054, 67314, null, 66925, 65470, 68681, 67559, 67551],
   },
   {
     name: 'QIP',
     kind: 'contract',
     scIndex: 18,
-    weeklyYieldPct: 0.2132,
-    annualYieldPct: 11.08,
-    paybackWeeks: 469.1,
-    avgWeekly: 807848.31,
+    weeklyYieldPct: 0.1483,
+    annualYieldPct: 7.71,
+    paybackWeeks: 674.4,
+    avgWeekly: 561981.43,
     totalDividends: 12925573,
     price: 379000000,
-    // epochs 184..227
-    epochs: [null, null, null, null, null, null, null, null, null, null, 545018, 2208906, 32098, 167337, 2695350, 7094101, 26088, 100134, 1849, 53900, 423, 369, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null],
+    // epochs 184..232
+    epochs: [null, null, null, null, null, null, null, null, null, null, 545018, 2208906, 32098, 167337, 2695350, 7094101, 26088, 100134, 1849, 53900, 423, 369, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   },
   {
     name: 'QMINE',
     kind: 'token',
     scIndex: null,
-    weeklyYieldPct: 0.0452,
-    annualYieldPct: 2.35,
-    paybackWeeks: 2214.2,
-    avgWeekly: 1.89,
-    totalDividends: 71.91,
+    weeklyYieldPct: 0.0497,
+    annualYieldPct: 2.59,
+    paybackWeeks: 2010.7,
+    avgWeekly: 2.08,
+    totalDividends: 91.69,
     price: 4190,
-    // epochs 184..227
-    epochs: [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 5, 2, 5, 2, 3, 2, 1.03, 0.93, 0.96, 1.72, 3.21, 1.47, 1.31, 0.1, 1.59, 1.22, 0.25, 1.84, 1.72, 1.65, 1.54, 1.37, null, null, null, null, null, null],
+    // epochs 184..232
+    epochs: [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 5, 2, 5, 2, 3, 2, 1.03, 0.93, 0.96, 1.72, 3.21, 1.47, 1.31, 0.1, 1.59, 1.22, 0.25, 1.84, 1.72, 1.65, 1.54, 1.37, null, null, null, null, null, 5.6009824, 0, 7.54814346, 2.58189888, 1.53561095, 2.51478754],
   },
   {
     name: 'RL',
     kind: 'contract',
     scIndex: 16,
-    weeklyYieldPct: 0.0404,
-    annualYieldPct: 2.1,
-    paybackWeeks: 2473.8,
-    avgWeekly: 60635.43,
-    totalDividends: 1697792,
+    weeklyYieldPct: 0.0323,
+    annualYieldPct: 1.68,
+    paybackWeeks: 3091.7,
+    avgWeekly: 48516.8,
+    totalDividends: 1698088,
     price: 150000000,
-    // epochs 184..227
-    epochs: [19526, 10355, 31656, 163461, 616863, 261834, 143491, 77218, 72781, 7100, 94523, 46004, 24800, 47928, 27958, 81, 0, 3041, 10651, 5570, 5240, 1930, 16277, 9504, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null],
+    // epochs 184..232
+    epochs: [19526, 10355, 31656, 163461, 616863, 261834, 143491, 77218, 72781, 7100, 94523, 46004, 24800, 47928, 27958, 81, 0, 3041, 10651, 5570, 5240, 1930, 16277, 9504, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 0, 0, 296, 0, 0, 0, 0],
   },
   {
     name: 'QRWA',
     kind: 'contract',
     scIndex: 20,
-    weeklyYieldPct: 0.0341,
-    annualYieldPct: 1.77,
-    paybackWeeks: 2932.3,
-    avgWeekly: 276230.7,
-    totalDividends: 8286921,
+    weeklyYieldPct: 0.0369,
+    annualYieldPct: 1.92,
+    paybackWeeks: 2711.2,
+    avgWeekly: 298760.72,
+    totalDividends: 10755386,
     price: 810000000,
-    // epochs 184..227
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, 263942, 254398, 232495, 617160, 849655, 277462, 282033, 230109, 321229, 209494, 146136, 143511, 130547, 134017, 240396, 215543, 193635, 220435, 171224, 309069, 440522, 326556, 254747, 226589, 200882, 184860, 217033, 172450, 0, null, 820792],
+    // epochs 184..232
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, 263942, 254398, 232495, 617160, 849655, 277462, 282033, 230109, 321229, 209494, 146136, 143511, 130547, 134017, 240396, 215543, 193635, 220435, 171224, 309069, 440522, 326556, 254747, 226589, 200882, 184860, 217033, 172450, 0, 893654, 820792, 0, 601832, 378205, 224951, 369823],
   },
   {
     name: 'QX',
     kind: 'contract',
     scIndex: 1,
-    weeklyYieldPct: 0.0305,
-    annualYieldPct: 1.59,
-    paybackWeeks: 3280.1,
-    avgWeekly: 2347509.12,
-    totalDividends: 100942892,
+    weeklyYieldPct: 0.0274,
+    annualYieldPct: 1.43,
+    paybackWeeks: 3644,
+    avgWeekly: 2113060.12,
+    totalDividends: 103539946,
     price: 7700000000,
-    // epochs 184..227
-    epochs: [353352, 5213601, 2122733, 846164, 645950, 882189, 2248160, 722157, 3607086, 480634, 3887334, 2108958, 681487, 12098906, 10715776, 8506098, 6829267, 9715154, 6379210, 944134, 2194350, 4688782, 3147873, 612702, 727820, 582077, 431974, 336943, 426051, 243880, 378977, 359969, 182740, 1812708, 1432197, 819827, 376294, 583775, 227400, 230360, 399257, 6, null, 1758580],
+    // epochs 184..232 -- 225/227 corrected using the more accurate chain-log read, see file header
+    epochs: [353352, 5213601, 2122733, 846164, 645950, 882189, 2248160, 722157, 3607086, 480634, 3887334, 2108958, 681487, 12098906, 10715776, 8506098, 6829267, 9715154, 6379210, 944134, 2194350, 4688782, 3147873, 612702, 727820, 582077, 431974, 336943, 426051, 243880, 378977, 359969, 182740, 1812708, 1432197, 819827, 376294, 583775, 227400, 230360, 399257, 81507, 523290, 1757500, 250988, 526186, 290716, 406323, 519130],
   },
   {
     name: 'QCAP',
     kind: 'token',
     scIndex: null,
-    weeklyYieldPct: 0.0209,
-    annualYieldPct: 1.09,
-    paybackWeeks: 4778.7,
-    avgWeekly: 62.74,
-    totalDividends: 2698,
+    weeklyYieldPct: 0.0199,
+    annualYieldPct: 1.03,
+    paybackWeeks: 5031.5,
+    avgWeekly: 59.59,
+    totalDividends: 2920,
     price: 299837,
-    // epochs 184..227
-    epochs: [49, 8, 3, 5, 148, 55, 48, 16, 28, 5, 124, 90, 31, 128, 323, 525, 14, 311, 92, 37, 35, 73, 63, 32, 16, 24, 36, 19, 8, 5, 29, 14, 20, 45, 34, 21, 24, 16, 15, 20, 34, 32, 43, null],
+    // epochs 184..232
+    epochs: [49, 8, 3, 5, 148, 55, 48, 16, 28, 5, 124, 90, 31, 128, 323, 525, 14, 311, 92, 37, 35, 73, 63, 32, 16, 24, 36, 19, 8, 5, 29, 14, 20, 45, 34, 21, 24, 16, 15, 20, 34, 32, 43, 121, 15, 9, 40, 14, 23],
   },
   {
     name: 'NOST',
     kind: 'contract',
     scIndex: 14,
-    weeklyYieldPct: 0.0079,
-    annualYieldPct: 0.41,
-    paybackWeeks: 12601.1,
-    avgWeekly: 10118.2,
+    weeklyYieldPct: 0.0047,
+    annualYieldPct: 0.24,
+    paybackWeeks: 21421.8,
+    avgWeekly: 5951.88,
     totalDividends: 101182,
     price: 127500000,
-    // epochs 184..227
-    epochs: [5325, null, null, 1331, null, null, null, null, null, 42603, 7988, null, null, null, 1332, null, 42603, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null],
+    // epochs 184..232
+    epochs: [5325, null, null, 1331, null, null, null, null, null, 42603, 7988, null, null, null, 1332, null, 42603, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   },
   {
     name: 'VOTTUN',
     kind: 'contract',
     scIndex: 25,
-    weeklyYieldPct: 0.0418,
-    annualYieldPct: 2.17,
-    paybackWeeks: 2393.4,
-    avgWeekly: 263219.9,
-    totalDividends: 5264398,
+    weeklyYieldPct: 0.0325,
+    annualYieldPct: 1.69,
+    paybackWeeks: 3081.3,
+    avgWeekly: 204460.62,
+    totalDividends: 5315976,
     price: 630000072,
-    // epochs 184..227
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 332, 147618, 200236, 210980, 157664, 77554, 26662, 77045, 99285, 159990, 429484, 15641, 31009, 66240, 39736, 78460, 254475, 712415, 40554, null, 2439018],
+    // epochs 184..232
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 332, 147618, 200236, 210980, 157664, 77554, 26662, 77045, 99285, 159990, 429484, 15641, 31009, 66240, 39736, 78460, 254475, 712415, 40554, 49578, 2441018, 0, 0, 0, 0, 0],
   },
   {
     name: 'QSWAP',
     kind: 'contract',
     scIndex: 13,
-    weeklyYieldPct: 0.0122,
-    annualYieldPct: 0.64,
-    paybackWeeks: 8187.7,
-    avgWeekly: 126409,
-    totalDividends: 5435587,
+    weeklyYieldPct: 0.0117,
+    annualYieldPct: 0.61,
+    paybackWeeks: 8564.6,
+    avgWeekly: 120846.1,
+    totalDividends: 5921459,
     price: 1035000000,
-    // epochs 184..227
-    epochs: [9829, 330231, 26405, 39146, 27016, 25393, 327367, 344659, 39095, 29006, 38327, 14741, 22956, 64749, 899266, 9769, 306435, 355547, 337457, 321340, 43044, 319003, 24886, 34597, 19946, 23493, 605917, 16260, 25448, 12816, 16561, 25669, 35011, 42333, 44260, 31029, 45760, 38899, 29162, 29364, 26563, 341682, null, 35150],
+    // epochs 184..232 -- 225 corrected using the more accurate chain-log read, see file header
+    epochs: [9829, 330231, 26405, 39146, 27016, 25393, 327367, 344659, 39095, 29006, 38327, 14741, 22956, 64749, 899266, 9769, 306435, 355547, 337457, 321340, 43044, 319003, 24886, 34597, 19946, 23493, 605917, 16260, 25448, 12816, 16561, 25669, 35011, 42333, 44260, 31029, 45760, 38899, 29162, 29364, 26563, 308813, 21956, 35586, 322976, 56920, 43885, 39569, 32999],
   },
   {
     name: 'QRAFFLE',
     kind: 'contract',
     scIndex: 19,
-    weeklyYieldPct: 0.0035,
-    annualYieldPct: 0.18,
-    paybackWeeks: 28646.5,
-    avgWeekly: 2129.09,
-    totalDividends: 70260,
+    weeklyYieldPct: 0.0031,
+    annualYieldPct: 0.16,
+    paybackWeeks: 32121.7,
+    avgWeekly: 1898.75,
+    totalDividends: 75950,
     price: 60990989,
-    // epochs 184..227
-    epochs: [null, null, null, null, null, null, null, null, 7988, 4205, 2196, 1420, null, 2130, 2218, 1331, 887, 1020, 221, 1331, 221, 4437, 44, 443, 1331, 1420, 2958, 2366, 4260, 4615, 946, 4733, 4970, 2366, 473, 591, 710, 591, 828, 5236, 946, 828, null, null],
+    // epochs 184..232 -- 223/225 corrected by a few qu using the chain-log read, see file header
+    epochs: [null, null, null, null, null, null, null, null, 7988, 4205, 2196, 1420, null, 2130, 2218, 1331, 887, 1020, 221, 1331, 221, 4437, 44, 443, 1331, 1420, 2958, 2366, 4260, 4615, 946, 4733, 4970, 2366, 473, 591, 710, 591, 828, 5239, 946, 831, 710, 591, 1065, 1307, 710, 591, 710],
   },
   {
     name: 'QBAY',
     kind: 'contract',
     scIndex: 12,
-    weeklyYieldPct: 0.0036,
-    annualYieldPct: 0.19,
-    paybackWeeks: 27966.6,
-    avgWeekly: 21382.65,
-    totalDividends: 855306,
+    weeklyYieldPct: 0.0035,
+    annualYieldPct: 0.18,
+    paybackWeeks: 28586.7,
+    avgWeekly: 20918.8,
+    totalDividends: 962265,
     price: 598000000,
-    // epochs 184..227
-    epochs: [162630, 53461, 4881, 47736, 171183, 24717, 66234, 118, 27943, 13357, 1005, null, null, 11449, 2500, 1967, 1183, 39511, 10806, 12507, 8579, 1997, 4881, 7011, 17869, 118, 19881, 4637, 18713, 18047, 0, 369, 43890, 939, 27943, 562, null, 7396, 1612, 0, 11183, 6270, null, 221],
+    // epochs 184..232
+    epochs: [162630, 53461, 4881, 47736, 171183, 24717, 66234, 118, 27943, 13357, 1005, null, null, 11449, 2500, 1967, 1183, 39511, 10806, 12507, 8579, 1997, 4881, 7011, 17869, 118, 19881, 4637, 18713, 18047, 0, 369, 43890, 939, 27943, 562, null, 7396, 1612, 0, 11183, 6270, 0, 221, 0, 5103, 15828, 0, 86028],
   },
   {
     name: 'QVAULT',
     kind: 'contract',
     scIndex: 10,
-    weeklyYieldPct: 0.0047,
+    weeklyYieldPct: 0.0046,
     annualYieldPct: 0.24,
-    paybackWeeks: 21335.6,
-    avgWeekly: 16826.35,
-    totalDividends: 723533,
+    paybackWeeks: 21900.2,
+    avgWeekly: 16392.51,
+    totalDividends: 803233,
     price: 359000000,
-    // epochs 184..227
-    epochs: [10981, 1941, 791, 1200, 33742, 12582, 15032, 2218, 6915, 1360, 15554, 12420, 12420, 17663, 44544, 75409, 14266, 44679, 13223, 5493, 5255, 84839, 24457, 19786, 17264, 18496, 5662, 2926, 1348, 862, 4520, 2231, 47587, 80878, 5378, 3382, 3778, 17367, 2393, 3183, 5450, 5045, null, 19013],
+    // epochs 184..232
+    epochs: [10981, 1941, 791, 1200, 33742, 12582, 15032, 2218, 6915, 1360, 15554, 12420, 12420, 17663, 44544, 75409, 14266, 44679, 13223, 5493, 5255, 84839, 24457, 19786, 17264, 18496, 5662, 2926, 1348, 862, 4520, 2231, 47587, 80878, 5378, 3382, 3778, 17367, 2393, 3183, 5450, 5045, 21567, 19013, 17168, 1483, 6288, 14793, 18401],
   },
   {
     name: 'MSVAULT',
     kind: 'contract',
     scIndex: 11,
-    weeklyYieldPct: 0.002,
+    weeklyYieldPct: 0.0019,
     annualYieldPct: 0.1,
-    paybackWeeks: 49619.1,
-    avgWeekly: 6707.41,
-    totalDividends: 275004,
+    paybackWeeks: 53109.5,
+    avgWeekly: 6266.6,
+    totalDividends: 294530,
     price: 332816000,
-    // epochs 184..227
-    epochs: [50000, 3255, 31952, 2223, 2662, 2219, null, null, 2663, 2219, 1775, 1480, 1479, 1775, 18195, 2219, 28255, 5029, 4290, 3994, 3254, 23373, 5030, 5029, 5622, 4289, 4438, 5917, 3846, 3255, 3698, 3402, 3255, 3550, 3550, 3551, 3550, 3254, 3551, 3106, 3846, 3403, null, 3551],
+    // epochs 184..232
+    epochs: [50000, 3255, 31952, 2223, 2662, 2219, null, null, 2663, 2219, 1775, 1480, 1479, 1775, 18195, 2219, 28255, 5029, 4290, 3994, 3254, 23373, 5030, 5029, 5622, 4289, 4438, 5917, 3846, 3255, 3698, 3402, 3255, 3550, 3550, 3551, 3550, 3254, 3551, 3106, 3846, 3403, 3254, 3551, 3254, 3846, 3255, 2958, 2959],
   },
   {
     name: 'QTRY',
     kind: 'contract',
     scIndex: 2,
-    weeklyYieldPct: 0.0009,
-    annualYieldPct: 0.05,
-    paybackWeeks: 110734.8,
-    avgWeekly: 5554.71,
+    weeklyYieldPct: 0.0005,
+    annualYieldPct: 0.02,
+    paybackWeeks: 221469.5,
+    avgWeekly: 2777.36,
     totalDividends: 38883,
     price: 615100000,
-    // epochs 184..227
-    epochs: [3698, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 9838, 25347, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, 0, null, null],
+    // epochs 184..232
+    epochs: [3698, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 9838, 25347, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   },
   {
     name: 'RANDOM',
@@ -247,8 +265,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 2820000000,
-    // epochs 184..227
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..232
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'QUTIL',
@@ -260,8 +278,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 30000002,
-    // epochs 184..227
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..232
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'MLM',
@@ -273,8 +291,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 2700000004,
-    // epochs 184..227
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..232
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'QEARN',
@@ -286,8 +304,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 56500000,
-    // epochs 184..227
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..232
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'QDRAW',
@@ -299,8 +317,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 12500000,
-    // epochs 184..227
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..232
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'QBOND',
@@ -312,8 +330,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 67499999.5,
-    // epochs 184..227
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..232
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'QRP',
@@ -325,21 +343,21 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 9400000,
-    // epochs 184..227
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..232
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'QTF',
     kind: 'contract',
     scIndex: 22,
-    weeklyYieldPct: 0,
-    annualYieldPct: 0,
-    paybackWeeks: null,
-    avgWeekly: 0,
-    totalDividends: 0,
+    weeklyYieldPct: 0.0034,
+    annualYieldPct: 0.18,
+    paybackWeeks: 29038.1,
+    avgWeekly: 206.63,
+    totalDividends: 1653,
     price: 6000000,
-    // epochs 184..227
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..232 -- previously wrongly marked a permanent zero-payer, see file header
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 137, 0, 1516, 0, 0, 0, 0, 0],
   },
   {
     name: 'QDUEL',
@@ -351,8 +369,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 4800004,
-    // epochs 184..227
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..232
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'PULSE',
@@ -364,8 +382,8 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 42200000,
-    // epochs 184..227
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..232
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'QUSINO',
@@ -377,34 +395,34 @@ export const DIVIDEND_PROJECTS: DividendProject[] = [
     avgWeekly: 0,
     totalDividends: 0,
     price: 68000000,
-    // epochs 184..227
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..232
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
   },
   {
     name: 'ESCROW',
     kind: 'contract',
     scIndex: 27,
-    weeklyYieldPct: 0,
-    annualYieldPct: 0,
-    paybackWeeks: null,
-    avgWeekly: 0,
-    totalDividends: 0,
+    weeklyYieldPct: 0.0009,
+    annualYieldPct: 0.05,
+    paybackWeeks: 109240.8,
+    avgWeekly: 1455.5,
+    totalDividends: 14555,
     price: 159000000,
-    // epochs 184..227
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..232 -- previously wrongly marked a permanent zero-payer, see file header
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 344, null, null, null, null, null, null, null, null, null, 2408, 2407, 688, 3027, 0, 1994, 1968, 1719, 0],
   },
   {
     name: 'GGWP',
     kind: 'contract',
     scIndex: 28,
-    weeklyYieldPct: 0,
-    annualYieldPct: 0,
-    paybackWeeks: null,
-    avgWeekly: 0,
-    totalDividends: 0,
+    weeklyYieldPct: 0.024,
+    annualYieldPct: 1.25,
+    paybackWeeks: 4170.1,
+    avgWeekly: 33812.07,
+    totalDividends: 473369,
     price: 140999999,
-    // epochs 184..227
-    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
+    // epochs 184..232 -- previously wrongly marked a permanent zero-payer, see file header
+    epochs: [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 73964, 44378, 0, 88757, 44378, 0, 88757, 44378, 0, 0, 88757, 0, 0, 0],
   },
 ];
 
