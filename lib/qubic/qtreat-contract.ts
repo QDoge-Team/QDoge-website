@@ -49,6 +49,15 @@ export const QTREAT_PROGRESSIVE_MAX_STREAK = 20;
 export const QTREAT_STAKE_ASSET = { name: 'QDOGE', issuer: QDOGE_ISSUER_ID };
 export const QTREAT_BONUS_ASSET = { name: 'QTREAT', issuer: QDOGE_ISSUER_ID };
 
+/**
+ * The all-zero Qubic identity (id containing 32 zero bytes). GetStakingInfo
+ * sets its network-wide fields (totalStaked/stakingFund) unconditionally,
+ * regardless of whether the queried identity is a real staker -- so this is
+ * a safe placeholder to read those two fields when no wallet is connected,
+ * without querying on behalf of any real user.
+ */
+export const NULL_ID = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXIB';
+
 const FUNCTION = {
   GetStakingInfo: 1,
   GetPhaseInfo: 2,
