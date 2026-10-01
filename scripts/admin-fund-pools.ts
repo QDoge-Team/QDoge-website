@@ -20,7 +20,7 @@ import { QTREAT_CONTRACT_INDEX, getFundsInfo, type FundsInfo } from '../lib/qubi
 import { createSCTx } from '../lib/qubic/tx-utils';
 import { broadcastTx, fetchTickInfo, fetchTxStatus } from '../lib/qubic/rpc';
 
-const TICK_OFFSET = 15;
+const TICK_OFFSET = 40;
 const CONFIRM_TIMEOUT_MS = 90_000;
 const CONFIRM_POLL_INTERVAL_MS = 3_000;
 
