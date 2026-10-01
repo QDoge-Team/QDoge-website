@@ -59,7 +59,7 @@ function parseAmountInput(value: string): string {
   return value.replace(/\D/g, '');
 }
 
-const TICK_OFFSET = 15;
+const TICK_OFFSET = 40;
 
 function StatCard({
   label,
