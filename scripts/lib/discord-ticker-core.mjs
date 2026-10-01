@@ -4,7 +4,12 @@
 
 export const QDOGE_ISSUER_ID = 'QDOGEEESKYPAICECHEAHOXPULEOADTKGEJHAVYPFKHLEWGXXZQUGIGMBUTZE';
 export const QPAY_ISSUER_ID = 'QPAYNOWSWZMGHFEAEVJXGZAVSHABAZDDBDIHTEBOPCOGHRGBCYCUZOHCVLXG';
-export const QPAYHUB_ISSUER_ID = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXIB';
+// Well-known zero identity -- also where QPAYHUB's token is issued from, and
+// separately where a second, differently-traded "QTREAT"-named asset lives
+// (distinct market from the QDOGE-issued QTREAT token: contract-side, not
+// the token itself).
+export const NULL_ID = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFXIB';
+export const QPAYHUB_ISSUER_ID = NULL_ID;
 
 /**
  * Fixed per-epoch airdrop/fetch schedule, as given directly by the team --
@@ -58,6 +63,16 @@ export const TICKERS = [
     channelId: process.env.DISCORD_CHANNEL_ID_QTREAT,
   },
   {
+    // The QTREAT *contract's* (index 30) own "QTREAT"-named asset -- a
+    // separate market from the QDOGE-issued QTREAT token ticker above.
+    kind: 'price',
+    label: 'QTREATSC',
+    issuer: NULL_ID,
+    asset: 'QTREAT',
+    emoji: '🍬',
+    channelId: process.env.DISCORD_CHANNEL_ID_QTREATSC,
+  },
+  {
     kind: 'price',
     label: 'QPAY',
     issuer: QPAY_ISSUER_ID,
@@ -108,7 +123,7 @@ export async function fetchAveragePriceQu(issuer, asset) {
 }
 
 export function formatChannelName(ticker, priceQu) {
-  return `${ticker.emoji} ${ticker.label} Price: ${priceQu.toLocaleString('en-US')} qu`;
+  return `${ticker.emoji} ${ticker.displayLabel ?? ticker.label} Price: ${priceQu.toLocaleString('en-US')} qu`;
 }
 
 /** Current Qubic epoch, straight from network status (epochs change weekly, ~Wed 12:00 UTC). */
