@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function DogeStatsPage() {
   return (
     <PageLoader>
-      <main className='min-h-screen bg-black'>
+      <main className='min-h-screen bg-background'>
         <Header />
         <DogeStatsPageContent />
         <FooterSection />

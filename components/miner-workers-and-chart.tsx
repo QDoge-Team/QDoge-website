@@ -36,13 +36,13 @@ export type MinerHistoryPoint = {
   dogeThs: number;
 };
 
-const axisStyle = { fill: '#9ca3af', fontSize: 11 };
+const axisStyle = { fill: '#6b7280', fontSize: 11 };
 const gridColor = 'rgba(34, 211, 238, 0.08)';
 const tooltipBox = {
-  backgroundColor: 'rgba(10, 10, 10, 0.95)',
+  backgroundColor: 'var(--surface)',
   border: '1px solid rgba(34, 211, 238, 0.35)',
   borderRadius: 8,
-  color: '#e5e7eb',
+  color: 'var(--surface-foreground)',
   fontSize: 12,
 };
 
@@ -81,7 +81,7 @@ function MinerHashrateTooltip({ active, payload, label }: MinerTooltipProps) {
     <div className='rounded-lg px-3 py-2 shadow-lg font-mono' style={tooltipBox}>
       <div className='text-[11px] text-cyan-300/90 mb-1'>{label}</div>
       <div className='text-xs text-amber-200'>{formatHashrateHs(row.dogeHs)}</div>
-      <div className='text-[10px] text-gray-500 mt-1'>{row.dogeThs.toFixed(3)} TH/s</div>
+      <div className='text-[10px] text-muted-text mt-1'>{row.dogeThs.toFixed(3)} TH/s</div>
     </div>
   );
 }
@@ -97,7 +97,7 @@ export function MinerWorkersTable({
     return (
       <div
         className={cn(
-          'rounded-xl border border-white/10 bg-black/40 p-8 text-center font-mono text-sm text-gray-500',
+          'rounded-xl border border-border bg-surface/40 p-8 text-center font-mono text-sm text-muted-text',
           className
         )}
       >
@@ -109,13 +109,13 @@ export function MinerWorkersTable({
   return (
     <div
       className={cn(
-        'overflow-x-auto rounded-xl border border-white/10 bg-black/40',
+        'overflow-x-auto rounded-xl border border-border bg-surface/40',
         className
       )}
     >
       <table className='w-full min-w-[640px] text-left text-sm font-mono'>
         <thead>
-          <tr className='border-b border-white/10 text-[10px] uppercase tracking-widest text-gray-500'>
+          <tr className='border-b border-border text-[10px] uppercase tracking-widest text-muted-text'>
             <th className='px-4 py-3 font-medium'>Worker</th>
             <th className='px-4 py-3 font-medium'>Type</th>
             <th className='px-4 py-3 font-medium'>Hashrate</th>
@@ -140,21 +140,21 @@ export function MinerWorkersTable({
             return (
               <tr
                 key={`${w.deviceId ?? 'w'}-${idx}`}
-                className='border-b border-white/5 text-gray-200 last:border-0 hover:bg-white/[0.03]'
+                className='border-b border-border/50 text-surface-foreground last:border-0 hover:bg-foreground/5'
               >
                 <td className='px-4 py-3 text-cyan-100/95'>{name}</td>
                 <td className='px-4 py-3 text-purple-300/90'>{w.type ?? '—'}</td>
                 <td className='px-4 py-3 tabular-nums text-amber-200/90'>
                   {formatHashrateHs(w.hashrate ?? 0)}
                 </td>
-                <td className='px-4 py-3 tabular-nums text-gray-400'>
+                <td className='px-4 py-3 tabular-nums text-muted-text'>
                   {formatHashrateHs(w.meanHashrate ?? 0)}
                 </td>
                 <td className='px-4 py-3 tabular-nums'>{w.shares ?? 0}</td>
                 <td className='px-4 py-3 tabular-nums text-red-300/80'>
                   {rejectTotal(w.rejects)}
                 </td>
-                <td className='px-4 py-3 text-xs text-gray-500'>{last}</td>
+                <td className='px-4 py-3 text-xs text-muted-text'>{last}</td>
               </tr>
             );
           })}
@@ -179,23 +179,23 @@ export function MinerHashrateHistoryChart({
   return (
     <div
       className={cn(
-        'rounded-xl border border-amber-400/15 bg-black/40 p-4 sm:p-5',
+        'rounded-xl border border-amber-400/15 bg-surface/40 p-4 sm:p-5',
         className
       )}
     >
       <div className='mb-3 flex flex-wrap items-end justify-between gap-2'>
         <div>
-          <h3 className='font-mono text-xs uppercase tracking-[0.2em] text-gray-400'>
+          <h3 className='font-mono text-xs uppercase tracking-[0.2em] text-muted-text'>
             Hashrate history
           </h3>
-          <p className='mt-1 text-[11px] text-gray-500 font-mono'>
+          <p className='mt-1 text-[11px] text-muted-text font-mono'>
             DOGE · stats.service{resolution ? ` · ${resolution}` : ''}
           </p>
         </div>
       </div>
       <div className='h-[280px] w-full min-h-[220px]'>
         {empty ? (
-          <div className='flex h-full items-center justify-center font-mono text-sm text-gray-500'>
+          <div className='flex h-full items-center justify-center font-mono text-sm text-muted-text'>
             No history samples in this window.
           </div>
         ) : (
@@ -238,7 +238,7 @@ export function MinerHashrateHistoryChart({
                 strokeWidth={2}
                 fill='url(#minerDogeHash)'
                 dot={false}
-                activeDot={{ r: 4, fill: '#22d3ee', stroke: '#fff', strokeWidth: 1 }}
+                activeDot={{ r: 4, fill: '#22d3ee', stroke: 'var(--surface)', strokeWidth: 1 }}
               />
             </AreaChart>
           </ResponsiveContainer>

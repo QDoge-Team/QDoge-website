@@ -18,7 +18,7 @@ const teamMembers = [
     name: 'Profitphil',
     role: 'Team Lead',
     icon: Crown,
-    color: 'text-yellow-400',
+    color: 'text-yellow-600 dark:text-yellow-400',
     borderColor: 'border-yellow-400/30',
     bgColor: 'bg-yellow-400/5',
     hoverBorder: 'hover:border-yellow-400/60',
@@ -27,7 +27,7 @@ const teamMembers = [
     name: 'KupTTera',
     role: 'Frontend & Web3 Integration Dev',
     icon: Code,
-    color: 'text-cyan-400',
+    color: 'text-cyan-600 dark:text-cyan-400',
     borderColor: 'border-cyan-400/30',
     bgColor: 'bg-cyan-400/5',
     hoverBorder: 'hover:border-cyan-400/60',
@@ -36,7 +36,7 @@ const teamMembers = [
     name: 'CozyBeard',
     role: 'CasinoGame Dev',
     icon: Code,
-    color: 'text-cyan-400',
+    color: 'text-cyan-600 dark:text-cyan-400',
     borderColor: 'border-cyan-400/30',
     bgColor: 'bg-cyan-400/5',
     hoverBorder: 'hover:border-cyan-400/60',
@@ -45,7 +45,7 @@ const teamMembers = [
     name: 'DoubleK',
     role: 'Backend Dev',
     icon: Server,
-    color: 'text-purple-400',
+    color: 'text-purple-600 dark:text-purple-400',
     borderColor: 'border-purple-400/30',
     bgColor: 'bg-purple-400/5',
     hoverBorder: 'hover:border-purple-400/60',
@@ -54,7 +54,7 @@ const teamMembers = [
     name: 'Sunrise',
     role: 'Discord Moderator',
     icon: MessageSquare,
-    color: 'text-blue-400',
+    color: 'text-blue-600 dark:text-blue-400',
     borderColor: 'border-blue-400/30',
     bgColor: 'bg-blue-400/5',
     hoverBorder: 'hover:border-blue-400/60',
@@ -63,7 +63,7 @@ const teamMembers = [
     name: 'Mr. Rose',
     role: 'MSVAULT Signer',
     icon: Shield,
-    color: 'text-emerald-400',
+    color: 'text-emerald-600 dark:text-emerald-400',
     borderColor: 'border-emerald-400/30',
     bgColor: 'bg-emerald-400/5',
     hoverBorder: 'hover:border-emerald-400/60',
@@ -72,7 +72,7 @@ const teamMembers = [
     name: 'SpikeinJapan',
     role: 'MSVAULT Signer',
     icon: Shield,
-    color: 'text-emerald-400',
+    color: 'text-emerald-600 dark:text-emerald-400',
     borderColor: 'border-emerald-400/30',
     bgColor: 'bg-emerald-400/5',
     hoverBorder: 'hover:border-emerald-400/60',
@@ -107,7 +107,7 @@ const TeamSection: React.FC = () => {
       ref={sectionRef}
       className={`relative py-20 lg:py-32 overflow-hidden ${sectionAnimation.animationClass}`}
     >
-      <div className='absolute inset-0 bg-linear-to-br from-gray-900 via-black to-gray-900' />
+      <div className='absolute inset-0 bg-background' />
       <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,243,255,0.1),transparent_70%)]' />
 
       <div className='relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
@@ -121,7 +121,7 @@ const TeamSection: React.FC = () => {
             hidden: { opacity: 0 },
           }}
         >
-          <MagicCard className='border-2 border-cyan-400/60 bg-black/80 backdrop-blur-sm'>
+          <MagicCard className='border-2 border-cyan-400/60 bg-surface/80 backdrop-blur-sm'>
             {/* Terminal Header */}
             <div className='border-b border-cyan-400/40 p-4 bg-cyan-400/10'>
               <div className='flex items-center justify-between'>
@@ -185,7 +185,7 @@ const TeamSection: React.FC = () => {
                       </h3>
 
                       {/* Role */}
-                      <p className='text-gray-400 font-mono text-sm text-center'>
+                      <p className='text-muted-text font-mono text-sm text-center'>
                         {member.role}
                       </p>
 

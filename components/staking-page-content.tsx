@@ -75,7 +75,7 @@ function StatCard({
   gradientFrom: string;
 }) {
   return (
-    <div className="flex h-full min-h-[110px] flex-col rounded-2xl border border-white/10 overflow-hidden shadow-[0_0_24px_rgba(0,243,255,0.06)]">
+    <div className="flex h-full min-h-[110px] flex-col rounded-2xl border border-border overflow-hidden shadow-[0_0_24px_rgba(0,243,255,0.06)]">
       <MagicCard
         className="h-full min-h-[110px] flex-1 flex flex-col rounded-2xl p-5"
         gradientFrom={gradientFrom}
@@ -84,11 +84,11 @@ function StatCard({
         gradientOpacity={0.3}
       >
         <div className="flex items-center justify-between gap-2 mb-3">
-          <span className="text-[10px] uppercase tracking-[0.18em] text-gray-400 font-mono">{label}</span>
+          <span className="text-[10px] uppercase tracking-[0.18em] text-muted-text font-mono">{label}</span>
           <Icon className="h-4 w-4 text-cyan-400/85 shrink-0" />
         </div>
-        <p className="text-xl font-bold tabular-nums text-white font-mono leading-tight">{value}</p>
-        {sub ? <p className="text-[11px] text-gray-400 font-mono mt-2 leading-snug">{sub}</p> : null}
+        <p className="text-xl font-bold tabular-nums text-surface-foreground font-mono leading-tight">{value}</p>
+        {sub ? <p className="text-[11px] text-muted-text font-mono mt-2 leading-snug">{sub}</p> : null}
       </MagicCard>
     </div>
   );
@@ -241,14 +241,14 @@ export function StakingPageContent() {
 
   return (
     <div className="relative">
-      <div className="absolute inset-0 bg-linear-to-br from-gray-900 via-black to-gray-900 pointer-events-none" />
+      <div className="absolute inset-0 bg-linear-to-br from-background via-surface to-background pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(0,243,255,0.12),transparent_55%)] pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(188,19,254,0.12),transparent_55%)] pointer-events-none" />
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 md:pt-32 md:pb-24">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-cyan-400 transition-colors font-mono uppercase tracking-wider mb-8"
+          className="inline-flex items-center gap-2 text-sm text-muted-text hover:text-cyan-400 transition-colors font-mono uppercase tracking-wider mb-8"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to home
@@ -256,17 +256,17 @@ export function StakingPageContent() {
 
         <div className="flex flex-wrap items-end justify-between gap-6 mb-10">
           <div className="max-w-2xl">
-            <p className="inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-black/70 px-4 py-1 text-[11px] tracking-[0.28em] uppercase text-cyan-300 font-mono mb-5">
+            <p className="inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-surface/70 px-4 py-1 text-[11px] tracking-[0.28em] uppercase text-cyan-300 font-mono mb-5">
               <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse" />
               QTREAT Smart Contract
             </p>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold font-mono text-white tracking-tight mb-3">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold font-mono text-foreground tracking-tight mb-3">
               QDOGE{' '}
               <span className="bg-linear-to-r from-cyan-400 via-purple-400 to-amber-300 bg-clip-text text-transparent">
                 Staking
               </span>
             </h1>
-            <p className="text-gray-400 text-sm font-mono">
+            <p className="text-muted-text text-sm font-mono">
               Stake QDOGE into the QTREAT contract to earn QTREAT bonus rewards. Minimum stake{' '}
               {formatQu(QTREAT_MIN_STAKE)} QDOGE.
             </p>
@@ -319,48 +319,48 @@ export function StakingPageContent() {
         </div>
 
         {!connected ? (
-          <div className="rounded-2xl border border-white/10 bg-black/50 p-8 text-center backdrop-blur-sm mb-10">
-            <p className="font-mono text-sm text-gray-400">
+          <div className="rounded-2xl border border-border bg-surface/50 p-8 text-center backdrop-blur-sm mb-10">
+            <p className="font-mono text-sm text-muted-text">
               Connect your wallet to stake QDOGE, request an unstake, or claim your QTREAT bonus.
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
             {/* Your position */}
-            <div className="rounded-2xl border border-cyan-400/20 bg-black/50 p-5 sm:p-6 backdrop-blur-sm">
-              <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-gray-400 mb-4">Your Position</h2>
+            <div className="rounded-2xl border border-cyan-400/20 bg-surface/50 p-5 sm:p-6 backdrop-blur-sm">
+              <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-muted-text mb-4">Your Position</h2>
               <div className="space-y-3 font-mono text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Wallet QDOGE</span>
-                  <span className="text-white">{formatQu(qdogeBalance)}</span>
+                  <span className="text-muted-text">Wallet QDOGE</span>
+                  <span className="text-surface-foreground">{formatQu(qdogeBalance)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Available to stake</span>
+                  <span className="text-muted-text">Available to stake</span>
                   <span className={cn(
                     qxManagedQdoge != null && qdogeBalance != null && qxManagedQdoge < qdogeBalance
                       ? 'text-amber-300'
-                      : 'text-white'
+                      : 'text-surface-foreground'
                   )}>
                     {formatQu(qxManagedQdoge)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Wallet QTREAT</span>
-                  <span className="text-white">{formatQu(qtreatBalance)}</span>
+                  <span className="text-muted-text">Wallet QTREAT</span>
+                  <span className="text-surface-foreground">{formatQu(qtreatBalance)}</span>
                 </div>
-                <div className="h-px bg-white/10 my-2" />
+                <div className="h-px bg-border my-2" />
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Staked</span>
+                  <span className="text-muted-text">Staked</span>
                   <span className="text-cyan-300 font-bold">{formatQu(staking?.staked)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Pending unstake</span>
+                  <span className="text-muted-text">Pending unstake</span>
                   <span className="text-amber-300">{formatQu(staking?.unstakeAmount)}</span>
                 </div>
                 {staking && staking.unstakeAmount > 0 ? (
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Unstake requested at epoch</span>
-                    <span className="text-gray-300">
+                    <span className="text-muted-text">Unstake requested at epoch</span>
+                    <span className="text-muted-text">
                       {staking.unstakeEpoch}{' '}
                       {canFinalize ? (
                         <span className="text-green-400">(ready to finalize)</span>
@@ -371,7 +371,7 @@ export function StakingPageContent() {
                   </div>
                 ) : null}
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Pending QTREAT bonus</span>
+                  <span className="text-muted-text">Pending QTREAT bonus</span>
                   <span className="text-purple-300 font-bold">{formatQu(staking?.pendingBonus)}</span>
                 </div>
               </div>
@@ -404,11 +404,11 @@ export function StakingPageContent() {
             </div>
 
             {/* Actions */}
-            <div className="rounded-2xl border border-white/10 bg-black/50 p-5 sm:p-6 backdrop-blur-sm">
-              <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-gray-400 mb-4">Actions</h2>
+            <div className="rounded-2xl border border-border bg-surface/50 p-5 sm:p-6 backdrop-blur-sm">
+              <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-muted-text mb-4">Actions</h2>
               <div className="space-y-5">
                 <div>
-                  <label className="text-[11px] text-gray-500 font-mono uppercase tracking-wider">
+                  <label className="text-[11px] text-muted-text font-mono uppercase tracking-wider">
                     Stake QDOGE
                   </label>
                   <div className="mt-1.5 flex gap-2">
@@ -418,7 +418,7 @@ export function StakingPageContent() {
                       value={formatAmountInput(stakeAmount)}
                       onChange={(e) => setStakeAmount(parseAmountInput(e.target.value))}
                       placeholder={formatQu(QTREAT_MIN_STAKE)}
-                      className="flex-1 rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-sm text-white font-mono outline-none focus:border-cyan-400/50"
+                      className="flex-1 rounded-lg border border-border bg-surface/50 px-3 py-2 text-sm text-surface-foreground font-mono outline-none focus:border-cyan-400/50"
                     />
                     <button
                       disabled={
@@ -463,7 +463,7 @@ export function StakingPageContent() {
                 </div>
 
                 <div>
-                  <label className="text-[11px] text-gray-500 font-mono uppercase tracking-wider">
+                  <label className="text-[11px] text-muted-text font-mono uppercase tracking-wider">
                     Request Unstake ({QTREAT_QX_TRANSFER_FEE} qu fee)
                   </label>
                   <div className="mt-1.5 flex gap-2">
@@ -473,7 +473,7 @@ export function StakingPageContent() {
                       value={formatAmountInput(unstakeAmount)}
                       onChange={(e) => setUnstakeAmount(parseAmountInput(e.target.value))}
                       placeholder="Amount to unstake"
-                      className="flex-1 rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-sm text-white font-mono outline-none focus:border-amber-400/50"
+                      className="flex-1 rounded-lg border border-border bg-surface/50 px-3 py-2 text-sm text-surface-foreground font-mono outline-none focus:border-amber-400/50"
                     />
                     <button
                       disabled={busy || !isLive || !unstakeAmount || !staking || staking.staked === 0}
@@ -534,7 +534,7 @@ export function StakingPageContent() {
           </div>
         )}
 
-        <div className="rounded-xl border border-white/10 bg-black/30 px-4 py-4 font-mono text-[11px] text-gray-500 leading-relaxed">
+        <div className="rounded-xl border border-border bg-surface/30 px-4 py-4 font-mono text-[11px] text-muted-text leading-relaxed">
           <p>
             Staking moves management of your QDOGE to the QTREAT contract via QX — it isn&apos;t a transfer to a
             third party, and you keep full ownership. Unstaking has a {QTREAT_UNSTAKE_DELAY_EPOCHS}-epoch delay

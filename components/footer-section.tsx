@@ -57,9 +57,9 @@ const FooterSection: React.FC = () => {
   ];
 
   return (
-    <footer className='relative bg-black border-t border-gray-800 overflow-hidden'>
+    <footer className='relative bg-surface border-t border-border overflow-hidden'>
       {/* Cyberpunk Background Effects */}
-      <div className='absolute inset-0 bg-linear-to-br from-gray-900 via-black to-gray-900' />
+      <div className='absolute inset-0 bg-linear-to-br from-surface via-background to-surface' />
       <div className='absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(0,243,255,0.15),transparent_50%)]' />
       <div className='absolute inset-0 bg-[radial-gradient(circle_at_75%_75%,rgba(188,19,254,0.15),transparent_50%)]' />
 
@@ -93,7 +93,7 @@ const FooterSection: React.FC = () => {
               </TextAnimate>
             </div>
 
-            <p className='text-gray-400 leading-relaxed mb-6 max-w-md font-mono text-sm'>
+            <p className='text-muted-text leading-relaxed mb-6 max-w-md font-mono text-sm'>
               Sent from the future by Anna, QDoge is the AI robotic Shiba Inu that scouts Dogecoin, trains Qubic miners, and rewards the most obedient with generational treats.
             </p>
 
@@ -104,14 +104,14 @@ const FooterSection: React.FC = () => {
                   href={social.href}
                   target='_blank'
                   rel='noopener noreferrer'
-                  className={`p-3 bg-gray-900/50 border border-gray-700 hover:border-cyan-400/50 transition-all duration-300 ${social.color} hover:scale-110 backdrop-blur-sm`}
+                  className={`p-3 bg-surface/50 border border-border hover:border-cyan-400/50 transition-all duration-300 ${social.color} hover:scale-110 backdrop-blur-sm`}
                   aria-label={social.name}
                 >
                   {social.image ? (
                     <img
                       src={social.image}
                       alt={social.name}
-                      className='w-5 h-5 object-contain brightness-0 invert'
+                      className='w-5 h-5 object-contain dark:brightness-0 dark:invert'
                     />
                   ) : social.icon ? (
                     <social.icon className='w-5 h-5' />
@@ -134,7 +134,7 @@ const FooterSection: React.FC = () => {
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className='text-gray-400 hover:text-cyan-400 transition-colors duration-200 flex items-center group font-mono text-sm'
+                    className='text-muted-text hover:text-cyan-400 transition-colors duration-200 flex items-center group font-mono text-sm'
                   >
                     <span>&gt; {link.name.toLowerCase()}</span>
                     <ExternalLink className='w-3 h-3 ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200' />
@@ -153,27 +153,27 @@ const FooterSection: React.FC = () => {
               mission_stats
             </h3>
             <div className='space-y-4'>
-              <div className='p-4 bg-gray-900/50 border border-cyan-400/30 hover:border-cyan-400/50 transition-colors duration-300'>
+              <div className='p-4 bg-surface/50 border border-cyan-400/30 hover:border-cyan-400/50 transition-colors duration-300'>
                 <div className='text-2xl font-bold text-cyan-400 font-mono'>
                   21B
                 </div>
-                <div className='text-gray-400 text-sm font-mono'>
+                <div className='text-muted-text text-sm font-mono'>
                   total_supply
                 </div>
               </div>
-              <div className='p-4 bg-gray-900/50 border border-purple-400/30 hover:border-purple-400/50 transition-colors duration-300'>
+              <div className='p-4 bg-surface/50 border border-purple-400/30 hover:border-purple-400/50 transition-colors duration-300'>
                 <div className='text-2xl font-bold text-purple-400 font-mono'>
                   100
                 </div>
-                <div className='text-gray-400 text-sm font-mono'>
+                <div className='text-muted-text text-sm font-mono'>
                   kennel_members
                 </div>
               </div>
-              <div className='p-4 bg-gray-900/50 border border-green-400/30 hover:border-green-400/50 transition-colors duration-300'>
+              <div className='p-4 bg-surface/50 border border-green-400/30 hover:border-green-400/50 transition-colors duration-300'>
                 <div className='text-2xl font-bold text-green-400 font-mono'>
                   52
                 </div>
-                <div className='text-gray-400 text-sm font-mono'>
+                <div className='text-muted-text text-sm font-mono'>
                   training_weeks
                 </div>
               </div>
@@ -186,7 +186,7 @@ const FooterSection: React.FC = () => {
 
         {/* Bottom Copyright Section */}
         <div className='text-center'>
-          <p className='text-gray-400 font-mono text-sm'>
+          <p className='text-muted-text font-mono text-sm'>
             © 2025 QDOGE. All rights reserved.
           </p>
           <p className='text-cyan-400 font-mono text-xs mt-2'>

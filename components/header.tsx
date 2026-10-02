@@ -4,6 +4,7 @@
 import { Dock, DockIcon } from '@/components/ui/dock';
 import { ShimmerButton } from '@/components/ui/shimmer-button';
 import { TextAnimate } from '@/components/ui/text-animate';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { cn } from '@/lib/utils';
 import { DiscordLogoIcon } from '@radix-ui/react-icons';
 import { Menu, MessageCircle, X, Zap } from 'lucide-react';
@@ -73,7 +74,7 @@ export function Header() {
         className={cn(
           'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
           isScrolled
-            ? 'bg-black/80 backdrop-blur-xl border-b border-white/10'
+            ? 'bg-surface/80 backdrop-blur-xl border-b border-border'
             : 'bg-transparent'
         )}
       >
@@ -107,7 +108,7 @@ export function Header() {
                   <button
                     key={item.label}
                     onClick={() => scrollToSection(item.scrollTo)}
-                    className='text-gray-300 hover:text-cyan-400 transition-colors text-sm uppercase tracking-wider'
+                    className='text-muted-text hover:text-cyan-400 transition-colors text-sm uppercase tracking-wider'
                   >
                     {item.label}
                   </button>
@@ -117,7 +118,7 @@ export function Header() {
                     href={item.href}
                     target='_blank'
                     rel='noopener noreferrer'
-                    className='text-gray-300 hover:text-cyan-400 transition-colors text-sm uppercase tracking-wider'
+                    className='text-muted-text hover:text-cyan-400 transition-colors text-sm uppercase tracking-wider'
                   >
                     {item.label}
                   </Link>
@@ -125,7 +126,7 @@ export function Header() {
                   <Link
                     key={item.label}
                     href={item.href}
-                    className='text-gray-300 hover:text-cyan-400 transition-colors text-sm uppercase tracking-wider'
+                    className='text-muted-text hover:text-cyan-400 transition-colors text-sm uppercase tracking-wider'
                   >
                     {item.label}
                   </Link>
@@ -134,7 +135,8 @@ export function Header() {
             </nav>
 
             {/* DESKTOP CTA */}
-            <div className='hidden md:flex'>
+            <div className='hidden md:flex items-center gap-3'>
+              <ThemeToggle />
               <ShimmerButton
                 className='px-4 py-2 text-sm font-bold uppercase'
                 shimmerColor='#00f3ff'
@@ -149,27 +151,30 @@ export function Header() {
             </div>
 
             {/* MOBILE TOGGLE */}
-            <button
-              onClick={() => setIsMobileMenuOpen((v) => !v)}
-              className='md:hidden p-2 text-gray-300 hover:text-cyan-400'
-              aria-label='Toggle menu'
-            >
-              {isMobileMenuOpen ? <X /> : <Menu />}
-            </button>
+            <div className='md:hidden flex items-center gap-2'>
+              <ThemeToggle />
+              <button
+                onClick={() => setIsMobileMenuOpen((v) => !v)}
+                className='p-2 text-muted-text hover:text-cyan-400'
+                aria-label='Toggle menu'
+              >
+                {isMobileMenuOpen ? <X /> : <Menu />}
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* MOBILE MENU */}
       {isMobileMenuOpen && (
-        <div className='fixed inset-0 z-40 md:hidden bg-black/90 backdrop-blur-xl pt-20 px-6'>
+        <div className='fixed inset-0 z-40 md:hidden bg-surface/95 backdrop-blur-xl pt-20 px-6'>
           <nav className='space-y-6'>
             {visibleNavItems.map((item) =>
               'scrollTo' in item ? (
                 <button
                   key={item.label}
                   onClick={() => scrollToSection(item.scrollTo)}
-                  className='block w-full text-left text-xl text-gray-300 hover:text-cyan-400'
+                  className='block w-full text-left text-xl text-muted-text hover:text-cyan-400'
                 >
                   {item.label}
                 </button>
@@ -179,7 +184,7 @@ export function Header() {
                   href={item.href}
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='block w-full text-left text-xl text-gray-300 hover:text-cyan-400'
+                  className='block w-full text-left text-xl text-muted-text hover:text-cyan-400'
                 >
                   {item.label}
                 </a>
@@ -188,7 +193,7 @@ export function Header() {
                   key={item.label}
                   href={item.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className='block w-full text-left text-xl text-gray-300 hover:text-cyan-400'
+                  className='block w-full text-left text-xl text-muted-text hover:text-cyan-400'
                 >
                   {item.label}
                 </Link>
@@ -212,7 +217,7 @@ export function Header() {
 
       {/* FLOATING DOCK */}
       <div className='hidden 2xl:block fixed bottom-8 left-1/2 -translate-x-1/2 z-40'>
-        <Dock className='bg-black/30 backdrop-blur-md border-white/10'>
+        <Dock className='bg-surface/30 backdrop-blur-md border-border'>
           <DockIcon>
             <button onClick={joinDiscord} className='text-cyan-400'>
               <MessageCircle />

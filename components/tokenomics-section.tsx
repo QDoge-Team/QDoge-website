@@ -241,7 +241,7 @@ const TokenomicsSection: React.FC = () => {
         {/* Cyberpunk Terminal Header */}
         <div ref={headerRef} className={`mb-16 lg:mb-24 ${headerAnimClass}`}>
           <div className='mx-auto'>
-            <MagicCard className='border-2 border-cyan-400/60 bg-black/90 backdrop-blur-sm'>
+            <MagicCard className='border-2 border-cyan-400/60 bg-surface/90 backdrop-blur-sm'>
               {/* Terminal Header Bar */}
               <div className='border-b border-cyan-400/40 p-4 bg-cyan-400/10'>
                 <div className='flex items-center justify-between'>
@@ -276,7 +276,7 @@ const TokenomicsSection: React.FC = () => {
                         Built for Training and Sustained Rewards
                       </span>
                     </div>
-                    <p className='text-sm text-cyan-100/80 font-mono leading-relaxed max-w-xl lg:max-w-none mx-auto lg:mx-0'>
+                    <p className='text-sm text-muted-text font-mono leading-relaxed max-w-xl lg:max-w-none mx-auto lg:mx-0'>
                     Qdoge tokens will be held in MSVAULT wallet. Two trusted Qubic Community Members will be signers to provide more trust and accountability for QDoge.<br />
                       21,000,000,000 total supply, precision‑allocated to reward discipline, deepen liquidity, and fuel long‑term Doge mining.
                     </p>
@@ -310,8 +310,8 @@ const TokenomicsSection: React.FC = () => {
                           />
                         ))}
                       </svg>
-                      <div className='absolute inset-8 rounded-full bg-black/90 border border-cyan-400/30 flex flex-col items-center justify-center text-center px-3'>
-                        <span className='text-[10px] uppercase text-cyan-300 font-mono tracking-[0.3em]'>
+                      <div className='absolute inset-8 rounded-full bg-surface/90 border border-cyan-400/30 flex flex-col items-center justify-center text-center px-3'>
+                        <span className='text-[10px] uppercase text-muted-text font-mono tracking-[0.3em]'>
                           {activeSlice.title}
                         </span>
                         <span
@@ -322,7 +322,7 @@ const TokenomicsSection: React.FC = () => {
                         </span>
                       </div>
                     </div>
-                    <div className='grid grid-cols-2 gap-3 text-xs font-mono text-cyan-100/80'>
+                    <div className='grid grid-cols-2 gap-3 text-xs font-mono text-muted-text'>
                       {tokenomicsData.map((item) => (
                         <div key={item.title} className='flex items-center gap-2'>
                           <span
@@ -332,7 +332,7 @@ const TokenomicsSection: React.FC = () => {
                           <span className='uppercase tracking-wide'>
                             {item.title}
                           </span>
-                          <span className='text-cyan-300'>[{item.percentage}%]</span>
+                          <span className='text-muted-text'>[{item.percentage}%]</span>
                         </div>
                       ))}
                     </div>
@@ -347,7 +347,7 @@ const TokenomicsSection: React.FC = () => {
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 mb-20'>
           {/* Left Panel - Allocation Table */}
           <div ref={tableRef} className={`${tableAnimClass}`}>
-            <MagicCard className='border-2 border-cyan-400/60 bg-black/90 backdrop-blur-sm h-full'>
+            <MagicCard className='border-2 border-cyan-400/60 bg-surface/90 backdrop-blur-sm h-full'>
               {/* Table Header */}
               <div className='border-b border-cyan-400/40 p-4 bg-cyan-400/10'>
                 <div className='flex items-center justify-between'>
@@ -375,7 +375,7 @@ const TokenomicsSection: React.FC = () => {
                   >
                     <div className='flex items-center space-x-3'>
                       <item.icon className='w-4 h-4 text-cyan-400' />
-                      <span className='text-cyan-300 lowercase'>
+                      <span className='text-muted-text lowercase'>
                         {item.title.toLowerCase().replace(' ', '_')}:
                       </span>
                     </div>
@@ -404,7 +404,7 @@ const TokenomicsSection: React.FC = () => {
 
           {/* Right Panel - Visual Chart Placeholder */}
           <div ref={chartRef} className={`${chartAnimClass}`}>
-            <MagicCard className='border-2 border-cyan-400/60 bg-black/80 backdrop-blur-sm h-full min-h-[500px] lg:min-h-[600px] flex items-center justify-center'>
+            <MagicCard className='border-2 border-cyan-400/60 bg-surface/80 backdrop-blur-sm h-full min-h-[500px] lg:min-h-[600px] flex items-center justify-center'>
               <img
                 src='/tokenomics.png'
                 alt='QDOGE AI Portrait'
@@ -416,7 +416,7 @@ const TokenomicsSection: React.FC = () => {
 
         {/* Airdrop Breakdown Terminal */}
         <div className='mb-20'>
-          <MagicCard className='border-2 border-cyan-400/60 bg-black/90 backdrop-blur-sm'>
+          <MagicCard className='border-2 border-cyan-400/60 bg-surface/90 backdrop-blur-sm'>
             {/* Terminal Header */}
             <div className='border-b border-cyan-400/40 p-4 bg-cyan-400/10'>
               <div className='flex items-center justify-between'>
@@ -445,7 +445,7 @@ const TokenomicsSection: React.FC = () => {
                   <div className='text-4xl font-black text-cyan-400 mb-3'>
                     7.5%
                   </div>
-                  <div className='text-cyan-300 text-sm leading-relaxed'>
+                  <div className='text-muted-text text-sm leading-relaxed'>
                     QDoge allocates 7.5% of supply to mining‑aligned airdrops. 2.5% is streamed monthly starting Sept &apos;26 to the most obedient trainees on the Top Kennel List.
                   </div>
                 </div>
@@ -457,7 +457,7 @@ const TokenomicsSection: React.FC = () => {
                   <div className='text-4xl font-black text-orange-400 mb-3'>
                     6%
                   </div>
-                  <div className='text-orange-300 text-sm leading-relaxed'>
+                  <div className='text-muted-text text-sm leading-relaxed'>
                     Three NFT collections (2% each) turn art into multipliers on QDoge rewards. Holding higher rarity means your treats scale with your discipline.
                   </div>
                 </div>
@@ -469,7 +469,7 @@ const TokenomicsSection: React.FC = () => {
                   <div className='text-4xl font-black text-green-400 mb-3'>
                     3%
                   </div>
-                  <div className='text-green-300 text-sm leading-relaxed'>
+                  <div className='text-muted-text text-sm leading-relaxed'>
                     P2E titles like QDoge Rocket and future games create an always‑on loop of skill, fun, and token flow. Game rewards come from a dedicated 3% allocation so the kennel can play without draining core reserves.
                   </div>
                 </div>

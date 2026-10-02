@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function DividendsPage() {
   return (
     <PageLoader>
-      <main className='min-h-screen bg-black'>
+      <main className='min-h-screen bg-background'>
         <Header />
         <DividendsPageContent />
         <FooterSection />
