@@ -496,3 +496,33 @@ export const QTREAT_SUPPLY_BY_EPOCH: Record<number, number> = {
   224: 2902,
   225: 3035,
 };
+
+/**
+ * QTREAT's own treasury holdings -- the assets that actually generate the
+ * qu dividends paid out to QTREAT holders. Supplied directly by the team,
+ * 2026-09.
+ */
+export type TreasuryAssetKind = 'sc-share' | 'token' | 'income';
+
+export type TreasuryAsset = {
+  name: string;
+  kind: TreasuryAssetKind;
+  amount: number;
+  unit: string;
+  note?: string;
+};
+
+export const QTREAT_TREASURY_ASSETS: TreasuryAsset[] = [
+  { name: 'QRAFFLE', kind: 'sc-share', amount: 22, unit: 'shares' },
+  { name: 'MSVAULT', kind: 'sc-share', amount: 12, unit: 'shares' },
+  { name: 'QRWA', kind: 'sc-share', amount: 12, unit: 'shares' },
+  { name: 'QSWAP', kind: 'sc-share', amount: 1, unit: 'share' },
+  { name: 'QIP', kind: 'sc-share', amount: 1, unit: 'share' },
+  { name: 'VOTTUN', kind: 'sc-share', amount: 1, unit: 'share' },
+  { name: 'QBAY', kind: 'sc-share', amount: 6, unit: 'shares' },
+  { name: 'QMINE', kind: 'token', amount: 1357051, unit: 'tokens' },
+  { name: 'WP', kind: 'token', amount: 4000000, unit: 'tokens', note: 'staked' },
+  { name: 'ML', kind: 'token', amount: 4000000, unit: 'tokens' },
+  { name: 'Mining rewards', kind: 'income', amount: 10000000, unit: 'qu' },
+  { name: 'NFT sales', kind: 'income', amount: 192000000, unit: 'qu' },
+];

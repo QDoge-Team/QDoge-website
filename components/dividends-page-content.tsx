@@ -7,6 +7,7 @@ import {
   EPOCH_TO,
   QTREAT_MAX_SUPPLY,
   QTREAT_SUPPLY_BY_EPOCH,
+  QTREAT_TREASURY_ASSETS,
   type DividendProject,
 } from '@/lib/dividends/data';
 import { formatCompact } from '@/lib/mining/format';
@@ -17,9 +18,12 @@ import {
   Coins,
   Crown,
   Download,
+  Gem,
   Hourglass,
+  Landmark,
   PiggyBank,
   Sparkles,
+  Wallet,
 } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
@@ -138,6 +142,8 @@ const ALL_EPOCHS_DESC = Array.from(
   (_, i) => EPOCH_TO - i
 );
 
+const PRICE_BY_NAME = new Map(DIVIDEND_PROJECTS.map((p) => [p.name, p.price]));
+
 export function DividendsPageContent() {
   const qtreat = DIVIDEND_PROJECTS.find((p) => p.name === 'QTREAT') as DividendProject;
   const [showRaw, setShowRaw] = useState(false);
@@ -194,6 +200,20 @@ export function DividendsPageContent() {
     const supply = QTREAT_SUPPLY_BY_EPOCH[Number(epoch)];
     return supply ? sum + payout * supply : sum;
   }, 0);
+
+  const treasuryShares = QTREAT_TREASURY_ASSETS.filter((a) => a.kind === 'sc-share');
+  const treasuryTokens = QTREAT_TREASURY_ASSETS.filter((a) => a.kind === 'token');
+  const treasuryIncome = QTREAT_TREASURY_ASSETS.filter((a) => a.kind === 'income');
+  const treasuryValue = (asset: (typeof QTREAT_TREASURY_ASSETS)[number]) => {
+    if (asset.kind === 'income') return asset.amount;
+    const price = PRICE_BY_NAME.get(asset.name);
+    return price != null ? price * asset.amount : null;
+  };
+  const treasuryKnownTotal = QTREAT_TREASURY_ASSETS.reduce((sum, a) => {
+    const v = treasuryValue(a);
+    return v != null ? sum + v : sum;
+  }, 0);
+  const treasuryUnpriced = QTREAT_TREASURY_ASSETS.filter((a) => treasuryValue(a) == null);
 
   const exportCsv = useCallback(() => {
     const header = [
@@ -315,6 +335,120 @@ export function DividendsPageContent() {
             icon={Hourglass}
             gradientFrom='rgba(34, 197, 94, 0.2)'
           />
+        </div>
+
+        <div className='rounded-2xl border border-amber-400/20 bg-black/50 p-4 sm:p-6 backdrop-blur-sm mb-10'>
+          <div className='mb-4 flex flex-wrap items-end justify-between gap-3'>
+            <div>
+              <h2 className='font-mono text-xs uppercase tracking-[0.2em] text-gray-400'>
+                QTREAT treasury
+              </h2>
+              <p className='mt-1 text-sm text-cyan-100/70 font-mono'>
+                Every payout comes from somewhere — here&apos;s what the treasury actually
+                holds.
+              </p>
+            </div>
+            <div className='text-right'>
+              <p className='text-[10px] uppercase tracking-[0.18em] text-gray-500 font-mono'>
+                Known value
+              </p>
+              <p className='text-xl font-bold tabular-nums text-amber-200 font-mono'>
+                ≈ {formatCompact(treasuryKnownTotal)} qu
+              </p>
+            </div>
+          </div>
+
+          <div className='grid grid-cols-1 lg:grid-cols-3 gap-4'>
+            <div className='rounded-xl border border-white/10 bg-black/40 p-4'>
+              <div className='flex items-center gap-2 mb-3'>
+                <Landmark className='h-4 w-4 text-cyan-400/85' />
+                <h3 className='font-mono text-[11px] uppercase tracking-[0.16em] text-gray-400'>
+                  SC shares held
+                </h3>
+              </div>
+              <div className='space-y-2'>
+                {treasuryShares.map((a) => {
+                  const value = treasuryValue(a);
+                  return (
+                    <div
+                      key={a.name}
+                      className='flex items-center justify-between font-mono text-sm'
+                    >
+                      <span className='text-gray-300'>
+                        {a.amount}× {a.name}
+                      </span>
+                      <span className='text-gray-500 text-xs tabular-nums'>
+                        {value != null ? `≈ ${formatCompact(value)} qu` : '—'}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className='rounded-xl border border-white/10 bg-black/40 p-4'>
+              <div className='flex items-center gap-2 mb-3'>
+                <Gem className='h-4 w-4 text-purple-400/85' />
+                <h3 className='font-mono text-[11px] uppercase tracking-[0.16em] text-gray-400'>
+                  Token holdings
+                </h3>
+              </div>
+              <div className='space-y-2'>
+                {treasuryTokens.map((a) => {
+                  const value = treasuryValue(a);
+                  return (
+                    <div
+                      key={a.name}
+                      className='flex items-center justify-between font-mono text-sm'
+                    >
+                      <span className='text-gray-300'>
+                        {formatCompact(a.amount)} ${a.name}
+                        {a.note ? (
+                          <span className='text-gray-500 text-xs'> ({a.note})</span>
+                        ) : null}
+                      </span>
+                      <span className='text-gray-500 text-xs tabular-nums'>
+                        {value != null ? `≈ ${formatCompact(value)} qu` : 'no price feed'}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className='rounded-xl border border-white/10 bg-black/40 p-4'>
+              <div className='flex items-center gap-2 mb-3'>
+                <Wallet className='h-4 w-4 text-green-400/85' />
+                <h3 className='font-mono text-[11px] uppercase tracking-[0.16em] text-gray-400'>
+                  Other income
+                </h3>
+              </div>
+              <div className='space-y-2'>
+                {treasuryIncome.map((a) => (
+                  <div
+                    key={a.name}
+                    className='flex items-center justify-between font-mono text-sm'
+                  >
+                    <span className='text-gray-300'>{a.name}</span>
+                    <span className='text-amber-200/90 text-xs tabular-nums'>
+                      {formatCompact(a.amount)} qu
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <p className='mt-4 text-[11px] text-gray-500 font-mono'>
+            Values estimated at current per-share/token prices where we track one.{' '}
+            {treasuryUnpriced.length ? (
+              <>
+                No live price feed for{' '}
+                {treasuryUnpriced.map((a) => `$${a.name}`).join(', ')} yet — excluded from
+                the total above.
+              </>
+            ) : null}
+          </p>
         </div>
 
         <div className='rounded-2xl border border-cyan-400/20 bg-black/50 p-4 sm:p-6 backdrop-blur-sm mb-10'>
