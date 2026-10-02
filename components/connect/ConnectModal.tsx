@@ -99,12 +99,12 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-2xl border border-cyan-400/25 bg-black/90 p-6 font-mono shadow-[0_0_40px_rgba(0,243,255,0.08)]"
+        className="w-full max-w-md rounded-2xl border border-cyan-400/25 bg-surface/90 p-6 font-mono shadow-[0_0_40px_rgba(0,243,255,0.08)]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-5">
           <p className="text-xs uppercase tracking-[0.25em] text-cyan-300">Connect Wallet</p>
-          <button onClick={onClose} className="text-gray-500 hover:text-cyan-300 transition-colors">
+          <button onClick={onClose} className="text-muted-text hover:text-cyan-300 transition-colors">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -121,7 +121,7 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
               <QrCode className="h-5 w-5 text-cyan-400 shrink-0" />
               <div className="text-left">
                 <p className="font-bold">WalletConnect</p>
-                <p className="text-[11px] text-gray-400">Approve from the Qubic Wallet mobile app</p>
+                <p className="text-[11px] text-muted-text">Approve from the Qubic Wallet mobile app</p>
               </div>
             </button>
 
@@ -132,14 +132,14 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
               <FileKey2 className="h-5 w-5 text-purple-400 shrink-0" />
               <div className="text-left">
                 <p className="font-bold">Vault File</p>
-                <p className="text-[11px] text-gray-400">Unlock a .qubic-vault file with your password</p>
+                <p className="text-[11px] text-muted-text">Unlock a .qubic-vault file with your password</p>
               </div>
             </button>
 
             <div className="my-1 flex items-center gap-3">
-              <div className="h-px flex-1 bg-white/10" />
+              <div className="h-px flex-1 bg-border" />
               <span className="text-[10px] uppercase tracking-wider text-amber-400/80">Use with care</span>
-              <div className="h-px flex-1 bg-white/10" />
+              <div className="h-px flex-1 bg-border" />
             </div>
 
             <button
@@ -149,7 +149,7 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
               <KeyRound className="h-5 w-5 text-amber-400 shrink-0" />
               <div className="text-left">
                 <p className="font-bold">Private Seed</p>
-                <p className="text-[11px] text-gray-400">Type your 55-character seed directly</p>
+                <p className="text-[11px] text-muted-text">Type your 55-character seed directly</p>
               </div>
             </button>
           </div>
@@ -157,10 +157,10 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
 
         {mode === 'walletconnect' && (
           <div className="flex flex-col items-center gap-4">
-            <p className="text-sm text-gray-300 text-center">
+            <p className="text-sm text-muted-text text-center">
               Scan with the Qubic Wallet app, or open it directly on this device.
             </p>
-            <div className="flex h-56 w-56 items-center justify-center rounded-xl border border-white/10 bg-white p-2">
+            <div className="flex h-56 w-56 items-center justify-center rounded-xl border border-border bg-white p-2">
               {qrCode ? (
                 <img src={qrCode} alt="WalletConnect QR code" className="h-full w-full" />
               ) : (
@@ -174,7 +174,7 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
             >
               Open in Qubic Wallet
             </button>
-            <button onClick={() => setMode('none')} className="text-xs text-gray-500 hover:text-gray-300">
+            <button onClick={() => setMode('none')} className="text-xs text-muted-text hover:text-surface-foreground">
               Cancel
             </button>
           </div>
@@ -189,12 +189,12 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
                 anywhere. Still, prefer WalletConnect or a Vault File when you can.
               </p>
             </div>
-            <label className="text-xs text-gray-400">Your 55-character seed</label>
+            <label className="text-xs text-muted-text">Your 55-character seed</label>
             <input
               type="password"
               value={privateSeed}
               onChange={(e) => validateSeed(e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-sm text-white outline-none focus:border-amber-400/50"
+              className="w-full rounded-lg border border-border bg-surface/50 px-3 py-2 text-sm text-surface-foreground outline-none focus:border-amber-400/50"
               autoComplete="off"
               spellCheck={false}
             />
@@ -202,7 +202,7 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
             <div className="grid grid-cols-2 gap-3 mt-1">
               <button
                 onClick={() => setMode('none')}
-                className="rounded-lg border border-white/15 py-2 text-sm text-gray-300 hover:bg-white/5"
+                className="rounded-lg border border-border py-2 text-sm text-muted-text hover:bg-muted"
               >
                 Cancel
               </button>
@@ -232,11 +232,11 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white hover:bg-white/10"
+              className="flex items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm text-surface-foreground hover:bg-muted"
             >
               Choose File
             </button>
-            <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-gray-400 truncate">
+            <div className="rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm text-muted-text truncate">
               {selectedFile ? selectedFile.name : 'No file selected'}
             </div>
             <input
@@ -244,7 +244,7 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
               placeholder="Vault password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-sm text-white outline-none focus:border-purple-400/50"
+              className="w-full rounded-lg border border-border bg-surface/50 px-3 py-2 text-sm text-surface-foreground outline-none focus:border-purple-400/50"
             />
             {vaultError ? <p className="text-xs text-red-400">{vaultError}</p> : null}
             <div className="grid grid-cols-2 gap-3 mt-1">
@@ -253,7 +253,7 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
                   setMode('none');
                   setVaultError('');
                 }}
-                className="rounded-lg border border-white/15 py-2 text-sm text-gray-300 hover:bg-white/5"
+                className="rounded-lg border border-border py-2 text-sm text-muted-text hover:bg-muted"
               >
                 Cancel
               </button>
@@ -291,7 +291,7 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
 
         {mode === 'account-select' && (
           <div className="flex flex-col gap-3">
-            <p className="text-sm text-gray-300">Select an account:</p>
+            <p className="text-sm text-muted-text">Select an account:</p>
             <div className="flex flex-col gap-2 max-h-56 overflow-y-auto">
               {accounts.map((acc, idx) => (
                 <button
@@ -305,11 +305,11 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
                     onClose();
                   }}
                   className={cn(
-                    'rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-left text-xs hover:border-cyan-400/40 hover:bg-cyan-400/5 transition-colors'
+                    'rounded-lg border border-border bg-muted/50 px-3 py-2 text-left text-xs hover:border-cyan-400/40 hover:bg-cyan-400/5 transition-colors'
                   )}
                 >
                   <p className="text-cyan-200 font-bold">{acc.alias || `Account ${idx + 1}`}</p>
-                  <p className="text-gray-500 truncate">{acc.publicId}</p>
+                  <p className="text-muted-text truncate">{acc.publicId}</p>
                 </button>
               ))}
             </div>

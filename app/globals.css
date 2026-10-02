@@ -4,11 +4,13 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Always dark -- this site has no light theme (header, hero, and every
-     other section are hardcoded dark/neon already), so --background and
-     --foreground shouldn't flip with the OS's prefers-color-scheme. */
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  /* Light theme (default). .dark overrides these below -- toggled via
+     next-themes, not the OS's prefers-color-scheme. */
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --surface: #ffffff;
+  --surface-foreground: #0f172a;
+  --muted-text: #475569;
   --color-1: oklch(66.2% 0.225 25.9);
   --color-2: oklch(60.4% 0.26 302);
   --color-3: oklch(69.6% 0.165 251);
@@ -26,6 +28,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-foreground: var(--surface-foreground);
+  --color-muted-text: var(--muted-text);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --animate-rainbow: rainbow var(--speed, 2s) infinite linear;
@@ -222,6 +227,11 @@ body {
 }
 
 .dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --surface: #0a0a0a;
+  --surface-foreground: #ededed;
+  --muted-text: #9ca3af;
   --color-1: oklch(66.2% 0.225 25.9);
   --color-2: oklch(60.4% 0.26 302);
   --color-3: oklch(69.6% 0.165 251);

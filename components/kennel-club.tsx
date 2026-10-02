@@ -60,7 +60,7 @@ const KennelClubSection: React.FC = () => {
       <div className='absolute inset-0 bg-linear-to-tr from-black via-black/70 to-cyan-900/40' />
 
       <div className='relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-        <MagicCard className='border-2 border-cyan-400/60 bg-black/70 backdrop-blur-md shadow-[0_0_60px_rgba(6,182,212,0.3)]'>
+        <MagicCard className='border-2 border-cyan-400/60 bg-surface/70 backdrop-blur-md shadow-[0_0_60px_rgba(6,182,212,0.3)]'>
           <div className='border-b border-cyan-400/40 p-4 bg-cyan-400/10'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center space-x-3'>
@@ -85,7 +85,7 @@ const KennelClubSection: React.FC = () => {
                 <div className='border border-cyan-400/30 bg-cyan-400/5 rounded-lg p-6'>
                   <div className='flex items-center gap-3 mb-4'>
                     <Trophy className='w-6 h-6 text-cyan-400' />
-                    <h3 className='text-2xl font-black text-cyan-300 font-mono'>
+                    <h3 className='text-2xl font-black text-surface-foreground font-mono'>
                       Kennel Club List
                     </h3>
                     <span className='text-cyan-400 font-mono font-black text-xl'>
@@ -95,10 +95,10 @@ const KennelClubSection: React.FC = () => {
 
                   <div className='space-y-4'>
                     <div className='border-l-2 border-cyan-400/50 pl-4'>
-                      <p className='text-cyan-200 font-mono text-sm font-semibold mb-2'>
+                      <p className='text-muted-text font-mono text-sm font-semibold mb-2'>
                         Top 100 Trainees
                       </p>
-                      <p className='text-cyan-200 font-mono text-sm font-semibold mb-4'>
+                      <p className='text-muted-text font-mono text-sm font-semibold mb-4'>
                         52 Week Training Program
                       </p>
 
@@ -110,8 +110,8 @@ const KennelClubSection: React.FC = () => {
                             type='button'
                             className={`py-2 rounded-lg border text-xs font-mono font-black transition-all ${
                               step.id === selectedStep.id
-                                ? 'border-cyan-400 bg-cyan-400/20 text-white shadow-[0_0_15px_rgba(34,211,238,0.5)]'
-                                : 'border-cyan-400/30 text-cyan-200 hover:border-cyan-400/70 hover:bg-cyan-400/10'
+                                ? 'border-cyan-400 bg-cyan-400/20 text-surface-foreground shadow-[0_0_15px_rgba(34,211,238,0.5)]'
+                                : 'border-cyan-400/30 text-muted-text hover:border-cyan-400/70 hover:bg-cyan-400/10'
                             }`}
                             onClick={() => setSelectedStep(step)}
                           >
@@ -121,12 +121,12 @@ const KennelClubSection: React.FC = () => {
                       </div>
 
                       {/* Selected Step Display */}
-                      <div className='relative border border-cyan-400/40 bg-black/80 rounded-lg overflow-hidden'>
+                      <div className='relative border border-cyan-400/40 bg-surface/80 rounded-lg overflow-hidden'>
                         <div className='p-4 space-y-2'>
-                          <p className='text-cyan-300 font-mono text-xs tracking-[0.3em] uppercase'>
+                          <p className='text-muted-text font-mono text-xs tracking-[0.3em] uppercase'>
                             {selectedStep.title}
                           </p>
-                          <p className='text-cyan-100/80 font-mono text-sm'>
+                          <p className='text-muted-text font-mono text-sm'>
                             {selectedStep.description}
                           </p>
                         </div>
@@ -152,7 +152,7 @@ const KennelClubSection: React.FC = () => {
                 <div className='border border-purple-400/30 bg-purple-400/5 rounded-lg p-6'>
                   <div className='flex items-center gap-3 mb-4'>
                     <Gift className='w-6 h-6 text-purple-400' />
-                    <h3 className='text-2xl font-black text-purple-300 font-mono'>
+                    <h3 className='text-2xl font-black text-surface-foreground font-mono'>
                       Rewards/Treats
                     </h3>
                     <span className='text-purple-400 font-mono font-black text-xl'>
@@ -162,17 +162,17 @@ const KennelClubSection: React.FC = () => {
 
                   <div className='space-y-4'>
                     {/* Epoch Bark Treat */}
-                    <div className='border border-purple-400/30 bg-black/60 rounded-lg p-4'>
+                    <div className='border border-purple-400/30 bg-surface/60 rounded-lg p-4'>
                       <div className='flex items-start gap-3 mb-2'>
                         <Award className='w-5 h-5 text-purple-400 mt-0.5' />
                         <div className='flex-1'>
-                          <h4 className='text-purple-300 font-mono font-semibold mb-1'>
+                          <h4 className='text-muted-text font-mono font-semibold mb-1'>
                             Epoch Bark Treat
                           </h4>
                           <p className='text-purple-400 font-mono font-black text-lg mb-1'>
                             1,000,000 Qdoge
                           </p>
-                          <p className='text-purple-200/80 font-mono text-xs'>
+                          <p className='text-muted-text font-mono text-xs'>
                             Voted best bark by community
                           </p>
                         </div>
@@ -180,17 +180,17 @@ const KennelClubSection: React.FC = () => {
                     </div>
 
                     {/* Monthly Stay Treat */}
-                    <div className='border border-emerald-400/30 bg-black/60 rounded-lg p-4'>
+                    <div className='border border-emerald-400/30 bg-surface/60 rounded-lg p-4'>
                       <div className='flex items-start gap-3 mb-2'>
                         <Users className='w-5 h-5 text-emerald-400 mt-0.5' />
                         <div className='flex-1'>
-                          <h4 className='text-emerald-300 font-mono font-semibold mb-1'>
+                          <h4 className='text-muted-text font-mono font-semibold mb-1'>
                             Monthly Stay Treat
                           </h4>
                           <p className='text-emerald-400 font-mono font-black text-lg mb-1'>
                             25,000,000 Qdoge
                           </p>
-                          <p className='text-emerald-200/80 font-mono text-xs'>
+                          <p className='text-muted-text font-mono text-xs'>
                             Shared by those who have kept 100%, not sold any
                           </p>
                         </div>
@@ -198,17 +198,17 @@ const KennelClubSection: React.FC = () => {
                     </div>
 
                     {/* Epoch Engage Bot */}
-                    <div className='border border-orange-400/30 bg-black/60 rounded-lg p-4'>
+                    <div className='border border-orange-400/30 bg-surface/60 rounded-lg p-4'>
                       <div className='flex items-start gap-3 mb-2'>
                         <Bot className='w-5 h-5 text-orange-400 mt-0.5' />
                         <div className='flex-1'>
-                          <h4 className='text-orange-300 font-mono font-semibold mb-1'>
+                          <h4 className='text-muted-text font-mono font-semibold mb-1'>
                             Epoch Engage Bot
                           </h4>
                           <p className='text-orange-400 font-mono font-black text-lg mb-1'>
                             3%
                           </p>
-                          <p className='text-orange-200/80 font-mono text-xs'>
+                          <p className='text-muted-text font-mono text-xs'>
                             Buy Qdoge tokens with Engage points
                           </p>
                         </div>

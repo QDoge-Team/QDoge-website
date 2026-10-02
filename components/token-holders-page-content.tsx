@@ -93,7 +93,7 @@ function StatCard({
   gradientFrom: string;
 }) {
   return (
-    <div className='flex h-full min-h-[120px] flex-col rounded-2xl border border-white/10 overflow-hidden shadow-[0_0_24px_rgba(0,243,255,0.06)]'>
+    <div className='flex h-full min-h-[120px] flex-col rounded-2xl border border-border overflow-hidden shadow-[0_0_24px_rgba(0,243,255,0.06)]'>
       <MagicCard
         className='h-full min-h-[120px] flex-1 flex flex-col rounded-2xl p-5 md:p-6'
         gradientFrom={gradientFrom}
@@ -102,16 +102,16 @@ function StatCard({
         gradientOpacity={0.3}
       >
         <div className='flex items-center justify-between gap-2 mb-3'>
-          <span className='text-[10px] uppercase tracking-[0.18em] text-gray-400 font-mono'>
+          <span className='text-[10px] uppercase tracking-[0.18em] text-muted-text font-mono'>
             {label}
           </span>
           <Icon className='h-4 w-4 text-cyan-400/85 shrink-0' />
         </div>
-        <p className='text-xl sm:text-2xl font-bold tabular-nums text-white font-mono leading-tight'>
+        <p className='text-xl sm:text-2xl font-bold tabular-nums text-surface-foreground font-mono leading-tight'>
           {value}
         </p>
         {sub ? (
-          <p className='text-[11px] text-gray-300 font-mono mt-2 leading-snug'>{sub}</p>
+          <p className='text-[11px] text-muted-text font-mono mt-2 leading-snug'>{sub}</p>
         ) : null}
       </MagicCard>
     </div>
@@ -212,12 +212,12 @@ function DistributionTreemap({
   const cells = useMemo(() => squarify(shown, 1000, 420), [shown]);
 
   return (
-    <div className='rounded-2xl border border-white/10 bg-black/55 p-4 sm:p-5 backdrop-blur-sm'>
+    <div className='rounded-2xl border border-border bg-surface/55 p-4 sm:p-5 backdrop-blur-sm'>
       <div className='flex flex-wrap items-center justify-between gap-3 mb-4'>
-        <h2 className='font-mono text-xs uppercase tracking-[0.25em] text-gray-400'>
+        <h2 className='font-mono text-xs uppercase tracking-[0.25em] text-muted-text'>
           Distribution map
         </h2>
-        <div className='flex items-center gap-1 rounded-lg border border-white/10 bg-black/40 p-1'>
+        <div className='flex items-center gap-1 rounded-lg border border-border bg-surface/40 p-1'>
           {MAP_SIZES.map((size) => (
             <button
               key={String(size)}
@@ -226,7 +226,7 @@ function DistributionTreemap({
                 'rounded-md px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider transition-colors',
                 mapSize === size
                   ? 'bg-cyan-400/15 text-cyan-300 border border-cyan-400/40'
-                  : 'text-gray-500 hover:text-gray-300 border border-transparent'
+                  : 'text-muted-text hover:text-foreground border border-transparent'
               )}
             >
               {size === 'ALL' ? 'All' : `Top ${size}`}
@@ -314,11 +314,11 @@ function DistributionTreemap({
           })}
         </svg>
       ) : (
-        <div className='h-48 flex items-center justify-center font-mono text-xs text-gray-500'>
+        <div className='h-48 flex items-center justify-center font-mono text-xs text-muted-text'>
           No holder data
         </div>
       )}
-      <div className='mt-3 flex flex-wrap gap-4 font-mono text-[10px] text-gray-500'>
+      <div className='mt-3 flex flex-wrap gap-4 font-mono text-[10px] text-muted-text'>
         <span className='flex items-center gap-1.5'>
           <span className='h-2.5 w-2.5 rounded-sm border border-[hsl(150_60%_38%)] bg-[hsl(150_45%_12%)]' />{' '}
           Locked (MsVault)
@@ -347,7 +347,7 @@ function CopyButton({ text }: { text: string }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 1200);
       }}
-      className='text-gray-600 hover:text-cyan-400 transition-colors'
+      className='text-muted-text hover:text-cyan-400 transition-colors'
       title='Copy address'
       aria-label='Copy address'
     >
@@ -453,14 +453,14 @@ export function TokenHoldersPageContent() {
 
   return (
     <div className='relative'>
-      <div className='absolute inset-0 bg-linear-to-br from-gray-900 via-black to-gray-900 pointer-events-none' />
+      <div className='absolute inset-0 bg-linear-to-br from-surface via-background to-surface pointer-events-none' />
       <div className='absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(0,243,255,0.12),transparent_55%)] pointer-events-none' />
       <div className='absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(188,19,254,0.12),transparent_55%)] pointer-events-none' />
 
       <div className='relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 md:pt-32 md:pb-24'>
         <Link
           href='/'
-          className='inline-flex items-center gap-2 text-sm text-gray-400 hover:text-cyan-400 transition-colors font-mono uppercase tracking-wider mb-8'
+          className='inline-flex items-center gap-2 text-sm text-muted-text hover:text-cyan-400 transition-colors font-mono uppercase tracking-wider mb-8'
         >
           <ArrowLeft className='h-4 w-4' />
           Back to home
@@ -469,21 +469,21 @@ export function TokenHoldersPageContent() {
         {/* Title + tabs */}
         <div className='flex flex-wrap items-end justify-between gap-6 mb-10'>
           <div className='max-w-2xl'>
-            <p className='inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-black/70 px-4 py-1 text-[11px] tracking-[0.28em] uppercase text-cyan-300 font-mono mb-5'>
+            <p className='inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-surface/70 px-4 py-1 text-[11px] tracking-[0.28em] uppercase text-cyan-300 font-mono mb-5'>
               <span className='h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse' />
               On-chain data
             </p>
-            <h1 className='text-4xl sm:text-5xl md:text-6xl font-bold font-mono text-white tracking-tight mb-3'>
+            <h1 className='text-4xl sm:text-5xl md:text-6xl font-bold font-mono text-foreground tracking-tight mb-3'>
               Token{' '}
               <span className='bg-linear-to-r from-cyan-400 via-purple-400 to-amber-300 bg-clip-text text-transparent'>
                 Holders
               </span>
             </h1>
-            <p className='text-gray-400 text-sm font-mono'>
+            <p className='text-muted-text text-sm font-mono'>
               Distribution of {asset} across the Qubic network.
             </p>
             {updatedAt ? (
-              <p className='mt-3 text-[11px] font-mono text-gray-500'>
+              <p className='mt-3 text-[11px] font-mono text-muted-text'>
                 Last refresh: {updatedAt.toLocaleTimeString()}
                 {current?.tick != null ? ` · Tick ${formatUnits(current.tick)}` : ''}
                 {loadError ? (
@@ -494,7 +494,7 @@ export function TokenHoldersPageContent() {
           </div>
 
           <div className='flex flex-wrap items-center gap-3'>
-            <div className='flex items-center gap-1 rounded-xl border border-white/10 bg-black/55 p-1'>
+            <div className='flex items-center gap-1 rounded-xl border border-border bg-surface/55 p-1'>
               {ASSETS.map((a) => (
                 <button
                   key={a}
@@ -503,7 +503,7 @@ export function TokenHoldersPageContent() {
                     'rounded-lg px-4 py-2 font-mono text-xs uppercase tracking-wider transition-colors',
                     asset === a
                       ? 'bg-cyan-400/15 text-cyan-300 border border-cyan-400/40'
-                      : 'text-gray-500 hover:text-gray-300 border border-transparent'
+                      : 'text-muted-text hover:text-foreground border border-transparent'
                   )}
                 >
                   {a} Holders
@@ -513,7 +513,7 @@ export function TokenHoldersPageContent() {
             <button
               onClick={exportCsv}
               disabled={!holders.length}
-              className='inline-flex items-center gap-2 rounded-xl border border-white/15 bg-black/55 px-4 py-2 font-mono text-xs uppercase tracking-wider text-gray-300 hover:text-cyan-300 hover:border-cyan-400/40 transition-colors disabled:opacity-40'
+              className='inline-flex items-center gap-2 rounded-xl border border-border bg-surface/55 px-4 py-2 font-mono text-xs uppercase tracking-wider text-muted-text hover:text-cyan-300 hover:border-cyan-400/40 transition-colors disabled:opacity-40'
             >
               <Download className='h-3.5 w-3.5' />
               Export CSV
@@ -563,18 +563,18 @@ export function TokenHoldersPageContent() {
         </div>
 
         {/* Controls */}
-        <div className='mb-4 rounded-2xl border border-white/10 bg-black/55 p-3 sm:p-4 backdrop-blur-sm'>
+        <div className='mb-4 rounded-2xl border border-border bg-surface/55 p-3 sm:p-4 backdrop-blur-sm'>
           <div className='flex flex-wrap items-center gap-3'>
             <div className='relative flex-1 min-w-[220px]'>
-              <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500' />
+              <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-text' />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder='Search address...'
-                className='w-full rounded-xl border border-white/10 bg-black/40 py-2 pl-10 pr-3 font-mono text-sm text-gray-200 placeholder:text-gray-600 focus:border-cyan-400/50 focus:outline-none'
+                className='w-full rounded-xl border border-border bg-surface/40 py-2 pl-10 pr-3 font-mono text-sm text-foreground placeholder:text-muted-text focus:border-cyan-400/50 focus:outline-none'
               />
             </div>
-            <div className='flex items-center gap-1 rounded-lg border border-white/10 bg-black/40 p-1'>
+            <div className='flex items-center gap-1 rounded-lg border border-border bg-surface/40 p-1'>
               {PAGE_SIZES.map((size) => (
                 <button
                   key={String(size)}
@@ -583,21 +583,21 @@ export function TokenHoldersPageContent() {
                     'rounded-md px-2.5 py-1 font-mono text-[11px] transition-colors',
                     pageSize === size
                       ? 'bg-cyan-400/15 text-cyan-300 border border-cyan-400/40'
-                      : 'text-gray-500 hover:text-gray-300 border border-transparent'
+                      : 'text-muted-text hover:text-foreground border border-transparent'
                   )}
                 >
                   {size}
                 </button>
               ))}
             </div>
-            <div className='flex items-center gap-1 rounded-lg border border-white/10 bg-black/40 p-1 ml-auto'>
+            <div className='flex items-center gap-1 rounded-lg border border-border bg-surface/40 p-1 ml-auto'>
               <button
                 onClick={() => setWhalesOnly(false)}
                 className={cn(
                   'rounded-md px-3 py-1 font-mono text-[11px] transition-colors',
                   !whalesOnly
-                    ? 'bg-white/10 text-white border border-white/20'
-                    : 'text-gray-500 hover:text-gray-300 border border-transparent'
+                    ? 'bg-foreground/10 text-foreground border border-foreground/20'
+                    : 'text-muted-text hover:text-foreground border border-transparent'
                 )}
               >
                 All
@@ -608,7 +608,7 @@ export function TokenHoldersPageContent() {
                   'rounded-md px-3 py-1 font-mono text-[11px] transition-colors',
                   whalesOnly
                     ? 'bg-cyan-400/15 text-cyan-300 border border-cyan-400/40'
-                    : 'text-gray-500 hover:text-gray-300 border border-transparent'
+                    : 'text-muted-text hover:text-foreground border border-transparent'
                 )}
               >
                 Whales (&gt;1%)
@@ -618,11 +618,11 @@ export function TokenHoldersPageContent() {
         </div>
 
         {/* Table */}
-        <div className='rounded-2xl border border-white/10 bg-black/55 backdrop-blur-sm overflow-hidden'>
+        <div className='rounded-2xl border border-border bg-surface/55 backdrop-blur-sm overflow-hidden'>
           <div className='overflow-x-auto'>
             <table className='w-full font-mono text-sm'>
               <thead>
-                <tr className='border-b border-white/10 text-[10px] uppercase tracking-[0.18em] text-gray-500'>
+                <tr className='border-b border-border text-[10px] uppercase tracking-[0.18em] text-muted-text'>
                   <th className='px-4 py-3 text-left font-medium'>Rank</th>
                   <th className='px-4 py-3 text-left font-medium'>Holder</th>
                   <th className='px-4 py-3 text-right font-medium'>{asset}</th>
@@ -632,13 +632,13 @@ export function TokenHoldersPageContent() {
               <tbody>
                 {loading && !current ? (
                   <tr>
-                    <td colSpan={4} className='px-4 py-10 text-center text-gray-500 text-xs'>
+                    <td colSpan={4} className='px-4 py-10 text-center text-muted-text text-xs'>
                       Loading on-chain holder data...
                     </td>
                   </tr>
                 ) : visible.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className='px-4 py-10 text-center text-gray-500 text-xs'>
+                    <td colSpan={4} className='px-4 py-10 text-center text-muted-text text-xs'>
                       No holders match your filters.
                     </td>
                   </tr>
@@ -648,9 +648,9 @@ export function TokenHoldersPageContent() {
                     return (
                       <tr
                         key={holder.identity}
-                        className='border-b border-white/5 hover:bg-white/[0.03] transition-colors'
+                        className='border-b border-border/50 hover:bg-foreground/[0.03] transition-colors'
                       >
-                        <td className='px-4 py-3 text-gray-500 tabular-nums'>#{rank}</td>
+                        <td className='px-4 py-3 text-muted-text tabular-nums'>#{rank}</td>
                         <td className='px-4 py-3'>
                           <div className='flex items-center gap-2'>
                             <a
@@ -666,7 +666,7 @@ export function TokenHoldersPageContent() {
                                     ? 'text-green-300'
                                     : holder.isContract
                                       ? 'text-purple-300'
-                                      : 'text-gray-200'
+                                      : 'text-surface-foreground'
                               )}
                             >
                               {truncateId(holder.identity)}
@@ -689,12 +689,12 @@ export function TokenHoldersPageContent() {
                             <CopyButton text={holder.identity} />
                           </div>
                         </td>
-                        <td className='px-4 py-3 text-right tabular-nums text-white'>
+                        <td className='px-4 py-3 text-right tabular-nums text-surface-foreground'>
                           {formatUnits(holder.balance)}
                         </td>
                         <td className='px-4 py-3'>
                           <div className='flex items-center justify-end gap-2'>
-                            <div className='h-1.5 w-16 rounded-full bg-gray-800 overflow-hidden'>
+                            <div className='h-1.5 w-16 rounded-full bg-border overflow-hidden'>
                               <div
                                 className='h-full rounded-full bg-linear-to-r from-cyan-400 to-purple-500'
                                 style={{ width: `${Math.min(Math.max(pct, 1), 100)}%` }}
@@ -713,7 +713,7 @@ export function TokenHoldersPageContent() {
             </table>
           </div>
           {current ? (
-            <p className='px-4 py-3 font-mono text-[11px] text-gray-500 border-t border-white/10'>
+            <p className='px-4 py-3 font-mono text-[11px] text-muted-text border-t border-border'>
               Showing {visible.length} of {current.totalHolders} holders
               {search || whalesOnly ? ' (filtered)' : ''} · Data from rpc.qubic.org
             </p>

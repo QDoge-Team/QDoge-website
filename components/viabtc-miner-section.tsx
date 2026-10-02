@@ -52,13 +52,13 @@ type ChartPoint = {
   rejectRatePercent: number;
 };
 
-const axisStyle = { fill: '#9ca3af', fontSize: 11 };
+const axisStyle = { fill: '#6b7280', fontSize: 11 };
 const gridColor = 'rgba(34, 211, 238, 0.08)';
 const tooltipBox = {
-  backgroundColor: 'rgba(10, 10, 10, 0.95)',
+  backgroundColor: 'var(--surface)',
   border: '1px solid rgba(34, 211, 238, 0.35)',
   borderRadius: 8,
-  color: '#e5e7eb',
+  color: 'var(--surface-foreground)',
   fontSize: 12,
 };
 
@@ -82,7 +82,7 @@ function ViaBtcHashrateTooltip({ active, payload, label }: ViaBtcTooltipProps) {
     <div className='rounded-lg px-3 py-2 shadow-lg font-mono' style={tooltipBox}>
       <div className='text-[11px] text-cyan-300/90 mb-1'>{label}</div>
       <div className='text-xs text-amber-200'>{formatHashrateHs(row.hashrateHs)}</div>
-      <div className='text-[10px] text-gray-500 mt-1'>
+      <div className='text-[10px] text-muted-text mt-1'>
         Reject {row.rejectRatePercent.toFixed(2)}%
       </div>
     </div>
@@ -99,8 +99,8 @@ function StatTile({
   accent: string;
 }) {
   return (
-    <div className='rounded-xl border border-white/10 bg-black/40 p-4'>
-      <p className='text-[10px] text-gray-500 font-mono uppercase tracking-wider'>
+    <div className='rounded-xl border border-border bg-surface/40 p-4'>
+      <p className='text-[10px] text-muted-text font-mono uppercase tracking-wider'>
         {label}
       </p>
       <p className={cn('mt-2 text-lg font-mono tabular-nums', accent)}>{value}</p>
@@ -154,13 +154,13 @@ export function ViaBtcMinerSection() {
 
   return (
     <div className='mb-6'>
-      <h2 className='font-mono text-xs uppercase tracking-[0.25em] text-gray-400 mb-4'>
+      <h2 className='font-mono text-xs uppercase tracking-[0.25em] text-muted-text mb-4'>
         QDoge ASIC miner
       </h2>
-      <div className='rounded-2xl border border-cyan-400/25 bg-black/50 p-5 sm:p-6 backdrop-blur-sm'>
+      <div className='rounded-2xl border border-cyan-400/25 bg-surface/50 p-5 sm:p-6 backdrop-blur-sm'>
         <div className='flex flex-wrap items-start justify-between gap-4'>
           <div>
-            <p className='text-[10px] uppercase tracking-widest text-gray-500 font-mono'>
+            <p className='text-[10px] uppercase tracking-widest text-muted-text font-mono'>
               Pool
             </p>
             <p className='mt-1 font-mono text-sm text-cyan-100/90'>
@@ -224,7 +224,7 @@ export function ViaBtcMinerSection() {
         </div>
 
         {otherGiftProfits.length ? (
-          <p className='mt-4 text-[11px] font-mono text-gray-500'>
+          <p className='mt-4 text-[11px] font-mono text-muted-text'>
             Also merged-mined:{' '}
             {otherGiftProfits
               .map((g) => `${formatProfit(g.profitTotal)} ${g.coin}`)
@@ -234,14 +234,14 @@ export function ViaBtcMinerSection() {
 
         <div className='mt-8 space-y-6'>
           <div>
-            <h3 className='font-mono text-xs uppercase tracking-[0.2em] text-gray-400 mb-3'>
+            <h3 className='font-mono text-xs uppercase tracking-[0.2em] text-muted-text mb-3'>
               Workers list
             </h3>
             {data?.workers?.length ? (
-              <div className='overflow-x-auto rounded-xl border border-white/10 bg-black/40'>
+              <div className='overflow-x-auto rounded-xl border border-border bg-surface/40'>
                 <table className='w-full min-w-[640px] text-left text-sm font-mono'>
                   <thead>
-                    <tr className='border-b border-white/10 text-[10px] uppercase tracking-widest text-gray-500'>
+                    <tr className='border-b border-border text-[10px] uppercase tracking-widest text-muted-text'>
                       <th className='px-4 py-3 font-medium'>Worker</th>
                       <th className='px-4 py-3 font-medium'>Status</th>
                       <th className='px-4 py-3 font-medium'>10 min</th>
@@ -255,7 +255,7 @@ export function ViaBtcMinerSection() {
                     {data.workers.map((w, idx) => (
                       <tr
                         key={`${w.name}-${idx}`}
-                        className='border-b border-white/5 text-gray-200 last:border-0 hover:bg-white/[0.03]'
+                        className='border-b border-border/50 text-surface-foreground last:border-0 hover:bg-foreground/5'
                       >
                         <td className='px-4 py-3 text-cyan-100/95'>{w.name}</td>
                         <td className='px-4 py-3'>
@@ -273,16 +273,16 @@ export function ViaBtcMinerSection() {
                         <td className='px-4 py-3 tabular-nums text-amber-200/90'>
                           {formatHashrateHs(w.hashrate10minHs)}
                         </td>
-                        <td className='px-4 py-3 tabular-nums text-gray-300'>
+                        <td className='px-4 py-3 tabular-nums text-muted-text'>
                           {formatHashrateHs(w.hashrate1hourHs)}
                         </td>
-                        <td className='px-4 py-3 tabular-nums text-gray-400'>
+                        <td className='px-4 py-3 tabular-nums text-muted-text'>
                           {formatHashrateHs(w.hashrate24hourHs)}
                         </td>
                         <td className='px-4 py-3 tabular-nums text-red-300/80'>
                           {w.rejectRatePercent.toFixed(2)}%
                         </td>
-                        <td className='px-4 py-3 text-xs text-gray-500'>
+                        <td className='px-4 py-3 text-xs text-muted-text'>
                           {w.lastActive
                             ? new Date(w.lastActive * 1000).toLocaleString(undefined, {
                                 month: 'short',
@@ -298,18 +298,18 @@ export function ViaBtcMinerSection() {
                 </table>
               </div>
             ) : (
-              <div className='rounded-xl border border-white/10 bg-black/40 p-8 text-center font-mono text-sm text-gray-500'>
+              <div className='rounded-xl border border-border bg-surface/40 p-8 text-center font-mono text-sm text-muted-text'>
                 {error ? 'Workers unavailable.' : 'No workers reported yet.'}
               </div>
             )}
           </div>
 
-          <div className='rounded-xl border border-amber-400/15 bg-black/40 p-4 sm:p-5'>
+          <div className='rounded-xl border border-amber-400/15 bg-surface/40 p-4 sm:p-5'>
             <div className='mb-3'>
-              <h3 className='font-mono text-xs uppercase tracking-[0.2em] text-gray-400'>
+              <h3 className='font-mono text-xs uppercase tracking-[0.2em] text-muted-text'>
                 Hashrate history
               </h3>
-              <p className='mt-1 text-[11px] text-gray-500 font-mono'>
+              <p className='mt-1 text-[11px] text-muted-text font-mono'>
                 {data?.coin ?? 'LTC'} scrypt · ViaBTC · hourly
               </p>
             </div>
@@ -357,12 +357,12 @@ export function ViaBtcMinerSection() {
                       strokeWidth={2}
                       fill='url(#viabtcHash)'
                       dot={false}
-                      activeDot={{ r: 4, fill: '#22d3ee', stroke: '#fff', strokeWidth: 1 }}
+                      activeDot={{ r: 4, fill: '#22d3ee', stroke: 'var(--surface)', strokeWidth: 1 }}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
               ) : (
-                <div className='flex h-full items-center justify-center font-mono text-sm text-gray-500'>
+                <div className='flex h-full items-center justify-center font-mono text-sm text-muted-text'>
                   {error ? 'History unavailable.' : 'No history samples yet.'}
                 </div>
               )}

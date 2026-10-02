@@ -43,7 +43,7 @@ const AboutSection: React.FC = () => {
                 },
               }}
             >
-              <MagicCard className='border-2 border-cyan-400/60 bg-black/80 backdrop-blur-sm relative h-full'>
+              <MagicCard className='border-2 border-cyan-400/60 bg-surface/80 backdrop-blur-sm relative h-full'>
                 {/* Terminal Header */}
                 <motion.div
                   className='border-b border-cyan-400/40 p-3 bg-cyan-400/10'
@@ -115,7 +115,7 @@ const AboutSection: React.FC = () => {
                       height={300}
                     />
                   </div>
-                  <div className='space-y-4 text-cyan-300 font-mono text-sm lg:text-base leading-relaxed pt-4'>
+                  <div className='space-y-4 text-muted-text font-mono text-sm lg:text-base leading-relaxed pt-4'>
                     {[
                       "a futuristic ai robotic shiba inu, sent from the future by anna's consciousness. born from qubic's overclocked mining rigs in aigarth's yard. mission: prepare the qubic community for the ultimate dogecoin mining conquest.",
                       "after monero, qubic's eyes turned toward dogecoin. doge is a giant defended by massive hashpower and entrenched asic miners. success requires more than brute force: preparation, unity, and strategy.",

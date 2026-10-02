@@ -254,7 +254,7 @@ const RoadmapSection: React.FC = () => {
                       {phase.items.map((item) => (
                         <div
                           key={item.text}
-                          className='group/item relative overflow-hidden border border-gray-700/50 bg-black/40 hover:border-cyan-400/50 transition-all duration-300'
+                          className='group/item relative overflow-hidden border border-border bg-surface/40 hover:border-cyan-400/50 transition-all duration-300'
                         >
                           {/* Hover Glow */}
                           <div className='absolute inset-0 bg-cyan-400/5 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300' />
@@ -277,10 +277,10 @@ const RoadmapSection: React.FC = () => {
                             </div>
 
                             <div className='flex-1 min-w-0'>
-                              <h4 className='text-white font-mono text-sm font-bold mb-1 group-hover/item:text-cyan-400 transition-colors duration-300'>
+                              <h4 className='text-surface-foreground font-mono text-sm font-bold mb-1 group-hover/item:text-cyan-400 transition-colors duration-300'>
                                 {item.text}
                               </h4>
-                              <p className='text-gray-400 font-mono text-xs'>
+                              <p className='text-muted-text font-mono text-xs'>
                                 EPOCH_{item.epoch}
                               </p>
                             </div>
@@ -303,7 +303,7 @@ const RoadmapSection: React.FC = () => {
 
         {/* Cyberpunk CTA */}
         <div ref={ctaRef} className={`mt-20 ${ctaAnimation.animationClass}`}>
-          <MagicCard className='relative border-2 border-cyan-400/60 bg-black/60 backdrop-blur-md overflow-hidden'>
+          <MagicCard className='relative border-2 border-cyan-400/60 bg-surface/60 backdrop-blur-md overflow-hidden'>
             {/* Animated Background */}
             <div className='absolute inset-0 bg-linear-to-r from-cyan-400/10 via-purple-400/10 to-cyan-400/10 animate-pulse' />
 
@@ -319,7 +319,7 @@ const RoadmapSection: React.FC = () => {
                 <p className='text-cyan-300 font-mono text-lg mb-2'>
                   &gt; KENNEL_CLUB.INIT --TRAINING=52WEEKS --REWARDS=ENABLED
                 </p>
-                <p className='text-gray-400 font-mono text-sm'>
+                <p className='text-muted-text font-mono text-sm'>
                   Train with the elite • Earn rewards • Prepare for DOGE mining
                 </p>
               </div>

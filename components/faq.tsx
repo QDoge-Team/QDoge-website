@@ -54,7 +54,7 @@ const FAQSection: React.FC = () => {
       ref={sectionRef}
       className={`relative py-20 lg:py-28 overflow-hidden ${sectionAnimClass}`}
     >
-      <div className='absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_top,#0f172a_10%,transparent_60%)] opacity-70' />
+      <div className='absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_top,var(--color-border)_10%,transparent_60%)] opacity-70' />
 
       <div className='relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='text-center mb-12 lg:mb-16'>
@@ -62,16 +62,16 @@ const FAQSection: React.FC = () => {
             <HelpCircle className='w-4 h-4 text-cyan-300' />
             FAQ
           </p>
-          <h2 className='mt-6 text-3xl lg:text-5xl font-black font-mono text-cyan-100'>
+          <h2 className='mt-6 text-3xl lg:text-5xl font-black font-mono text-foreground'>
             Answers from the Cyber Kennel
           </h2>
-          <p className='mt-4 text-cyan-100/70 font-mono text-sm max-w-2xl mx-auto'>
+          <p className='mt-4 text-muted-text font-mono text-sm max-w-2xl mx-auto'>
             Tap into the kennel console to decode how training, trade-ins, and
             mining rewards sync up across the QDOGE ecosystem.
           </p>
         </div>
 
-        <MagicCard className='border-2 border-cyan-400/60 bg-black/80 backdrop-blur-sm'>
+        <MagicCard className='border-2 border-cyan-400/60 bg-surface/80 backdrop-blur-sm'>
           <div className='divide-y divide-cyan-400/20'>
             {faqs.map((faq, index) => {
               const isOpen = openIndex === index;
@@ -80,7 +80,7 @@ const FAQSection: React.FC = () => {
                 <div key={faq.question}>
                   <button
                     type='button'
-                    className='w-full flex items-center justify-between px-6 py-5 text-left text-cyan-100 font-mono uppercase tracking-wide hover:bg-cyan-400/5 transition-colors'
+                    className='w-full flex items-center justify-between px-6 py-5 text-left text-surface-foreground font-mono uppercase tracking-wide hover:bg-cyan-400/5 transition-colors'
                     onClick={() =>
                       setOpenIndex((prev) => (prev === index ? null : index))
                     }
@@ -100,7 +100,7 @@ const FAQSection: React.FC = () => {
                       isOpen ? 'max-h-96' : 'max-h-0'
                     }`}
                   >
-                    <p className='px-6 pb-6 text-sm lg:text-base text-cyan-100/80 font-mono leading-relaxed'>
+                    <p className='px-6 pb-6 text-sm lg:text-base text-muted-text font-mono leading-relaxed'>
                       {faq.answer}
                     </p>
                   </div>

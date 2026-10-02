@@ -64,7 +64,7 @@ function StatCard({
   gradientFrom: string;
 }) {
   return (
-    <div className='flex h-full min-h-[120px] flex-col rounded-2xl border border-white/10 overflow-hidden shadow-[0_0_24px_rgba(0,243,255,0.06)]'>
+    <div className='flex h-full min-h-[120px] flex-col rounded-2xl border border-border overflow-hidden shadow-[0_0_24px_rgba(0,243,255,0.06)]'>
       <MagicCard
         className='h-full min-h-[120px] flex-1 flex flex-col rounded-2xl p-5 md:p-6'
         gradientFrom={gradientFrom}
@@ -73,16 +73,16 @@ function StatCard({
         gradientOpacity={0.3}
       >
         <div className='flex items-center justify-between gap-2 mb-3'>
-          <span className='text-[10px] uppercase tracking-[0.18em] text-gray-400 font-mono'>
+          <span className='text-[10px] uppercase tracking-[0.18em] text-muted-text font-mono'>
             {label}
           </span>
           <Icon className='h-4 w-4 text-cyan-400/85 shrink-0' />
         </div>
-        <p className='text-xl sm:text-2xl font-bold tabular-nums text-white font-mono leading-tight'>
+        <p className='text-xl sm:text-2xl font-bold tabular-nums text-surface-foreground font-mono leading-tight'>
           {value}
         </p>
         {sub ? (
-          <p className='text-[11px] text-gray-300 font-mono mt-2 leading-snug'>{sub}</p>
+          <p className='text-[11px] text-muted-text font-mono mt-2 leading-snug'>{sub}</p>
         ) : null}
       </MagicCard>
     </div>
@@ -236,14 +236,14 @@ export function DividendsPageContent() {
 
   return (
     <div className='relative'>
-      <div className='absolute inset-0 bg-linear-to-br from-gray-900 via-black to-gray-900 pointer-events-none' />
+      <div className='absolute inset-0 bg-linear-to-br from-background via-surface to-background pointer-events-none' />
       <div className='absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(0,243,255,0.12),transparent_55%)] pointer-events-none' />
       <div className='absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(188,19,254,0.12),transparent_55%)] pointer-events-none' />
 
       <div className='relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 md:pt-32 md:pb-24'>
         <Link
           href='/'
-          className='inline-flex items-center gap-2 text-sm text-gray-400 hover:text-cyan-400 transition-colors font-mono uppercase tracking-wider mb-8'
+          className='inline-flex items-center gap-2 text-sm text-muted-text hover:text-cyan-400 transition-colors font-mono uppercase tracking-wider mb-8'
         >
           <ArrowLeft className='h-4 w-4' />
           Back to home
@@ -251,24 +251,24 @@ export function DividendsPageContent() {
 
         <div className='flex flex-wrap items-end justify-between gap-6 mb-10'>
           <div className='max-w-3xl'>
-            <p className='inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-black/70 px-4 py-1 text-[11px] tracking-[0.28em] uppercase text-cyan-300 font-mono mb-5'>
+            <p className='inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-surface/70 px-4 py-1 text-[11px] tracking-[0.28em] uppercase text-cyan-300 font-mono mb-5'>
               <span className='h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse' />
               Weekly payouts
             </p>
-            <h1 className='text-4xl sm:text-5xl md:text-6xl font-bold font-mono text-white tracking-tight mb-3'>
+            <h1 className='text-4xl sm:text-5xl md:text-6xl font-bold font-mono text-foreground tracking-tight mb-3'>
               QTREAT{' '}
               <span className='bg-linear-to-r from-cyan-400 via-purple-400 to-amber-300 bg-clip-text text-transparent'>
                 Dividends
               </span>
             </h1>
-            <p className='text-gray-400 text-sm font-mono'>
+            <p className='text-muted-text text-sm font-mono'>
               Every epoch, QTREAT holders receive QUBIC dividends — the highest yield of
               any dividend-paying project on the network.
             </p>
           </div>
           <button
             onClick={exportCsv}
-            className='inline-flex items-center gap-2 rounded-xl border border-white/15 bg-black/55 px-4 py-2 font-mono text-xs uppercase tracking-wider text-gray-300 hover:text-cyan-300 hover:border-cyan-400/40 transition-colors shrink-0'
+            className='inline-flex items-center gap-2 rounded-xl border border-border bg-surface/55 px-4 py-2 font-mono text-xs uppercase tracking-wider text-muted-text hover:text-cyan-300 hover:border-cyan-400/40 transition-colors shrink-0'
           >
             <Download className='h-3.5 w-3.5' />
             Export raw data (CSV)
@@ -317,9 +317,9 @@ export function DividendsPageContent() {
           />
         </div>
 
-        <div className='rounded-2xl border border-cyan-400/20 bg-black/50 p-4 sm:p-6 backdrop-blur-sm mb-10'>
+        <div className='rounded-2xl border border-cyan-400/20 bg-surface/50 p-4 sm:p-6 backdrop-blur-sm mb-10'>
           <div className='mb-4'>
-            <h2 className='font-mono text-xs uppercase tracking-[0.2em] text-gray-400'>
+            <h2 className='font-mono text-xs uppercase tracking-[0.2em] text-muted-text'>
               QTREAT payout per epoch
             </h2>
             <p className='mt-1 text-sm text-cyan-100/70 font-mono'>
@@ -345,9 +345,9 @@ export function DividendsPageContent() {
           </div>
         </div>
 
-        <div className='rounded-2xl border border-white/10 bg-black/50 p-4 sm:p-6 backdrop-blur-sm mb-10'>
+        <div className='rounded-2xl border border-border bg-surface/50 p-4 sm:p-6 backdrop-blur-sm mb-10'>
           <div className='mb-4'>
-            <h2 className='font-mono text-xs uppercase tracking-[0.2em] text-gray-400'>
+            <h2 className='font-mono text-xs uppercase tracking-[0.2em] text-muted-text'>
               Weekly yield vs other Qubic projects
             </h2>
             <p className='mt-1 text-sm text-cyan-100/70 font-mono'>
@@ -392,11 +392,11 @@ export function DividendsPageContent() {
           </div>
         </div>
 
-        <div className='rounded-2xl border border-white/10 bg-black/55 backdrop-blur-sm overflow-hidden mb-6'>
+        <div className='rounded-2xl border border-border bg-surface/55 backdrop-blur-sm overflow-hidden mb-6'>
           <div className='overflow-x-auto'>
             <table className='w-full font-mono text-sm'>
               <thead>
-                <tr className='border-b border-white/10 text-[10px] uppercase tracking-[0.18em] text-gray-500'>
+                <tr className='border-b border-border text-[10px] uppercase tracking-[0.18em] text-muted-text'>
                   <th className='px-4 py-3 text-left font-medium'>Rank</th>
                   <th className='px-4 py-3 text-left font-medium'>Project</th>
                   <th className='px-4 py-3 text-right font-medium'>Price (qu)</th>
@@ -414,13 +414,13 @@ export function DividendsPageContent() {
                     <tr
                       key={p.name}
                       className={cn(
-                        'border-b border-white/5 transition-colors',
+                        'border-b border-border/50 transition-colors',
                         isQtreat
                           ? 'bg-amber-400/[0.07] hover:bg-amber-400/[0.1]'
-                          : 'hover:bg-white/[0.03]'
+                          : 'hover:bg-surface-foreground/[0.03]'
                       )}
                     >
-                      <td className='px-4 py-3 text-gray-500 tabular-nums'>
+                      <td className='px-4 py-3 text-muted-text tabular-nums'>
                         {isQtreat ? (
                           <span className='text-amber-300 font-bold'>#{i + 1}</span>
                         ) : (
@@ -431,7 +431,7 @@ export function DividendsPageContent() {
                         <span
                           className={cn(
                             'font-bold',
-                            isQtreat ? 'text-amber-300' : 'text-gray-200'
+                            isQtreat ? 'text-amber-300' : 'text-surface-foreground'
                           )}
                         >
                           {p.name}
@@ -447,13 +447,13 @@ export function DividendsPageContent() {
                           {p.kind === 'token' ? 'Token' : `SC #${p.scIndex}`}
                         </span>
                       </td>
-                      <td className='px-4 py-3 text-right tabular-nums text-gray-300'>
+                      <td className='px-4 py-3 text-right tabular-nums text-muted-text'>
                         {formatCompact(p.price)}
                       </td>
-                      <td className='px-4 py-3 text-right tabular-nums text-gray-300'>
+                      <td className='px-4 py-3 text-right tabular-nums text-muted-text'>
                         {formatQu(p.avgWeekly)}
                       </td>
-                      <td className='px-4 py-3 text-right tabular-nums text-white'>
+                      <td className='px-4 py-3 text-right tabular-nums text-surface-foreground'>
                         {formatQu(p.totalDividends)}
                       </td>
                       <td
@@ -472,7 +472,7 @@ export function DividendsPageContent() {
                       >
                         {p.annualYieldPct.toFixed(2)}%
                       </td>
-                      <td className='px-4 py-3 text-right tabular-nums text-gray-300'>
+                      <td className='px-4 py-3 text-right tabular-nums text-muted-text'>
                         {p.paybackWeeks != null ? `${Math.round(p.paybackWeeks)} wk` : '—'}
                       </td>
                     </tr>
@@ -481,19 +481,19 @@ export function DividendsPageContent() {
               </tbody>
             </table>
           </div>
-          <p className='px-4 py-3 font-mono text-[11px] text-gray-500 border-t border-white/10'>
+          <p className='px-4 py-3 font-mono text-[11px] text-muted-text border-t border-border'>
             Per-share figures in qu · epochs {EPOCH_FROM}–{EPOCH_FROM + qtreat.epochs.length - 1}{' '}
             · prices are a live snapshot, yields move with price
           </p>
         </div>
 
-        <div className='rounded-2xl border border-white/10 bg-black/55 backdrop-blur-sm overflow-hidden mb-6'>
+        <div className='rounded-2xl border border-border bg-surface/55 backdrop-blur-sm overflow-hidden mb-6'>
           <button
             onClick={() => setShowRaw((v) => !v)}
             className='flex w-full items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4 text-left'
           >
             <div>
-              <h2 className='font-mono text-xs uppercase tracking-[0.2em] text-gray-400'>
+              <h2 className='font-mono text-xs uppercase tracking-[0.2em] text-muted-text'>
                 Raw per-epoch data
               </h2>
               <p className='mt-1 text-sm text-cyan-100/70 font-mono'>
@@ -502,17 +502,17 @@ export function DividendsPageContent() {
             </div>
             <ChevronDown
               className={cn(
-                'h-4 w-4 text-gray-400 shrink-0 transition-transform',
+                'h-4 w-4 text-muted-text shrink-0 transition-transform',
                 showRaw ? 'rotate-180' : ''
               )}
             />
           </button>
           {showRaw ? (
-            <div className='overflow-x-auto border-t border-white/10'>
+            <div className='overflow-x-auto border-t border-border'>
               <table className='w-full font-mono text-xs'>
                 <thead>
-                  <tr className='border-b border-white/10 text-[9px] uppercase tracking-[0.12em] text-gray-500'>
-                    <th className='sticky left-0 bg-black/95 px-4 py-2 text-left font-medium'>
+                  <tr className='border-b border-border text-[9px] uppercase tracking-[0.12em] text-muted-text'>
+                    <th className='sticky left-0 bg-surface/95 px-4 py-2 text-left font-medium'>
                       Project
                     </th>
                     {ALL_EPOCHS_DESC.map((e) => (
@@ -530,14 +530,14 @@ export function DividendsPageContent() {
                       <tr
                         key={p.name}
                         className={cn(
-                          'border-b border-white/5',
+                          'border-b border-border/50',
                           isQtreat && 'bg-amber-400/[0.06]'
                         )}
                       >
                         <td
                           className={cn(
                             'sticky left-0 px-4 py-2 text-left whitespace-nowrap',
-                            isQtreat ? 'bg-black/95 text-amber-300 font-bold' : 'bg-black/95 text-gray-300'
+                            isQtreat ? 'bg-surface/95 text-amber-300 font-bold' : 'bg-surface/95 text-muted-text'
                           )}
                         >
                           {p.name}
@@ -547,7 +547,7 @@ export function DividendsPageContent() {
                           return (
                             <td
                               key={e}
-                              className='px-3 py-2 text-right tabular-nums text-gray-400 whitespace-nowrap'
+                              className='px-3 py-2 text-right tabular-nums text-muted-text whitespace-nowrap'
                             >
                               {v != null ? formatQu(v) : '—'}
                             </td>
@@ -560,7 +560,7 @@ export function DividendsPageContent() {
               </table>
             </div>
           ) : null}
-          <p className='px-4 py-3 font-mono text-[11px] text-gray-500 border-t border-white/10'>
+          <p className='px-4 py-3 font-mono text-[11px] text-muted-text border-t border-border'>
             qu paid per share, per epoch · dashes mean no dividend paid that epoch ·{' '}
             <button onClick={exportCsv} className='underline hover:text-cyan-300'>
               download full CSV
@@ -569,8 +569,8 @@ export function DividendsPageContent() {
         </div>
 
         {inactive.length ? (
-          <div className='rounded-xl border border-white/10 bg-black/30 px-4 py-4 font-mono text-[11px] text-gray-500 leading-relaxed'>
-            <span className='text-gray-400 uppercase tracking-wider mr-2'>
+          <div className='rounded-xl border border-border bg-surface/30 px-4 py-4 font-mono text-[11px] text-muted-text leading-relaxed'>
+            <span className='text-muted-text uppercase tracking-wider mr-2'>
               No dividends paid yet:
             </span>
             {inactive.map((p) => p.name).join(' · ')}

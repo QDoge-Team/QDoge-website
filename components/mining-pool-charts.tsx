@@ -19,13 +19,13 @@ export type HashrateChartPoint = {
   workers: number;
 };
 
-const axisStyle = { fill: '#9ca3af', fontSize: 11 };
+const axisStyle = { fill: '#6b7280', fontSize: 11 };
 const gridColor = 'rgba(34, 211, 238, 0.08)';
 const tooltipStyle = {
-  backgroundColor: 'rgba(10, 10, 10, 0.95)',
+  backgroundColor: 'var(--surface)',
   border: '1px solid rgba(34, 211, 238, 0.35)',
   borderRadius: 8,
-  color: '#e5e7eb',
+  color: 'var(--surface-foreground)',
   fontSize: 12,
 };
 
@@ -70,10 +70,10 @@ export function MiningPoolCharts({ data, className }: MiningPoolChartsProps) {
 
   return (
     <div className={cn('grid grid-cols-1 gap-6 lg:grid-cols-1', className)}>
-      <div className='rounded-2xl border border-cyan-400/20 bg-black/50 p-4 sm:p-6 backdrop-blur-sm'>
+      <div className='rounded-2xl border border-cyan-400/20 bg-surface/50 p-4 sm:p-6 backdrop-blur-sm'>
         <div className='mb-4 flex flex-wrap items-end justify-between gap-2'>
           <div>
-            <h3 className='font-mono text-xs uppercase tracking-[0.2em] text-gray-400'>
+            <h3 className='font-mono text-xs uppercase tracking-[0.2em] text-muted-text'>
               Pool hashrate
             </h3>
             <p className='mt-1 text-sm text-cyan-100/70 font-mono'>
@@ -83,7 +83,7 @@ export function MiningPoolCharts({ data, className }: MiningPoolChartsProps) {
         </div>
         <div className='h-[300px] w-full min-h-[260px]'>
           {empty ? (
-            <div className='flex h-full items-center justify-center font-mono text-sm text-gray-500'>
+            <div className='flex h-full items-center justify-center font-mono text-sm text-muted-text'>
               No history samples yet.
             </div>
           ) : (
@@ -126,7 +126,7 @@ export function MiningPoolCharts({ data, className }: MiningPoolChartsProps) {
                   strokeWidth={2}
                   fill='url(#dogeHashFill)'
                   dot={false}
-                  activeDot={{ r: 4, fill: '#22d3ee', stroke: '#fff', strokeWidth: 1 }}
+                  activeDot={{ r: 4, fill: '#22d3ee', stroke: 'var(--surface)', strokeWidth: 1 }}
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -134,9 +134,9 @@ export function MiningPoolCharts({ data, className }: MiningPoolChartsProps) {
         </div>
       </div>
 
-      <div className='rounded-2xl border border-purple-400/20 bg-black/50 p-4 sm:p-6 backdrop-blur-sm'>
+      <div className='rounded-2xl border border-purple-400/20 bg-surface/50 p-4 sm:p-6 backdrop-blur-sm'>
         <div className='mb-4'>
-          <h3 className='font-mono text-xs uppercase tracking-[0.2em] text-gray-400'>
+          <h3 className='font-mono text-xs uppercase tracking-[0.2em] text-muted-text'>
             Pool workers
           </h3>
           <p className='mt-1 text-sm text-cyan-100/70 font-mono'>
@@ -145,7 +145,7 @@ export function MiningPoolCharts({ data, className }: MiningPoolChartsProps) {
         </div>
         <div className='h-[260px] w-full'>
           {empty ? (
-            <div className='flex h-full items-center justify-center font-mono text-sm text-gray-500'>
+            <div className='flex h-full items-center justify-center font-mono text-sm text-muted-text'>
               No history samples yet.
             </div>
           ) : (

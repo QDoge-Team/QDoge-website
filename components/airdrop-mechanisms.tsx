@@ -109,7 +109,7 @@ const AirdropMechanismsSection: React.FC = () => {
             hidden: { opacity: 0 },
           }}
         >
-          <MagicCard className='border-2 border-cyan-400/60 bg-black/80 backdrop-blur-sm'>
+          <MagicCard className='border-2 border-cyan-400/60 bg-surface/80 backdrop-blur-sm'>
             {/* Terminal Header */}
             <div className='border-b border-cyan-400/40 p-4 bg-cyan-400/10'>
               <div className='flex items-center justify-between'>
@@ -155,7 +155,7 @@ const AirdropMechanismsSection: React.FC = () => {
                   <CheckCircle className='w-6 h-6 text-cyan-400' />
                   <h3 className='text-2xl font-black text-cyan-300 font-mono'>Eligibility Requirements</h3>
                 </div>
-                <p className='text-cyan-200 font-mono text-sm lg:text-base leading-relaxed'>
+                <p className='text-muted-text font-mono text-sm lg:text-base leading-relaxed'>
                   Register your Qubic wallet and X account with{' '}
                   <a
                     href='https://zealy.io/cw/qdoge'
@@ -235,7 +235,7 @@ const AirdropMechanismsSection: React.FC = () => {
                   <Calendar className='w-6 h-6 text-emerald-400' />
                   <h3 className='text-2xl font-black text-emerald-300 font-mono'>Airdrop Timeline</h3>
                 </div>
-                <p className='text-emerald-200 font-mono text-sm lg:text-base leading-relaxed'>
+                <p className='text-muted-text font-mono text-sm lg:text-base leading-relaxed'>
                   AirDrop to start <span className='text-emerald-400 font-black'>January 21 12 UTC</span>
                 </p>
               </motion.div>
@@ -253,7 +253,7 @@ const AirdropMechanismsSection: React.FC = () => {
                   <h3 className='text-2xl font-black text-cyan-300 font-mono'>Distribution Breakdown</h3>
                 </div>
                 <div className='mb-4'>
-                  <p className='text-cyan-200 font-mono text-lg lg:text-xl font-black mb-4'>
+                  <p className='text-surface-foreground font-mono text-lg lg:text-xl font-black mb-4'>
                     Total Airdrop: <span className='text-cyan-400'>15%</span>
                   </p>
                 </div>
@@ -262,7 +262,7 @@ const AirdropMechanismsSection: React.FC = () => {
                     const Icon = item.icon;
                     const content = (
                       <motion.div
-                        className='border border-cyan-400/30 bg-black/60 rounded-lg p-5 hover:border-cyan-400/60 transition-all'
+                        className='border border-cyan-400/30 bg-surface/60 rounded-lg p-5 hover:border-cyan-400/60 transition-all'
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
@@ -274,7 +274,7 @@ const AirdropMechanismsSection: React.FC = () => {
                             {item.percentage}
                           </span>
                         </div>
-                        <h4 className='text-cyan-200 font-mono text-sm font-semibold'>
+                        <h4 className='text-muted-text font-mono text-sm font-semibold'>
                           {item.title}
                         </h4>
                       </motion.div>
@@ -289,7 +289,7 @@ const AirdropMechanismsSection: React.FC = () => {
                   })}
                 </div>
                 <div className='mt-4 p-4 bg-orange-400/5 border border-orange-400/30 rounded-lg'>
-                  <p className='text-orange-200 font-mono text-sm lg:text-base leading-relaxed'>
+                  <p className='text-muted-text font-mono text-sm lg:text-base leading-relaxed'>
                     Beginning January 22, send QXMR to [SPECIAL_WALLET] and receive QDoge (100:1)
                   </p>
                 </div>

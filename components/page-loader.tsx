@@ -21,7 +21,7 @@ const PageLoader: React.FC<PageLoaderProps> = ({ children }) => {
 
   if (loading) {
     return (
-      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black'>
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-surface'>
         <div className='relative z-10 flex flex-col items-center gap-4 font-mono text-center'>
           {/* ScaleLoader-style bars */}
           <div className='flex items-end gap-1'>
