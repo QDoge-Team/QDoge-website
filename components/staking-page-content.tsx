@@ -159,12 +159,12 @@ export function StakingPageContent() {
       return;
     }
     const [qdoge, qxManaged, qtreat] = await Promise.all([
-      fetchAssetBalance(wallet.publicKey, QTREAT_STAKE_ASSET.name),
+      fetchAssetBalance(wallet.publicKey, QTREAT_STAKE_ASSET),
       // Only QDOGE currently under QX's own management is eligible to stake --
       // QX's TransferShareManagementRights silently no-ops (transfers 0, no
       // error) for any amount beyond that, even though the tx still confirms.
-      fetchAssetBalance(wallet.publicKey, QTREAT_STAKE_ASSET.name, QX_CONTRACT_INDEX),
-      fetchAssetBalance(wallet.publicKey, QTREAT_BONUS_ASSET.name),
+      fetchAssetBalance(wallet.publicKey, QTREAT_STAKE_ASSET, QX_CONTRACT_INDEX),
+      fetchAssetBalance(wallet.publicKey, QTREAT_BONUS_ASSET),
     ]);
     setQdogeBalance(qdoge);
     setQxManagedQdoge(qxManaged);

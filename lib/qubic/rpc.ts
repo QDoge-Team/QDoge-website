@@ -48,10 +48,18 @@ type OwnedAsset = {
   };
 };
 
-/** Sums a wallet's owned units of one asset, optionally scoped to a specific managing contract. */
+/**
+ * Sums a wallet's owned units of one asset, optionally scoped to a specific managing contract.
+ *
+ * Asset names are not unique on Qubic -- e.g. there are two entirely separate
+ * assets both named "QTREAT": the real QTREAT bonus token (issued by the
+ * QDOGE team) and an unrelated asset tied to the QTREAT contract (issued by
+ * the zero identity). Matching on name alone would silently sum both
+ * together, so the issuer is required, not optional.
+ */
 export async function fetchAssetBalance(
   publicId: string,
-  assetName: string,
+  asset: { name: string; issuer: string },
   managingContractIndex?: number
 ): Promise<number> {
   const data = await rpcGet<{ ownedAssets?: OwnedAsset[] }>(`/v1/assets/${publicId}/owned`);
@@ -59,7 +67,8 @@ export async function fetchAssetBalance(
   return owned
     .filter(
       (a) =>
-        a.data.issuedAsset.name === assetName &&
+        a.data.issuedAsset.name === asset.name &&
+        a.data.issuedAsset.issuerIdentity === asset.issuer &&
         (managingContractIndex === undefined || a.data.managingContractIndex === managingContractIndex)
     )
     .reduce((sum, a) => sum + Number(a.data.numberOfUnits), 0);
