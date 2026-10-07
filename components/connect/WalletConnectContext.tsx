@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import SignClient from '@walletconnect/sign-client';
 
 type WalletConnectAccount = { address: string; name?: string };
@@ -31,14 +31,31 @@ const WalletConnectContext = createContext<WalletConnectContextType | undefined>
  */
 const WALLETCONNECT_PROJECT_ID = '5e3a92826e48cede45276c0cb1a1be79';
 
+const CLIENT_READY_TIMEOUT_MS = 20_000;
+
+/**
+ * Mobile browsers freeze a backgrounded tab's websocket (e.g. while the user
+ * is in the wallet app approving). Restart the relay transport if it didn't
+ * survive, otherwise approvals and signatures never arrive.
+ */
+async function ensureRelayConnected(client: SignClient) {
+  if (client.core.relayer.connected) return;
+  try {
+    await client.core.relayer.restartTransport();
+  } catch (err) {
+    console.error('WalletConnect relay reconnect failed:', err);
+  }
+}
+
 export function WalletConnectProvider({ children }: { children: ReactNode }) {
   const [signClient, setSignClient] = useState<SignClient | null>(null);
   const [sessionTopic, setSessionTopic] = useState<string>('');
   const [isConnecting, setIsConnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
+  const clientPromiseRef = useRef<Promise<SignClient> | null>(null);
 
   useEffect(() => {
-    SignClient.init({
+    const initPromise = SignClient.init({
       projectId: WALLETCONNECT_PROJECT_ID,
       metadata: {
         name: 'QDOGE',
@@ -46,8 +63,15 @@ export function WalletConnectProvider({ children }: { children: ReactNode }) {
         url: 'https://qdogeonqubic.com',
         icons: ['https://qdogeonqubic.com/logo.png'],
       },
-    }).then((client) => {
+    });
+    clientPromiseRef.current = initPromise;
+    initPromise.then((client) => {
       setSignClient(client);
+      const adopt = (topic: string) => {
+        setSessionTopic(topic);
+        setIsConnected(true);
+        localStorage.setItem('qtreatStakingSessionTopic', topic);
+      };
       const storedTopic = localStorage.getItem('qtreatStakingSessionTopic');
       if (storedTopic) {
         try {
@@ -58,6 +82,19 @@ export function WalletConnectProvider({ children }: { children: ReactNode }) {
           localStorage.removeItem('qtreatStakingSessionTopic');
         }
       }
+      if (!localStorage.getItem('qtreatStakingSessionTopic')) {
+        // The wallet can approve while this page was reloaded or suspended (common
+        // in mobile webviews), so the approval handler that saves the topic never
+        // ran. The SDK still persisted the session -- pick it back up.
+        const existing = client.session
+          .getAll()
+          .filter((s) => s.acknowledged && s.namespaces.qubic && s.expiry * 1000 > Date.now())
+          .sort((a, b) => b.expiry - a.expiry)[0];
+        if (existing) adopt(existing.topic);
+      }
+      client.on('session_connect', ({ session }) => {
+        if (session.namespaces.qubic) adopt(session.topic);
+      });
       client.on('session_delete', () => {
         setSessionTopic('');
         setIsConnected(false);
@@ -68,8 +105,23 @@ export function WalletConnectProvider({ children }: { children: ReactNode }) {
         setIsConnected(false);
         localStorage.removeItem('qtreatStakingSessionTopic');
       });
+    }).catch((err) => {
+      console.error('WalletConnect failed to initialize:', err);
     });
   }, []);
+
+  useEffect(() => {
+    if (!signClient) return;
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void ensureRelayConnected(signClient);
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('online', onVisible);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('online', onVisible);
+    };
+  }, [signClient]);
 
   const getActiveSession = () => {
     const effectiveTopic = sessionTopic || localStorage.getItem('qtreatStakingSessionTopic') || '';
@@ -88,10 +140,19 @@ export function WalletConnectProvider({ children }: { children: ReactNode }) {
   };
 
   const connect = async (): Promise<{ uri: string; approve: () => Promise<void> }> => {
-    if (!signClient) return { uri: '', approve: async () => {} };
     setIsConnecting(true);
     try {
-      const { uri, approval } = await signClient.connect({
+      // A tap on "WalletConnect" can land before init finishes (slow mobile
+      // network) -- wait for it rather than handing back an empty link.
+      const client =
+        signClient ??
+        (await Promise.race([
+          clientPromiseRef.current,
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), CLIENT_READY_TIMEOUT_MS)),
+        ]));
+      if (!client) throw new Error('WalletConnect is not ready yet. Check your connection and try again.');
+      await ensureRelayConnected(client);
+      const { uri, approval } = await client.connect({
         requiredNamespaces: {
           qubic: {
             chains: ['qubic:mainnet'],
@@ -125,6 +186,7 @@ export function WalletConnectProvider({ children }: { children: ReactNode }) {
 
   const requestAccounts = async (): Promise<WalletConnectAccount[]> => {
     const { client, topic } = getActiveSession();
+    await ensureRelayConnected(client);
     return client.request({
       topic,
       chainId: 'qubic:mainnet',
@@ -134,6 +196,7 @@ export function WalletConnectProvider({ children }: { children: ReactNode }) {
 
   const signTransaction: WalletConnectContextType['signTransaction'] = async (params) => {
     const { client, topic } = getActiveSession();
+    await ensureRelayConnected(client);
     return client.request({
       topic,
       chainId: 'qubic:mainnet',

@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { AlertTriangle, FileKey2, KeyRound, Loader2, QrCode, X } from 'lucide-react';
+import { AlertTriangle, Check, Copy, FileKey2, KeyRound, Loader2, QrCode, X } from 'lucide-react';
 import { useQubicConnect } from './QubicConnectContext';
 import { useWalletConnect } from './WalletConnectContext';
 import { cn } from '@/lib/utils';
@@ -10,6 +10,29 @@ import { cn } from '@/lib/utils';
 type Mode = 'none' | 'walletconnect' | 'private-seed' | 'vault-file' | 'account-select';
 
 type Account = { publicId: string; alias?: string };
+
+async function copyText(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    // Clipboard API is unavailable or blocked (some mobile webviews) -- fall back to a hidden textarea.
+    try {
+      const el = document.createElement('textarea');
+      el.value = text;
+      el.setAttribute('readonly', '');
+      el.style.position = 'fixed';
+      el.style.opacity = '0';
+      document.body.appendChild(el);
+      el.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(el);
+      return ok;
+    } catch {
+      return false;
+    }
+  }
+}
 
 export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [mode, setMode] = useState<Mode>('none');
@@ -22,10 +45,12 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { connect, privateKeyConnect, vaultFileConnect } = useQubicConnect();
-  const { connect: wcConnect, isConnected: wcIsConnected, requestAccounts } = useWalletConnect();
+  const { connect: wcConnect, disconnect: wcDisconnect, isConnected: wcIsConnected, requestAccounts } = useWalletConnect();
 
   const [qrCode, setQrCode] = useState('');
   const [connectionUri, setConnectionUri] = useState('');
+  const [wcError, setWcError] = useState('');
+  const [copied, setCopied] = useState(false);
   const [accounts, setAccounts] = useState<Account[]>([]);
   // Which flow produced the current `accounts` list -- recorded once, at the
   // moment that flow succeeds, rather than re-derived from a live value at
@@ -45,30 +70,64 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
       setSeedError('');
       setQrCode('');
       setConnectionUri('');
+      setWcError('');
+      setCopied(false);
       setAccountSource(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   }, [open]);
 
+  const loadWalletConnectAccounts = async () => {
+    setWcError('');
+    try {
+      const accs = await requestAccounts();
+      setAccounts(accs.map((a) => ({ publicId: a.address, alias: a.name })));
+      setAccountSource('walletconnect');
+      setMode('account-select');
+    } catch (err) {
+      setWcError(
+        err instanceof Error && err.message
+          ? err.message
+          : 'The wallet did not respond. Open the Qubic Wallet app and try again.'
+      );
+    }
+  };
+
   useEffect(() => {
     if (wcIsConnected && mode === 'walletconnect') {
-      requestAccounts().then((accs) => {
-        setAccounts(accs.map((a) => ({ publicId: a.address, alias: a.name })));
-        setAccountSource('walletconnect');
-        setMode('account-select');
-      });
+      void loadWalletConnectAccounts();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wcIsConnected]);
 
   const generateUri = async () => {
-    const { uri, approve } = await wcConnect();
-    setConnectionUri(uri);
-    if (uri) {
-      const QRCode = (await import('qrcode')).default;
-      setQrCode(await QRCode.toDataURL(uri));
+    setWcError('');
+    setQrCode('');
+    setConnectionUri('');
+    setCopied(false);
+    try {
+      const { uri, approve } = await wcConnect();
+      setConnectionUri(uri);
+      if (uri) {
+        const QRCode = (await import('qrcode')).default;
+        setQrCode(await QRCode.toDataURL(uri));
+      }
+      await approve();
+    } catch (err) {
+      setWcError(
+        err instanceof Error && err.message
+          ? err.message
+          : 'The connection request expired or was declined. Generate a new code and try again.'
+      );
     }
-    await approve();
+  };
+
+  const handleCopy = async () => {
+    if (!connectionUri) return;
+    if (await copyText(connectionUri)) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const validateSeed = (value: string) => {
@@ -114,7 +173,9 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
             <button
               onClick={() => {
                 setMode('walletconnect');
-                void generateUri();
+                // A session may already exist (e.g. approved in the wallet while this
+                // page was reloaded) -- use it instead of pairing from scratch.
+                void (wcIsConnected ? loadWalletConnectAccounts() : generateUri());
               }}
               className="flex items-center gap-3 rounded-xl border border-cyan-400/30 bg-cyan-400/5 px-4 py-3 text-sm text-cyan-100 hover:border-cyan-400/60 hover:bg-cyan-400/10 transition-colors"
             >
@@ -158,7 +219,9 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
         {mode === 'walletconnect' && (
           <div className="flex flex-col items-center gap-4">
             <p className="text-sm text-muted-text text-center">
-              Scan with the Qubic Wallet app, or open it directly on this device.
+              {wcIsConnected && !wcError
+                ? 'Connected to your wallet. Open the Qubic Wallet app and approve the request to continue.'
+                : 'Scan with the Qubic Wallet app, or open it directly on this device.'}
             </p>
             <div className="flex h-56 w-56 items-center justify-center rounded-xl border border-border bg-white p-2">
               {qrCode ? (
@@ -167,13 +230,51 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
                 <Loader2 className="h-8 w-8 animate-spin text-black/40" />
               )}
             </div>
+            {/* location.href, not window.open: mobile browsers often leave a blank tab (or block it) for custom-scheme popups. */}
             <button
-              onClick={() => window.open(`qubic-wallet://pairwc/${connectionUri}`, '_blank')}
+              onClick={() => {
+                window.location.href = `qubic-wallet://pairwc/${connectionUri}`;
+              }}
               disabled={!connectionUri}
               className="w-full rounded-xl border border-cyan-400/40 bg-cyan-400/10 px-4 py-2.5 text-sm font-bold text-cyan-300 hover:bg-cyan-400/20 transition-colors disabled:opacity-40"
             >
               Open in Qubic Wallet
             </button>
+            <button
+              onClick={() => void handleCopy()}
+              disabled={!connectionUri}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-bold text-surface-foreground hover:bg-muted transition-colors disabled:opacity-40"
+            >
+              {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
+              {copied ? 'Link copied' : 'Copy link'}
+            </button>
+            {wcError ? (
+              <div className="w-full rounded-lg border border-red-400/30 bg-red-400/5 p-3">
+                <p className="text-xs text-red-300 leading-snug">{wcError}</p>
+                <div className="mt-2 flex gap-4">
+                  {wcIsConnected ? (
+                    <button
+                      onClick={() => void loadWalletConnectAccounts()}
+                      className="text-xs font-bold text-cyan-300 hover:text-cyan-200"
+                    >
+                      Try again
+                    </button>
+                  ) : null}
+                  <button
+                    onClick={() =>
+                      void (async () => {
+                        // A stale session (deleted wallet-side) would just time out again.
+                        if (wcIsConnected) await wcDisconnect().catch(() => {});
+                        await generateUri();
+                      })()
+                    }
+                    className="text-xs font-bold text-cyan-300 hover:text-cyan-200"
+                  >
+                    {wcIsConnected ? 'Start over' : 'Generate a new code'}
+                  </button>
+                </div>
+              </div>
+            ) : null}
             <button onClick={() => setMode('none')} className="text-xs text-muted-text hover:text-surface-foreground">
               Cancel
             </button>
