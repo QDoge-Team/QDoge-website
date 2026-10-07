@@ -51,6 +51,7 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
   const [connectionUri, setConnectionUri] = useState('');
   const [wcError, setWcError] = useState('');
   const [copied, setCopied] = useState(false);
+  const [wcSlow, setWcSlow] = useState(false);
   const [accounts, setAccounts] = useState<Account[]>([]);
   // Which flow produced the current `accounts` list -- recorded once, at the
   // moment that flow succeeds, rather than re-derived from a live value at
@@ -79,22 +80,13 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
 
   const loadWalletConnectAccounts = async () => {
     setWcError('');
+    setWcSlow(false);
+    // Don't abandon the request: the wallet may answer late (the user has to
+    // switch apps and approve), and a late answer must still complete the
+    // connection. After a while just surface the escape hatches.
+    const slowTimer = setTimeout(() => setWcSlow(true), 10_000);
     try {
-      // A stale session never answers; don't leave the user spinning for the SDK's 5-minute expiry.
-      const accs = await Promise.race([
-        requestAccounts(),
-        new Promise<never>((_, reject) =>
-          setTimeout(
-            () =>
-              reject(
-                new Error(
-                  'Your wallet did not respond. Open the Qubic Wallet app and approve, or start over with a new code.'
-                )
-              ),
-            15_000
-          )
-        ),
-      ]);
+      const accs = await requestAccounts();
       setAccounts(accs.map((a) => ({ publicId: a.address, alias: a.name })));
       setAccountSource('walletconnect');
       setMode('account-select');
@@ -104,6 +96,9 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
           ? err.message
           : 'The wallet did not respond. Open the Qubic Wallet app and try again.'
       );
+    } finally {
+      clearTimeout(slowTimer);
+      setWcSlow(false);
     }
   };
 
@@ -136,7 +131,8 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
     }
   };
 
-  const reusingSession = wcIsConnected && !connectionUri;
+  // Once the session exists the pairing QR/link is spent; what's left is waiting on the wallet to answer.
+  const waitingForWallet = wcIsConnected;
 
   const startOver = async () => {
     if (wcIsConnected) await wcDisconnect().catch(() => {});
@@ -245,19 +241,31 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
                 : 'Scan with the Qubic Wallet app, or open it directly on this device.'}
             </p>
             <div className="flex h-56 w-56 items-center justify-center rounded-xl border border-border bg-white p-2">
-              {qrCode ? (
+              {qrCode && !waitingForWallet ? (
                 <img src={qrCode} alt="WalletConnect QR code" className="h-full w-full" />
               ) : (
                 <Loader2 className="h-8 w-8 animate-spin text-black/40" />
               )}
             </div>
-            {reusingSession ? (
-              <button
-                onClick={() => void startOver()}
-                className="w-full rounded-xl border border-cyan-400/40 bg-cyan-400/10 px-4 py-2.5 text-sm font-bold text-cyan-300 hover:bg-cyan-400/20 transition-colors"
-              >
-                Start over with a new code
-              </button>
+            {waitingForWallet ? (
+              <>
+                <button
+                  onClick={() => {
+                    window.location.href = 'qubic-wallet://';
+                  }}
+                  className="w-full rounded-xl border border-cyan-400/40 bg-cyan-400/10 px-4 py-2.5 text-sm font-bold text-cyan-300 hover:bg-cyan-400/20 transition-colors"
+                >
+                  Open Qubic Wallet
+                </button>
+                {wcSlow && !wcError ? (
+                  <button
+                    onClick={() => void startOver()}
+                    className="w-full rounded-xl border border-border px-4 py-2.5 text-sm font-bold text-surface-foreground hover:bg-muted transition-colors"
+                  >
+                    Start over with a new code
+                  </button>
+                ) : null}
+              </>
             ) : (
               <>
                 {/* location.href, not window.open: mobile browsers often leave a blank tab (or block it) for custom-scheme popups. */}
