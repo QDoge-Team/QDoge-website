@@ -45,6 +45,8 @@ export const QTREAT_QX_TRANSFER_FEE = 100;
 export const QTREAT_PROGRESSIVE_MIN_STEP = 1_000_000;
 export const QTREAT_PROGRESSIVE_BONUS_PERMILLE = 25;
 export const QTREAT_PROGRESSIVE_MAX_STREAK = 20;
+/** Epochs after staking starts during which the streak stays at 0 (only the holdings high-water mark is tracked). */
+export const QTREAT_PROGRESSIVE_START_DELAY_EPOCHS = 4;
 
 export const QTREAT_STAKE_ASSET = { name: 'QDOGE', issuer: QDOGE_ISSUER_ID };
 export const QTREAT_BONUS_ASSET = { name: 'QTREAT', issuer: QDOGE_ISSUER_ID };

@@ -8,6 +8,7 @@ import {
   QTREAT_PROGRESSIVE_BONUS_PERMILLE,
   QTREAT_PROGRESSIVE_MAX_STREAK,
   QTREAT_PROGRESSIVE_MIN_STEP,
+  QTREAT_PROGRESSIVE_START_DELAY_EPOCHS,
   QTREAT_QX_TRANSFER_FEE,
   QTREAT_STAKE_ASSET,
   QTREAT_BONUS_ASSET,
@@ -381,6 +382,11 @@ export function StakingPageContent() {
                 const atMax = streak >= QTREAT_PROGRESSIVE_MAX_STREAK;
                 const bonusPct = (streak * QTREAT_PROGRESSIVE_BONUS_PERMILLE) / 10;
                 const maxBonusPct = (QTREAT_PROGRESSIVE_MAX_STREAK * QTREAT_PROGRESSIVE_BONUS_PERMILLE) / 10;
+                const streakStartEpoch =
+                  phase && phase.stakingStartEpoch > 0
+                    ? phase.stakingStartEpoch + QTREAT_PROGRESSIVE_START_DELAY_EPOCHS
+                    : null;
+                const streakNotStarted = streakStartEpoch != null && tick != null && tick.epoch < streakStartEpoch;
                 return (
                   <div className="mt-4 rounded-xl border border-orange-400/30 bg-orange-400/5 p-3.5">
                     <div className="flex items-center justify-between">
@@ -398,6 +404,21 @@ export function StakingPageContent() {
                         ? `Maxed out! You're earning +${maxBonusPct}% weight in every epoch's staking-fund payout -- keep growing your stake to hold it.`
                         : `Raise your total staked QDOGE by ${formatQu(QTREAT_PROGRESSIVE_MIN_STEP)}+ every epoch to build this streak -- each epoch adds +${QTREAT_PROGRESSIVE_BONUS_PERMILLE / 10}% weight in the qu staking-fund payout, up to +${maxBonusPct}% at a ${QTREAT_PROGRESSIVE_MAX_STREAK}-epoch streak. Skip an epoch's increase and it resets to 0.`}
                     </p>
+                    {!atMax ? (
+                      <ul className="mt-2 space-y-1 text-[11px] text-orange-200/70 font-mono leading-snug list-disc pl-4">
+                        <li>
+                          Must be newly acquired QDOGE: your total holdings (staked + unstaking + QX-managed wallet
+                          balance) have to reach a new all-time high. Moving QDOGE you already hold into the stake, or
+                          unstaking and re-staking it, doesn&apos;t count and resets the streak.
+                        </li>
+                        {streakNotStarted ? (
+                          <li>
+                            Streak counting starts at epoch {streakStartEpoch} (the first{' '}
+                            {QTREAT_PROGRESSIVE_START_DELAY_EPOCHS} epochs after staking opened are a warm-up).
+                          </li>
+                        ) : null}
+                      </ul>
+                    ) : null}
                   </div>
                 );
               })()}
@@ -417,7 +438,7 @@ export function StakingPageContent() {
                       inputMode="numeric"
                       value={formatAmountInput(stakeAmount)}
                       onChange={(e) => setStakeAmount(parseAmountInput(e.target.value))}
-                      placeholder={formatQu(QTREAT_MIN_STAKE)}
+                      placeholder={formatQu((staking?.staked ?? 0) > 0 ? QTREAT_PROGRESSIVE_MIN_STEP : QTREAT_MIN_STAKE)}
                       className="flex-1 rounded-lg border border-border bg-surface/50 px-3 py-2 text-sm text-surface-foreground font-mono outline-none focus:border-cyan-400/50"
                     />
                     <button
@@ -425,7 +446,11 @@ export function StakingPageContent() {
                         busy ||
                         !isLive ||
                         !stakeAmount ||
-                        Number(stakeAmount) < QTREAT_MIN_STAKE ||
+                        // Mirrors PRE_ACQUIRE_SHARES: the 10M minimum applies to the
+                        // resulting total, so existing stakers can top up by less.
+                        (staking?.staked ?? 0) + Number(stakeAmount) < QTREAT_MIN_STAKE ||
+                        // The contract refuses new stake while an unstake is pending.
+                        (staking?.unstakeAmount ?? 0) > 0 ||
                         (qxManagedQdoge != null && Number(stakeAmount) > qxManagedQdoge)
                       }
                       onClick={() => {
