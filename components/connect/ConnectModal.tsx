@@ -45,7 +45,13 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { connect, privateKeyConnect, vaultFileConnect } = useQubicConnect();
-  const { connect: wcConnect, disconnect: wcDisconnect, isConnected: wcIsConnected, requestAccounts } = useWalletConnect();
+  const {
+    connect: wcConnect,
+    disconnect: wcDisconnect,
+    isConnected: wcIsConnected,
+    requestAccounts,
+    getSessionInfo,
+  } = useWalletConnect();
 
   const [qrCode, setQrCode] = useState('');
   const [connectionUri, setConnectionUri] = useState('');
@@ -235,18 +241,42 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
 
         {mode === 'walletconnect' && (
           <div className="flex flex-col items-center gap-4">
-            <p className="text-sm text-muted-text text-center">
-              {wcIsConnected && !wcError
-                ? 'Connected to your wallet. Open the Qubic Wallet app and approve the request to continue.'
-                : 'Scan with the Qubic Wallet app, or open it directly on this device.'}
-            </p>
-            <div className="flex h-56 w-56 items-center justify-center rounded-xl border border-border bg-white p-2">
-              {qrCode && !waitingForWallet ? (
-                <img src={qrCode} alt="WalletConnect QR code" className="h-full w-full" />
-              ) : (
-                <Loader2 className="h-8 w-8 animate-spin text-black/40" />
-              )}
-            </div>
+            {waitingForWallet ? (
+              <div className="w-full rounded-xl border border-cyan-400/25 bg-cyan-400/5 p-4">
+                <div className="flex items-center gap-2 text-sm font-bold text-cyan-300">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Waiting for your wallet
+                </div>
+                <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-xs text-muted-text leading-snug">
+                  <li>Open the Qubic Wallet app.</li>
+                  <li>Approve the request to share your accounts.</li>
+                  <li>Come back to this page. It continues on its own.</li>
+                </ol>
+                {wcSlow && !wcError ? (
+                  <p className="mt-3 text-[10px] text-muted-text/80">
+                    {(() => {
+                      const info = getSessionInfo();
+                      return info
+                        ? `Still waiting · relay ${info.relayConnected ? 'connected' : 'disconnected'} · ${info.sharedAccounts} account(s) in session`
+                        : 'Still waiting · no active session';
+                    })()}
+                  </p>
+                ) : null}
+              </div>
+            ) : (
+              <>
+                <p className="text-sm text-muted-text text-center">
+                  Scan with the Qubic Wallet app, or open it directly on this device.
+                </p>
+                <div className="flex h-56 w-56 items-center justify-center rounded-xl border border-border bg-white p-2">
+                  {qrCode ? (
+                    <img src={qrCode} alt="WalletConnect QR code" className="h-full w-full" />
+                  ) : (
+                    <Loader2 className="h-8 w-8 animate-spin text-black/40" />
+                  )}
+                </div>
+              </>
+            )}
             {waitingForWallet ? (
               <>
                 <button

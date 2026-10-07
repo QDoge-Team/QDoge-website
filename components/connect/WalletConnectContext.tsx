@@ -11,6 +11,8 @@ interface WalletConnectContextType {
   connect: () => Promise<{ uri: string; approve: () => Promise<void> }>;
   disconnect: () => Promise<void>;
   requestAccounts: () => Promise<WalletConnectAccount[]>;
+  /** For troubleshooting a stuck connect: relay state and how many accounts the wallet put in the session itself. */
+  getSessionInfo: () => { relayConnected: boolean; sharedAccounts: number } | null;
   signTransaction: (params: {
     from: string;
     to: string;
@@ -194,6 +196,18 @@ export function WalletConnectProvider({ children }: { children: ReactNode }) {
     }) as Promise<WalletConnectAccount[]>;
   };
 
+  const getSessionInfo = () => {
+    const topic = sessionTopic || localStorage.getItem('qtreatStakingSessionTopic') || '';
+    if (!signClient || !topic) return null;
+    let sharedAccounts = 0;
+    try {
+      sharedAccounts = signClient.session.get(topic).namespaces.qubic?.accounts?.length ?? 0;
+    } catch {
+      // session already gone
+    }
+    return { relayConnected: signClient.core.relayer.connected, sharedAccounts };
+  };
+
   const signTransaction: WalletConnectContextType['signTransaction'] = async (params) => {
     const { client, topic } = getActiveSession();
     await ensureRelayConnected(client);
@@ -209,7 +223,7 @@ export function WalletConnectProvider({ children }: { children: ReactNode }) {
 
   return (
     <WalletConnectContext.Provider
-      value={{ isConnecting, isConnected, connect, disconnect, requestAccounts, signTransaction }}
+      value={{ isConnecting, isConnected, connect, disconnect, requestAccounts, getSessionInfo, signTransaction }}
     >
       {children}
     </WalletConnectContext.Provider>
