@@ -60,6 +60,12 @@ function parseAmountInput(value: string): string {
 }
 
 const TICK_OFFSET = 40;
+// A WalletConnect signature needs a human to switch apps and approve, which on
+// a phone routinely takes longer than TICK_OFFSET ticks (~0.85s each, measured
+// 2026-10) -- the target tick would already be in the past by the time the
+// signed tx comes back and it would never execute.
+const WALLETCONNECT_TICK_OFFSET = 100;
+const TICK_SECONDS = 1;
 
 function StatCard({
   label,
@@ -96,9 +102,8 @@ function StatCard({
 
 type ActionState = { status: 'idle' | 'signing' | 'broadcasting' | 'confirming' | 'ok' | 'error'; message?: string };
 
-async function pollTxStatus(txId: string, onDone: (ok: boolean) => void) {
+async function pollTxStatus(txId: string, onDone: (ok: boolean) => void, timeoutMs = 45_000) {
   const start = Date.now();
-  const timeoutMs = 45_000;
   const tick = async () => {
     const status = await fetchTxStatus(txId);
     if (status?.moneyFlew) return onDone(true);
@@ -197,13 +202,17 @@ export function StakingPageContent() {
       setAction({ status: 'signing', message: `Sign the ${label} transaction in your wallet…` });
       try {
         const t = await fetchTickInfo();
-        const targetTick = t.tick + TICK_OFFSET;
+        const targetTick =
+          t.tick + (wallet.connectType === 'walletconnect' ? WALLETCONNECT_TICK_OFFSET : TICK_OFFSET);
         const tx = await build(wallet.publicKey, targetTick);
         const { tx: signed } = await getSignedTx(tx);
         setAction({ status: 'broadcasting', message: 'Broadcasting transaction…' });
         const result = await broadcastTx(signed);
         if (!result.transactionId) throw new Error('Broadcast did not return a transaction ID');
         setAction({ status: 'confirming', message: `Waiting for tick ${targetTick} to confirm…` });
+        // The tx only executes at its target tick, so the poll window has to
+        // outlast however many ticks are still left until then.
+        const ticksLeft = Math.max(0, targetTick - (await fetchTickInfo()).tick);
         pollTxStatus(result.transactionId, async (ok) => {
           if (!ok) {
             setAction({ status: 'error', message: `${label} did not confirm in time. Check the explorer before retrying.` });
@@ -219,7 +228,7 @@ export function StakingPageContent() {
           }
           void loadWalletInfo();
           void loadContractInfo();
-        });
+        }, Math.max(45_000, (ticksLeft * TICK_SECONDS + 30) * 1000));
       } catch (err) {
         setAction({ status: 'error', message: err instanceof Error ? err.message : String(err) });
       }
@@ -526,7 +535,19 @@ export function StakingPageContent() {
                     ) : (
                       <AlertCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
                     )}
-                    <span>{action.message}</span>
+                    <div className="flex flex-col items-start gap-2">
+                      <span>{action.message}</span>
+                      {action.status === 'signing' && wallet?.connectType === 'walletconnect' ? (
+                        <button
+                          onClick={() => {
+                            window.location.href = 'qubic-wallet://';
+                          }}
+                          className="rounded-md border border-cyan-400/40 bg-cyan-400/10 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-cyan-300 hover:bg-cyan-400/20"
+                        >
+                          Open Qubic Wallet
+                        </button>
+                      ) : null}
+                    </div>
                   </div>
                 ) : null}
               </div>
