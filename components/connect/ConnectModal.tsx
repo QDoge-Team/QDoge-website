@@ -80,7 +80,21 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
   const loadWalletConnectAccounts = async () => {
     setWcError('');
     try {
-      const accs = await requestAccounts();
+      // A stale session never answers; don't leave the user spinning for the SDK's 5-minute expiry.
+      const accs = await Promise.race([
+        requestAccounts(),
+        new Promise<never>((_, reject) =>
+          setTimeout(
+            () =>
+              reject(
+                new Error(
+                  'Your wallet did not respond. Open the Qubic Wallet app and approve, or start over with a new code.'
+                )
+              ),
+            15_000
+          )
+        ),
+      ]);
       setAccounts(accs.map((a) => ({ publicId: a.address, alias: a.name })));
       setAccountSource('walletconnect');
       setMode('account-select');
@@ -120,6 +134,13 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
           : 'The connection request expired or was declined. Generate a new code and try again.'
       );
     }
+  };
+
+  const reusingSession = wcIsConnected && !connectionUri;
+
+  const startOver = async () => {
+    if (wcIsConnected) await wcDisconnect().catch(() => {});
+    await generateUri();
   };
 
   const handleCopy = async () => {
@@ -230,24 +251,35 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
                 <Loader2 className="h-8 w-8 animate-spin text-black/40" />
               )}
             </div>
-            {/* location.href, not window.open: mobile browsers often leave a blank tab (or block it) for custom-scheme popups. */}
-            <button
-              onClick={() => {
-                window.location.href = `qubic-wallet://pairwc/${connectionUri}`;
-              }}
-              disabled={!connectionUri}
-              className="w-full rounded-xl border border-cyan-400/40 bg-cyan-400/10 px-4 py-2.5 text-sm font-bold text-cyan-300 hover:bg-cyan-400/20 transition-colors disabled:opacity-40"
-            >
-              Open in Qubic Wallet
-            </button>
-            <button
-              onClick={() => void handleCopy()}
-              disabled={!connectionUri}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-bold text-surface-foreground hover:bg-muted transition-colors disabled:opacity-40"
-            >
-              {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
-              {copied ? 'Link copied' : 'Copy link'}
-            </button>
+            {reusingSession ? (
+              <button
+                onClick={() => void startOver()}
+                className="w-full rounded-xl border border-cyan-400/40 bg-cyan-400/10 px-4 py-2.5 text-sm font-bold text-cyan-300 hover:bg-cyan-400/20 transition-colors"
+              >
+                Start over with a new code
+              </button>
+            ) : (
+              <>
+                {/* location.href, not window.open: mobile browsers often leave a blank tab (or block it) for custom-scheme popups. */}
+                <button
+                  onClick={() => {
+                    window.location.href = `qubic-wallet://pairwc/${connectionUri}`;
+                  }}
+                  disabled={!connectionUri}
+                  className="w-full rounded-xl border border-cyan-400/40 bg-cyan-400/10 px-4 py-2.5 text-sm font-bold text-cyan-300 hover:bg-cyan-400/20 transition-colors disabled:opacity-40"
+                >
+                  Open in Qubic Wallet
+                </button>
+                <button
+                  onClick={() => void handleCopy()}
+                  disabled={!connectionUri}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-bold text-surface-foreground hover:bg-muted transition-colors disabled:opacity-40"
+                >
+                  {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
+                  {copied ? 'Link copied' : 'Copy link'}
+                </button>
+              </>
+            )}
             {wcError ? (
               <div className="w-full rounded-lg border border-red-400/30 bg-red-400/5 p-3">
                 <p className="text-xs text-red-300 leading-snug">{wcError}</p>
@@ -261,13 +293,7 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
                     </button>
                   ) : null}
                   <button
-                    onClick={() =>
-                      void (async () => {
-                        // A stale session (deleted wallet-side) would just time out again.
-                        if (wcIsConnected) await wcDisconnect().catch(() => {});
-                        await generateUri();
-                      })()
-                    }
+                    onClick={() => void startOver()}
                     className="text-xs font-bold text-cyan-300 hover:text-cyan-200"
                   >
                     {wcIsConnected ? 'Start over' : 'Generate a new code'}
