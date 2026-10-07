@@ -25,6 +25,35 @@
   --electric-blue: #0080ff;
 }
 
+/*
+ * Not `inline`: with `@theme inline` Tailwind bakes the literal value into each
+ * utility (e.g. `border-border` -> #e2e8f0), so the `.dark` overrides below
+ * would never apply. Plain `@theme` keeps utilities pointing at the variable.
+ */
+@theme {
+  /* Border and Ring Colors for Tailwind v4 */
+  --color-border: hsl(214.3 31.8% 91.4%);
+  --color-ring: hsl(222.2 84% 4.9%);
+
+  /* Additional Tailwind CSS variables for Magic UI */
+  --color-muted: hsl(210 40% 98%);
+  --color-muted-foreground: hsl(215.4 16.3% 46.9%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(222.2 84% 4.9%);
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(222.2 84% 4.9%);
+  --color-primary: hsl(222.2 47.4% 11.2%);
+  --color-primary-foreground: hsl(210 40% 98%);
+  --color-secondary: hsl(210 40% 96%);
+  --color-secondary-foreground: hsl(222.2 84% 4.9%);
+  --color-accent: hsl(210 40% 96%);
+  --color-accent-foreground: hsl(222.2 84% 4.9%);
+  --color-destructive: hsl(0 84.2% 60.2%);
+  --color-destructive-foreground: hsl(210 40% 98%);
+  --color-input: hsl(214.3 31.8% 91.4%);
+  --radius: 0.5rem;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -49,27 +78,6 @@
   --color-neon-green: var(--neon-green);
   --color-electric-blue: var(--electric-blue);
 
-  /* Border and Ring Colors for Tailwind v4 */
-  --color-border: hsl(214.3 31.8% 91.4%);
-  --color-ring: hsl(222.2 84% 4.9%);
-
-  /* Additional Tailwind CSS variables for Magic UI */
-  --color-muted: hsl(210 40% 98%);
-  --color-muted-foreground: hsl(215.4 16.3% 46.9%);
-  --color-card: hsl(0 0% 100%);
-  --color-card-foreground: hsl(222.2 84% 4.9%);
-  --color-popover: hsl(0 0% 100%);
-  --color-popover-foreground: hsl(222.2 84% 4.9%);
-  --color-primary: hsl(222.2 47.4% 11.2%);
-  --color-primary-foreground: hsl(210 40% 98%);
-  --color-secondary: hsl(210 40% 96%);
-  --color-secondary-foreground: hsl(222.2 84% 4.9%);
-  --color-accent: hsl(210 40% 96%);
-  --color-accent-foreground: hsl(222.2 84% 4.9%);
-  --color-destructive: hsl(0 84.2% 60.2%);
-  --color-destructive-foreground: hsl(210 40% 98%);
-  --color-input: hsl(214.3 31.8% 91.4%);
-  --radius: 0.5rem;
   @keyframes rainbow {
   0% {
     background-position: 0%;
