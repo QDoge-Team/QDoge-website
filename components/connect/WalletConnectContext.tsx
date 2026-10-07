@@ -67,6 +67,11 @@ export function WalletConnectProvider({ children }: { children: ReactNode }) {
     clientPromiseRef.current = initPromise;
     initPromise.then((client) => {
       setSignClient(client);
+      const adopt = (topic: string) => {
+        setSessionTopic(topic);
+        setIsConnected(true);
+        localStorage.setItem('qtreatStakingSessionTopic', topic);
+      };
       const storedTopic = localStorage.getItem('qtreatStakingSessionTopic');
       if (storedTopic) {
         try {
@@ -77,6 +82,19 @@ export function WalletConnectProvider({ children }: { children: ReactNode }) {
           localStorage.removeItem('qtreatStakingSessionTopic');
         }
       }
+      if (!localStorage.getItem('qtreatStakingSessionTopic')) {
+        // The wallet can approve while this page was reloaded or suspended (common
+        // in mobile webviews), so the approval handler that saves the topic never
+        // ran. The SDK still persisted the session -- pick it back up.
+        const existing = client.session
+          .getAll()
+          .filter((s) => s.acknowledged && s.namespaces.qubic && s.expiry * 1000 > Date.now())
+          .sort((a, b) => b.expiry - a.expiry)[0];
+        if (existing) adopt(existing.topic);
+      }
+      client.on('session_connect', ({ session }) => {
+        if (session.namespaces.qubic) adopt(session.topic);
+      });
       client.on('session_delete', () => {
         setSessionTopic('');
         setIsConnected(false);

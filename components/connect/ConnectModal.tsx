@@ -45,7 +45,7 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { connect, privateKeyConnect, vaultFileConnect } = useQubicConnect();
-  const { connect: wcConnect, isConnected: wcIsConnected, requestAccounts } = useWalletConnect();
+  const { connect: wcConnect, disconnect: wcDisconnect, isConnected: wcIsConnected, requestAccounts } = useWalletConnect();
 
   const [qrCode, setQrCode] = useState('');
   const [connectionUri, setConnectionUri] = useState('');
@@ -173,7 +173,9 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
             <button
               onClick={() => {
                 setMode('walletconnect');
-                void generateUri();
+                // A session may already exist (e.g. approved in the wallet while this
+                // page was reloaded) -- use it instead of pairing from scratch.
+                void (wcIsConnected ? loadWalletConnectAccounts() : generateUri());
               }}
               className="flex items-center gap-3 rounded-xl border border-cyan-400/30 bg-cyan-400/5 px-4 py-3 text-sm text-cyan-100 hover:border-cyan-400/60 hover:bg-cyan-400/10 transition-colors"
             >
@@ -217,7 +219,9 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
         {mode === 'walletconnect' && (
           <div className="flex flex-col items-center gap-4">
             <p className="text-sm text-muted-text text-center">
-              Scan with the Qubic Wallet app, or open it directly on this device.
+              {wcIsConnected && !wcError
+                ? 'Connected to your wallet. Open the Qubic Wallet app and approve the request to continue.'
+                : 'Scan with the Qubic Wallet app, or open it directly on this device.'}
             </p>
             <div className="flex h-56 w-56 items-center justify-center rounded-xl border border-border bg-white p-2">
               {qrCode ? (
@@ -247,12 +251,28 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
             {wcError ? (
               <div className="w-full rounded-lg border border-red-400/30 bg-red-400/5 p-3">
                 <p className="text-xs text-red-300 leading-snug">{wcError}</p>
-                <button
-                  onClick={() => void (wcIsConnected ? loadWalletConnectAccounts() : generateUri())}
-                  className="mt-2 text-xs font-bold text-cyan-300 hover:text-cyan-200"
-                >
-                  {wcIsConnected ? 'Try again' : 'Generate a new code'}
-                </button>
+                <div className="mt-2 flex gap-4">
+                  {wcIsConnected ? (
+                    <button
+                      onClick={() => void loadWalletConnectAccounts()}
+                      className="text-xs font-bold text-cyan-300 hover:text-cyan-200"
+                    >
+                      Try again
+                    </button>
+                  ) : null}
+                  <button
+                    onClick={() =>
+                      void (async () => {
+                        // A stale session (deleted wallet-side) would just time out again.
+                        if (wcIsConnected) await wcDisconnect().catch(() => {});
+                        await generateUri();
+                      })()
+                    }
+                    className="text-xs font-bold text-cyan-300 hover:text-cyan-200"
+                  >
+                    {wcIsConnected ? 'Start over' : 'Generate a new code'}
+                  </button>
+                </div>
               </div>
             ) : null}
             <button onClick={() => setMode('none')} className="text-xs text-muted-text hover:text-surface-foreground">
