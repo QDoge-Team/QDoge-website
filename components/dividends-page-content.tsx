@@ -1,5 +1,6 @@
 'use client';
 
+import { TreasuryHoldings } from '@/components/treasury-holdings';
 import { MagicCard } from '@/components/ui/magic-card';
 import {
   DIVIDEND_PROJECTS,
@@ -316,6 +317,8 @@ export function DividendsPageContent() {
             gradientFrom='rgba(34, 197, 94, 0.2)'
           />
         </div>
+
+        <TreasuryHoldings />
 
         <div className='rounded-2xl border border-cyan-400/20 bg-surface/50 p-4 sm:p-6 backdrop-blur-sm mb-10'>
           <div className='mb-4'>
