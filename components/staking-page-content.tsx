@@ -61,11 +61,12 @@ function parseAmountInput(value: string): string {
 }
 
 const TICK_OFFSET = 40;
-// A WalletConnect signature needs a human to switch apps and approve, which on
-// a phone routinely takes longer than TICK_OFFSET ticks (~0.85s each, measured
-// 2026-10) -- the target tick would already be in the past by the time the
-// signed tx comes back and it would never execute.
-const WALLETCONNECT_TICK_OFFSET = 100;
+// A WalletConnect signature needs a human to switch apps and approve, so it
+// gets a longer window than TICK_OFFSET. Tick speed varies (~0.5-0.85s each,
+// measured 2026-10); if the approval takes longer than this the target tick is
+// already in the past by the time the signed tx comes back and it never
+// executes.
+const WALLETCONNECT_TICK_OFFSET = 50;
 const TICK_SECONDS = 1;
 
 function StatCard({
