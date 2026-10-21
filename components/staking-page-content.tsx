@@ -27,6 +27,7 @@ import {
   type StakingInfo,
 } from '@/lib/qubic/qtreat-contract';
 import { broadcastTx, fetchAssetBalance, fetchTickInfo, fetchTxStatus, type TickInfo } from '@/lib/qubic/rpc';
+import { inspectSignedTx } from '@/lib/qubic/tx-inspect';
 import { cn } from '@/lib/utils';
 import {
   AlertCircle,
@@ -102,7 +103,11 @@ function StatCard({
   );
 }
 
-type ActionState = { status: 'idle' | 'signing' | 'broadcasting' | 'confirming' | 'ok' | 'error'; message?: string };
+type ActionState = {
+  status: 'idle' | 'signing' | 'broadcasting' | 'confirming' | 'ok' | 'error';
+  message?: string;
+  txId?: string;
+};
 
 async function pollTxStatus(txId: string, onDone: (ok: boolean) => void, timeoutMs = 45_000) {
   const start = Date.now();
@@ -208,25 +213,66 @@ export function StakingPageContent() {
           t.tick + (wallet.connectType === 'walletconnect' ? WALLETCONNECT_TICK_OFFSET : TICK_OFFSET);
         const tx = await build(wallet.publicKey, targetTick);
         const { tx: signed } = await getSignedTx(tx);
+
+        // A node silently drops a transaction it can't validate, so catch a bad
+        // wallet response here instead of broadcasting something that can never land.
+        const info = inspectSignedTx(signed);
+        if (info.length !== info.expectedLength) {
+          throw new Error(
+            `The wallet returned a malformed transaction (${info.length} bytes, expected ${info.expectedLength}). Nothing was sent.`
+          );
+        }
+        if (info.signatureIsZero) {
+          throw new Error('The wallet returned an unsigned transaction. Nothing was sent.');
+        }
+        // The tx executes at the tick baked into the signed bytes, which is what the wallet
+        // actually signed -- trust that over the value we asked for.
+        const executeTick = info.tick;
+
         setAction({ status: 'broadcasting', message: 'Broadcasting transaction…' });
         const result = await broadcastTx(signed);
         if (!result.transactionId) throw new Error('Broadcast did not return a transaction ID');
-        setAction({ status: 'confirming', message: `Waiting for tick ${targetTick} to confirm…` });
+        if (result.peersBroadcasted === 0) {
+          throw new Error('The network did not relay the transaction to any peers. Nothing was sent; please try again.');
+        }
+        console.info('[staking] broadcast', {
+          label,
+          txId: result.transactionId,
+          peers: result.peersBroadcasted,
+          askedTick: targetTick,
+          signedTick: executeTick,
+          inputType: info.inputType,
+          amount: info.amount.toString(),
+        });
+        const txId = result.transactionId;
+        setAction({
+          status: 'confirming',
+          txId,
+          message: `Broadcast to ${result.peersBroadcasted ?? '?'} peers. Waiting for tick ${executeTick} to confirm…`,
+        });
         // The tx only executes at its target tick, so the poll window has to
         // outlast however many ticks are still left until then.
-        const ticksLeft = Math.max(0, targetTick - (await fetchTickInfo()).tick);
-        pollTxStatus(result.transactionId, async (ok) => {
+        const ticksLeft = Math.max(0, executeTick - (await fetchTickInfo()).tick);
+        pollTxStatus(txId, async (ok) => {
           if (!ok) {
-            setAction({ status: 'error', message: `${label} did not confirm in time. Check the explorer before retrying.` });
+            const now = await fetchTickInfo().then((r) => r.tick).catch(() => null);
+            setAction({
+              status: 'error',
+              txId,
+              message:
+                now != null && now > executeTick
+                  ? `${label} was not included at tick ${executeTick} (the network is now at ${now}), so it expired and nothing happened. Please try again.`
+                  : `${label} had not confirmed after waiting. Check the transaction link before retrying.`,
+            });
           } else if (verify) {
             const verification = await verify();
             setAction(
               verification.ok
-                ? { status: 'ok', message: `${label} confirmed.` }
-                : { status: 'error', message: verification.message }
+                ? { status: 'ok', txId, message: `${label} confirmed.` }
+                : { status: 'error', txId, message: verification.message }
             );
           } else {
-            setAction({ status: 'ok', message: `${label} confirmed.` });
+            setAction({ status: 'ok', txId, message: `${label} confirmed.` });
           }
           void loadWalletInfo();
           void loadContractInfo();
@@ -563,6 +609,16 @@ export function StakingPageContent() {
                     )}
                     <div className="flex flex-col items-start gap-2">
                       <span>{action.message}</span>
+                      {action.txId ? (
+                        <a
+                          href={`https://explorer.qubic.org/network/tx/${action.txId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="break-all text-[11px] underline opacity-80 hover:opacity-100"
+                        >
+                          Tx {action.txId.slice(0, 12)}… · view on explorer
+                        </a>
+                      ) : null}
                       {action.status === 'signing' && wallet?.connectType === 'walletconnect' ? (
                         <button
                           onClick={() => {
