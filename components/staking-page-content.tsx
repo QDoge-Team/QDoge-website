@@ -27,6 +27,8 @@ import {
   type StakingInfo,
 } from '@/lib/qubic/qtreat-contract';
 import { broadcastTx, fetchAssetBalance, fetchTickInfo, fetchTxStatus, type TickInfo } from '@/lib/qubic/rpc';
+import { prewarmGlyphSession } from '@/lib/glyph/client';
+import { useGlyphState } from '@/lib/glyph/use-glyph-state';
 import { inspectSignedTx } from '@/lib/qubic/tx-inspect';
 import { cn } from '@/lib/utils';
 import {
@@ -121,7 +123,7 @@ async function pollTxStatus(txId: string, onDone: (ok: boolean) => void, timeout
 }
 
 export function StakingPageContent() {
-  const { connected, wallet, getSignedTx } = useQubicConnect();
+  const { connected, wallet, getSignedTx, sendViaGlyph } = useQubicConnect();
 
   const [phase, setPhase] = useState<PhaseInfo | null>(null);
   const [funds, setFunds] = useState<FundsInfo | null>(null);
@@ -206,6 +208,55 @@ export function StakingPageContent() {
       verify?: () => Promise<{ ok: boolean; message: string }>
     ) => {
       if (!wallet) return;
+
+      // Shared by every wallet: watch the tx until it confirms (or its tick passes).
+      const waitForConfirmation = async (txId: string, executeTick: number, sentMessage: string) => {
+        setAction({ status: 'confirming', txId, message: `${sentMessage} Waiting for tick ${executeTick} to confirm…` });
+        // The tx only executes at its target tick, so the poll window has to
+        // outlast however many ticks are still left until then.
+        const ticksLeft = Math.max(0, executeTick - (await fetchTickInfo()).tick);
+        pollTxStatus(txId, async (ok) => {
+          if (!ok) {
+            const now = await fetchTickInfo().then((r) => r.tick).catch(() => null);
+            setAction({
+              status: 'error',
+              txId,
+              message:
+                now != null && now > executeTick
+                  ? `${label} was not included at tick ${executeTick} (the network is now at ${now}), so it expired and nothing happened. Please try again.`
+                  : `${label} had not confirmed after waiting. Check the transaction link before retrying.`,
+            });
+          } else if (verify) {
+            const verification = await verify();
+            setAction(
+              verification.ok
+                ? { status: 'ok', txId, message: `${label} confirmed.` }
+                : { status: 'error', txId, message: verification.message }
+            );
+          } else {
+            setAction({ status: 'ok', txId, message: `${label} confirmed.` });
+          }
+          void loadWalletInfo();
+          void loadContractInfo();
+        }, Math.max(45_000, (ticksLeft * TICK_SECONDS + 30) * 1000));
+      };
+
+      // Glyph Wallet signs AND broadcasts itself, and picks the tick when the user
+      // approves, so there is no tick to expire and nothing for us to broadcast.
+      // The wallet launch must stay inside the click, so no network work before it.
+      if (wallet.connectType === 'glyph') {
+        setAction({ status: 'signing', message: `Approve the ${label} request in Glyph Wallet…` });
+        try {
+          const tx = await build(wallet.publicKey, 0);
+          const { txId, targetTick } = await sendViaGlyph(tx);
+          console.info('[staking] glyph sent', { label, txId, targetTick });
+          await waitForConfirmation(txId, targetTick, 'Sent by Glyph Wallet.');
+        } catch (err) {
+          setAction({ status: 'error', message: err instanceof Error ? err.message : String(err) });
+        }
+        return;
+      }
+
       setAction({ status: 'signing', message: `Sign the ${label} transaction in your wallet…` });
       try {
         const t = await fetchTickInfo();
@@ -244,44 +295,16 @@ export function StakingPageContent() {
           inputType: info.inputType,
           amount: info.amount.toString(),
         });
-        const txId = result.transactionId;
-        setAction({
-          status: 'confirming',
-          txId,
-          message: `Broadcast to ${result.peersBroadcasted ?? '?'} peers. Waiting for tick ${executeTick} to confirm…`,
-        });
-        // The tx only executes at its target tick, so the poll window has to
-        // outlast however many ticks are still left until then.
-        const ticksLeft = Math.max(0, executeTick - (await fetchTickInfo()).tick);
-        pollTxStatus(txId, async (ok) => {
-          if (!ok) {
-            const now = await fetchTickInfo().then((r) => r.tick).catch(() => null);
-            setAction({
-              status: 'error',
-              txId,
-              message:
-                now != null && now > executeTick
-                  ? `${label} was not included at tick ${executeTick} (the network is now at ${now}), so it expired and nothing happened. Please try again.`
-                  : `${label} had not confirmed after waiting. Check the transaction link before retrying.`,
-            });
-          } else if (verify) {
-            const verification = await verify();
-            setAction(
-              verification.ok
-                ? { status: 'ok', txId, message: `${label} confirmed.` }
-                : { status: 'error', txId, message: verification.message }
-            );
-          } else {
-            setAction({ status: 'ok', txId, message: `${label} confirmed.` });
-          }
-          void loadWalletInfo();
-          void loadContractInfo();
-        }, Math.max(45_000, (ticksLeft * TICK_SECONDS + 30) * 1000));
+        await waitForConfirmation(
+          result.transactionId,
+          executeTick,
+          `Broadcast to ${result.peersBroadcasted ?? '?'} peers.`
+        );
       } catch (err) {
         setAction({ status: 'error', message: err instanceof Error ? err.message : String(err) });
       }
     },
-    [wallet, getSignedTx, loadWalletInfo, loadContractInfo]
+    [wallet, getSignedTx, sendViaGlyph, loadWalletInfo, loadContractInfo]
   );
 
   // Mirrors FinalizeUnstake's own guard (qpi.epoch() < unstakeEpoch + QTREAT_UNSTAKE_DELAY_EPOCHS -> revert).
@@ -292,6 +315,14 @@ export function StakingPageContent() {
     tick.epoch >= staking.unstakeEpoch + QTREAT_UNSTAKE_DELAY_EPOCHS;
 
   const busy = action.status === 'signing' || action.status === 'broadcasting' || action.status === 'confirming';
+  // Glyph needs a single-use relay session registered before the click that opens the wallet.
+  const glyph = useGlyphState();
+  const isGlyph = wallet?.connectType === 'glyph';
+  const actionsLocked = busy || (isGlyph && !glyph.ready);
+
+  useEffect(() => {
+    if (isGlyph) void prewarmGlyphSession();
+  }, [isGlyph]);
   // The contract is in its IPO phase until it activates -- until then every
   // querySmartContract read comes back empty, not with real zeros.
   const isLive = phase !== null || funds !== null;
@@ -483,6 +514,25 @@ export function StakingPageContent() {
             {/* Actions */}
             <div className="rounded-2xl border border-border bg-surface/50 p-5 sm:p-6 backdrop-blur-sm">
               <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-muted-text mb-4">Actions</h2>
+              {isGlyph ? (
+                <p className="-mt-2 mb-4 font-mono text-[11px] text-muted-text">
+                  {glyph.ready ? (
+                    'Glyph Wallet is ready. Each action opens the app for you to approve.'
+                  ) : glyph.error ? (
+                    <>
+                      {glyph.error}{' '}
+                      <button
+                        onClick={() => void prewarmGlyphSession()}
+                        className="font-bold text-cyan-600 hover:underline dark:text-cyan-300"
+                      >
+                        Try again
+                      </button>
+                    </>
+                  ) : (
+                    'Preparing a secure Glyph session…'
+                  )}
+                </p>
+              ) : null}
               <div className="space-y-5">
                 <div>
                   <label className="text-[11px] text-muted-text font-mono uppercase tracking-wider">
@@ -499,7 +549,7 @@ export function StakingPageContent() {
                     />
                     <button
                       disabled={
-                        busy ||
+                        actionsLocked ||
                         !isLive ||
                         !stakeAmount ||
                         // Mirrors PRE_ACQUIRE_SHARES: the 10M minimum applies to the
@@ -557,7 +607,7 @@ export function StakingPageContent() {
                       className="flex-1 rounded-lg border border-border bg-surface/50 px-3 py-2 text-sm text-surface-foreground font-mono outline-none focus:border-amber-400/50"
                     />
                     <button
-                      disabled={busy || !isLive || !unstakeAmount || !staking || staking.staked === 0}
+                      disabled={actionsLocked || !isLive || !unstakeAmount || !staking || staking.staked === 0}
                       onClick={() =>
                         submit('Request Unstake', (sourceId, targetTick) =>
                           buildRequestUnstakeTx({ sourceId, amount: Number(unstakeAmount), tick: targetTick })
@@ -572,7 +622,7 @@ export function StakingPageContent() {
 
                 <div className="flex gap-3">
                   <button
-                    disabled={busy || !isLive || !canFinalize}
+                    disabled={actionsLocked || !isLive || !canFinalize}
                     onClick={() => submit('Finalize Unstake', (sourceId, targetTick) => buildFinalizeUnstakeTx({ sourceId, tick: targetTick }))}
                     className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border border-green-400/40 bg-green-400/10 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-green-300 hover:bg-green-400/20 disabled:opacity-40 font-mono"
                   >
@@ -580,7 +630,7 @@ export function StakingPageContent() {
                     Finalize Unstake
                   </button>
                   <button
-                    disabled={busy || !isLive || !staking || staking.pendingBonus === 0}
+                    disabled={actionsLocked || !isLive || !staking || staking.pendingBonus === 0}
                     onClick={() => submit('Claim Bonus', (sourceId, targetTick) => buildClaimBonusTx({ sourceId, tick: targetTick }))}
                     className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border border-purple-400/40 bg-purple-400/10 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-purple-300 hover:bg-purple-400/20 disabled:opacity-40 font-mono"
                   >

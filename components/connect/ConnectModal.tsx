@@ -2,12 +2,14 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { AlertTriangle, Check, Copy, FileKey2, KeyRound, Loader2, QrCode, X } from 'lucide-react';
+import { AlertTriangle, Check, Copy, FileKey2, KeyRound, Loader2, Monitor, QrCode, X } from 'lucide-react';
 import { useQubicConnect } from './QubicConnectContext';
 import { useWalletConnect } from './WalletConnectContext';
+import { connectGlyph, glyphUnavailableReason, prewarmGlyphSession } from '@/lib/glyph/client';
+import { useGlyphState } from '@/lib/glyph/use-glyph-state';
 import { cn } from '@/lib/utils';
 
-type Mode = 'none' | 'walletconnect' | 'private-seed' | 'vault-file' | 'account-select';
+type Mode = 'none' | 'walletconnect' | 'glyph' | 'private-seed' | 'vault-file' | 'account-select';
 
 type Account = { publicId: string; alias?: string };
 
@@ -55,6 +57,12 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
 
   const [qrCode, setQrCode] = useState('');
   const [connectionUri, setConnectionUri] = useState('');
+  const glyph = useGlyphState();
+  const [glyphBlocked, setGlyphBlocked] = useState<string | null>(null);
+  const [glyphWaiting, setGlyphWaiting] = useState(false);
+  const [glyphError, setGlyphError] = useState('');
+  // Bumped to ignore a late Glyph reply after the user cancelled or closed the modal.
+  const glyphAttempt = useRef(0);
   const [wcError, setWcError] = useState('');
   const [copied, setCopied] = useState(false);
   const [wcSlow, setWcSlow] = useState(false);
@@ -67,7 +75,14 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
   const [accountSource, setAccountSource] = useState<'walletconnect' | 'vault' | null>(null);
 
   useEffect(() => {
+    if (open) setGlyphBlocked(glyphUnavailableReason());
+  }, [open]);
+
+  useEffect(() => {
     if (!open) {
+      glyphAttempt.current += 1;
+      setGlyphWaiting(false);
+      setGlyphError('');
       setMode('none');
       setSelectedFile(null);
       setPassword('');
@@ -145,6 +160,24 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
     await generateUri();
   };
 
+  // Must stay a direct, synchronous click handler: the wallet launch happens inside connectGlyph().
+  const handleGlyphConnect = () => {
+    setGlyphError('');
+    const attempt = ++glyphAttempt.current;
+    setGlyphWaiting(true);
+    connectGlyph()
+      .then(({ identity }) => {
+        if (attempt !== glyphAttempt.current) return;
+        connect({ connectType: 'glyph', publicKey: identity, alias: 'Glyph Wallet' });
+        onClose();
+      })
+      .catch((err: unknown) => {
+        if (attempt !== glyphAttempt.current) return;
+        setGlyphWaiting(false);
+        setGlyphError(err instanceof Error ? err.message : 'Glyph connection failed.');
+      });
+  };
+
   const handleCopy = async () => {
     if (!connectionUri) return;
     if (await copyText(connectionUri)) {
@@ -206,6 +239,23 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
               <div className="text-left">
                 <p className="font-bold">WalletConnect</p>
                 <p className="text-[11px] text-muted-text">Approve from the Qubic Wallet mobile app</p>
+              </div>
+            </button>
+
+            <button
+              disabled={glyphBlocked != null}
+              onClick={() => {
+                setMode('glyph');
+                void prewarmGlyphSession();
+              }}
+              className="flex items-center gap-3 rounded-xl border border-emerald-400/30 bg-emerald-400/5 px-4 py-3 text-sm text-surface-foreground hover:border-emerald-400/60 hover:bg-emerald-400/10 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Monitor className="h-5 w-5 text-emerald-500 dark:text-emerald-400 shrink-0" />
+              <div className="text-left">
+                <p className="font-bold">Glyph Wallet</p>
+                <p className="text-[11px] text-muted-text">
+                  {glyphBlocked ?? 'Desktop app · approve and send from the wallet'}
+                </p>
               </div>
             </button>
 
@@ -340,6 +390,67 @@ export function ConnectModal({ open, onClose }: { open: boolean; onClose: () => 
               </div>
             ) : null}
             <button onClick={() => setMode('none')} className="text-xs text-muted-text hover:text-surface-foreground">
+              Cancel
+            </button>
+          </div>
+        )}
+
+        {mode === 'glyph' && (
+          <div className="flex flex-col gap-4">
+            <p className="text-sm text-muted-text text-center">
+              Glyph Wallet is a desktop app. It signs and sends your transactions from the app once you approve them.
+            </p>
+            {glyphWaiting ? (
+              <div className="rounded-xl border border-emerald-400/25 bg-emerald-400/5 p-4">
+                <div className="flex items-center gap-2 text-sm font-bold text-emerald-600 dark:text-emerald-300">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Waiting for approval in Glyph Wallet
+                </div>
+                <p className="mt-2 text-xs text-muted-text leading-snug">
+                  Open the app, review the connection request and approve it. This page continues on its own.
+                </p>
+              </div>
+            ) : glyph.ready ? (
+              <button
+                onClick={handleGlyphConnect}
+                className="w-full rounded-xl border border-emerald-400/40 bg-emerald-400/10 px-4 py-2.5 text-sm font-bold text-emerald-600 hover:bg-emerald-400/20 transition-colors dark:text-emerald-300"
+              >
+                Open Glyph Wallet
+              </button>
+            ) : glyph.error ? (
+              <div className="rounded-lg border border-red-400/30 bg-red-400/5 p-3">
+                <p className="text-xs text-red-300 leading-snug">{glyph.error}</p>
+                <button
+                  onClick={() => void prewarmGlyphSession()}
+                  className="mt-2 text-xs font-bold text-cyan-600 hover:underline dark:text-cyan-300"
+                >
+                  Try again
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center gap-2 rounded-xl border border-border py-3 text-sm text-muted-text">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Preparing a secure session…
+              </div>
+            )}
+            {glyphError ? <p className="text-xs text-red-400">{glyphError}</p> : null}
+            <a
+              href="https://glyphq.org/download"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-center text-xs text-muted-text hover:text-surface-foreground underline"
+            >
+              Don&apos;t have it? Get Glyph Wallet
+            </a>
+            <button
+              onClick={() => {
+                glyphAttempt.current += 1;
+                setGlyphWaiting(false);
+                setGlyphError('');
+                setMode('none');
+              }}
+              className="text-xs text-muted-text hover:text-surface-foreground"
+            >
               Cancel
             </button>
           </div>
