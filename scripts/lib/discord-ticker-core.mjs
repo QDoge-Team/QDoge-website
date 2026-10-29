@@ -112,6 +112,90 @@ export const TICKERS = [
   },
 ];
 
+/** Readable message for a failed fetch: Node's "fetch failed" hides the real cause (ECONNRESET, ENOTFOUND, ...). */
+export function describeError(err) {
+  const cause = err?.cause?.code ?? err?.cause?.message;
+  return cause ? `${err.message} (${cause})` : (err?.message ?? String(err));
+}
+
+const QUBIC_RPC = 'https://rpc.qubic.org';
+const QX_CONTRACT_INDEX = 1;
+const QX_ASSET_ASK_ORDERS = 2;
+const QX_ASSET_BID_ORDERS = 3;
+/** Ask/bid beyond this ratio means the book is too thin for a midpoint to mean much. */
+const WIDE_SPREAD_RATIO = 2.5;
+
+/** 60-char Qubic identity -> its 32-byte public key (the 4 checksum characters are not needed). */
+function identityToPublicKey(identity) {
+  if (!/^[A-Z]{60}$/.test(identity)) throw new Error(`Invalid identity: ${identity}`);
+  const bytes = new Uint8Array(32);
+  const view = new DataView(bytes.buffer);
+  for (let i = 0; i < 4; i++) {
+    let value = 0n;
+    for (let j = 13; j >= 0; j--) value = value * 26n + BigInt(identity.charCodeAt(i * 14 + j) - 65);
+    view.setBigUint64(i * 8, value, true);
+  }
+  return bytes;
+}
+
+function assetNameToU64(name) {
+  let value = 0n;
+  for (let i = name.length - 1; i >= 0; i--) value = (value << 8n) | BigInt(name.charCodeAt(i));
+  return value;
+}
+
+/**
+ * Best price on one side of QX's order book for an asset, or null if that
+ * side is empty. QX returns each side best-first (lowest ask / highest bid),
+ * so only the first slot is needed; unused slots are zeroed.
+ */
+async function fetchBestOrderQu(issuer, asset, functionNumber) {
+  const input = new Uint8Array(48);
+  const view = new DataView(input.buffer);
+  input.set(identityToPublicKey(issuer), 0);
+  view.setBigUint64(32, assetNameToU64(asset), true);
+  view.setBigUint64(40, 0n, true);
+
+  const res = await fetch(`${QUBIC_RPC}/live/v1/querySmartContract`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contractIndex: QX_CONTRACT_INDEX,
+      inputType: functionNumber,
+      inputSize: input.length,
+      requestData: Buffer.from(input).toString('base64'),
+    }),
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!res.ok) throw new Error(`QX order book returned ${res.status}`);
+  const { responseData } = await res.json();
+  const out = Buffer.from(responseData ?? '', 'base64');
+  if (out.length < 48) throw new Error('QX order book returned an empty response');
+  const price = Number(out.readBigInt64LE(32));
+  const shares = Number(out.readBigInt64LE(40));
+  return price > 0 && shares > 0 ? price : null;
+}
+
+/**
+ * Price from QX's own order book: the midpoint of the best bid and best ask
+ * (or whichever side exists). Returns null when nobody is quoting the asset.
+ */
+export async function fetchOrderBookPriceQu(issuer, asset, label = asset) {
+  const [ask, bid] = await Promise.all([
+    fetchBestOrderQu(issuer, asset, QX_ASSET_ASK_ORDERS),
+    fetchBestOrderQu(issuer, asset, QX_ASSET_BID_ORDERS),
+  ]);
+  if (ask == null && bid == null) return null;
+  if (ask != null && bid != null) {
+    if (ask / bid > WIDE_SPREAD_RATIO) {
+      console.warn(`[${label}] wide spread (bid ${bid.toLocaleString('en-US')}, ask ${ask.toLocaleString('en-US')}); midpoint is only a rough price`);
+    }
+    return Math.round((ask + bid) / 2);
+  }
+  return ask ?? bid;
+}
+
+/** Average trade price today from quhub; only used when the order book can't price the asset. */
 export async function fetchAveragePriceQu(issuer, asset) {
   const url = `https://api.quhub.app/service/v1/qx/issuer/${issuer}/asset/${asset}/chart/average-price`;
   const res = await fetch(url);
@@ -120,6 +204,22 @@ export async function fetchAveragePriceQu(issuer, asset) {
   const today = days.at(-1);
   if (!today) throw new Error('Price feed returned no data');
   return Math.round(today.averagePrice);
+}
+
+/** QX order book first (it is the source of truth), quhub trades only as a fallback. */
+export async function fetchPriceQu(issuer, asset, label = asset) {
+  try {
+    const price = await fetchOrderBookPriceQu(issuer, asset, label);
+    if (price != null) return price;
+    console.warn(`[${label}] no orders on the QX book, falling back to average trade price`);
+  } catch (err) {
+    console.warn(`[${label}] QX order book failed (${describeError(err)}), falling back to average trade price`);
+  }
+  try {
+    return await fetchAveragePriceQu(issuer, asset);
+  } catch (err) {
+    throw new Error(`no price: QX order book empty/unavailable and trade feed failed (${describeError(err)})`);
+  }
 }
 
 export function formatChannelName(ticker, priceQu) {
@@ -178,7 +278,7 @@ async function resolveChannelName(ticker) {
     const { value } = await fetchEpochScheduleValue(ticker.field);
     return `${ticker.emoji} ${ticker.displayLabel}: ${value.toLocaleString('en-US')}`;
   }
-  const priceQu = await fetchAveragePriceQu(ticker.issuer, ticker.asset);
+  const priceQu = await fetchPriceQu(ticker.issuer, ticker.asset, ticker.label);
   return formatChannelName(ticker, priceQu);
 }
 

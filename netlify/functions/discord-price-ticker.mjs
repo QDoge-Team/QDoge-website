@@ -16,7 +16,7 @@
 //   3. Redeploy (or trigger a deploy) so the function picks up the env vars.
 // The schedule below is UTC cron syntax; adjust if you want a different cadence.
 
-import { TICKERS, tickOne } from '../../scripts/lib/discord-ticker-core.mjs';
+import { TICKERS, describeError, tickOne } from '../../scripts/lib/discord-ticker-core.mjs';
 
 export default async () => {
   const botToken = process.env.DISCORD_BOT_TOKEN;
@@ -29,7 +29,7 @@ export default async () => {
 
   results.forEach((result, i) => {
     if (result.status === 'rejected') {
-      console.error(`[${new Date().toISOString()}] ${TICKERS[i].label} tick failed:`, result.reason?.message);
+      console.error(`[${new Date().toISOString()}] ${TICKERS[i].label} tick failed:`, describeError(result.reason));
     }
   });
 

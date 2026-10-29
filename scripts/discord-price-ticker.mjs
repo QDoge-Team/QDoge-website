@@ -7,10 +7,13 @@
 // Netlify scheduled function instead (recommended if the site is already on
 // Netlify: no server to keep alive), see netlify/functions/discord-price-ticker.mjs.
 //
-// Price source: quhub.app's public QX average-price chart, per asset. Its
-// most recent entry is a rolling average of today's trades on QX (updates as
-// trades happen), not a single last-trade tick -- a steadier number for a
-// ticker than the raw order book, and it needs no wallet/signing setup.
+// Price source: QX's own order book, read from the Qubic RPC -- the midpoint of
+// the best bid and best ask (or whichever side exists). It is the exchange's
+// live state, needs no wallet/signing, and doesn't depend on a third-party
+// price site. Only when the book has no orders for an asset does it fall back
+// to quhub.app's average trade price for today. Note that on a thin book with
+// a very wide spread the midpoint is only a rough price (a warning is logged).
+//
 // The epoch comes straight from Qubic network status (rpc.qubic.org) --
 // epochs change weekly, around Wednesday 12:00 UTC. Airdrop/fetch amounts
 // are a fixed, team-supplied table in EPOCH_SCHEDULE (not a formula, even
@@ -38,7 +41,7 @@
 //      Keep it running (pm2, a systemd service, screen/tmux, etc.) -- it's a
 //      long-lived process, not a one-shot script.
 
-import { TICKERS, tickOne } from './lib/discord-ticker-core.mjs';
+import { TICKERS, describeError, tickOne } from './lib/discord-ticker-core.mjs';
 
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
 const UPDATE_INTERVAL_MS = Number(process.env.UPDATE_INTERVAL_MS) || 10 * 60 * 1000;
@@ -60,7 +63,7 @@ async function tick() {
       });
       if (name) lastNames.set(ticker.label, name);
     } catch (err) {
-      console.error(`[${new Date().toISOString()}] ${ticker.label} tick failed:`, err.message);
+      console.error(`[${new Date().toISOString()}] ${ticker.label} tick failed:`, describeError(err));
     }
   }
 }
