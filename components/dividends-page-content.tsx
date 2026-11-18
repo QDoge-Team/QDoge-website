@@ -150,6 +150,7 @@ export function DividendsPageContent() {
         .sort((a, b) => b.weeklyYieldPct - a.weeklyYieldPct),
     []
   );
+  const qtreatRank = ranked.findIndex((p) => p.name === 'QTREAT') + 1;
   const inactive = useMemo(
     () => DIVIDEND_PROJECTS.filter((p) => p.totalDividends <= 0),
     []
@@ -305,7 +306,7 @@ export function DividendsPageContent() {
           <StatCard
             label='Annual yield'
             value={`${qtreat.annualYieldPct.toFixed(2)}%`}
-            sub={`${qtreat.weeklyYieldPct.toFixed(2)}% weekly · #1 on Qubic`}
+            sub={`${qtreat.weeklyYieldPct.toFixed(2)}% weekly · #${qtreatRank} on Qubic`}
             icon={Crown}
             gradientFrom='rgba(168, 85, 247, 0.24)'
           />
